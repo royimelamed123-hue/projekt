@@ -294,7 +294,12 @@
         }
 
         function calculateHabitStreak(habit) {
-            if (habit.type === 'weekly') return calculateWeeklyStreak(habit);
-            if (habit.type === 'monthly') return calculateMonthlyStreak(habit);
-            return calculateDailyStreak(habit);
+            // מטמון streak: מחשב פעם אחת בלבד עד לשינוי נתונים
+            if (streakCache.has(habit.id)) return streakCache.get(habit.id);
+            let result;
+            if (habit.type === 'weekly') result = calculateWeeklyStreak(habit);
+            else if (habit.type === 'monthly') result = calculateMonthlyStreak(habit);
+            else result = calculateDailyStreak(habit);
+            streakCache.set(habit.id, result);
+            return result;
         }
