@@ -66,6 +66,184 @@
         }
         // ---- סיום ייצוא לאקסל ----
 
+        // ---- יוצר את תפריט שלוש הנקודות של כרטיס ----
+        function createCardMenuHTML(habitId) {
+            return `
+                <button class="btn-card-menu" onclick="toggleCardMenu('${esc(habitId)}', event)">⋮</button>
+                <div id="cardMenu-${esc(habitId)}" class="card-menu-dropdown">
+                    <div class="card-menu-item" onclick="editHabitFromHome('${esc(habitId)}', event); closeAllCardMenus();">ערוך הרגל</div>
+                    <div class="card-menu-item" onclick="duplicateHabit('${esc(habitId)}', event); closeAllCardMenus();">שכפל הרגל</div>
+                    <div class="card-menu-item" onclick="toggleHabitArchive('${esc(habitId)}', event); closeAllCardMenus();">העבר לארכיון</div>
+                    <div class="card-menu-item danger" onclick="deleteHabit('${esc(habitId)}', event); closeAllCardMenus();">מחק הרגל</div>
+                </div>`;
+        }
+
+        // ---- יוצר את חלק ה-header של כרטיס (כותרת + ממוצע חודשי) ----
+        function createCardHeaderHTML(habit, mStats) {
+            return `
+                <div class="habit-header">
+                    <span class="habit-title" data-habit-title></span>
+                    <div style="display:flex; align-items:center; gap:4px;">
+                        <span class="btn-drag-handle" title="גרור לסידור מחדש">⠿⠿</span>
+                        <span class="habit-stats-summary">חודשי: <span style="color: ${getScoreColor(mStats.pct, habit, mStats.text)}; padding: 1px 6px; border-radius: 4px; font-weight: 700;">${esc(mStats.text)}</span></span>
+                    </div>
+                </div>`;
+        }
+
+        // ---- יוצר את אזור ההערות של כרטיס ----
+        function createCardNotesHTML(habitId) {
+            return `
+                <div class="card-notes-container" onclick="event.stopPropagation();">
+                    <textarea id="noteText-${esc(habitId)}" class="card-notes-textarea" placeholder="רשום הערה ליום זה..."></textarea>
+                    <button class="btn-card-notes-save" onclick="saveCardNote('${esc(habitId)}', event)">שמור</button>
+                </div>`;
+        }
+
+        // ---- יוצר כרטיס בסיסי (div) עם מאפיינים משותפים ----
+        function createBaseCard(habit) {
+            const card = document.createElement('div');
+            card.className = 'habit-card';
+            card.style.borderRight = `5px solid ${getThemeColor(habit.theme)}`;
+            setupCardDragAndDrop(card, habit.id);
+            card.onclick = () => openMonthView(habit.id);
+            return card;
+        }
+
+        // ---- כרטיס להרגל חודשי (monthly) ----
+        function createMonthlyHabitCard(habit, todayStatus, mStats, currentDayTextVal) {
+            const mTarget = (habit.monthlyDayTargets && habit.monthlyDayTargets[currentDayOfWeek]) || 1;
+            const isNHarmfulM = isMonthlyNHarmful(habit, actualCurrentMonthKey, currentHebrewDayIndex);
+            const isNActiveM = (todayStatus === 'N');
+
+            let wTextM = mTarget === 1 ? "בוצע" : `${mTarget}`;
+            let wStyleM = "";
+            let isWActiveM = false;
+            if (todayStatus === 'W') {
+                wTextM = "בוצע";
+                wStyleM = getStatusProgressStyle(100);
+                isWActiveM = true;
+            } else if (mTarget > 1 && typeof todayStatus === 'number') {
+                const rem = mTarget - todayStatus;
+                wTextM = rem > 0 ? `${rem}` : "בוצע";
+                const pct = Math.round((todayStatus / mTarget) * 100);
+                wStyleM = getStatusProgressStyle(pct);
+            }
+
+            const card = createBaseCard(habit);
+            card.innerHTML =
+                createCardMenuHTML(habit.id) +
+                createCardHeaderHTML(habit, mStats) +
+                `<div class="controls-row">
+                    <div class="status-buttons-group">
+                        <div class="action-toggle btn-w-skip ${isNActiveM ? 'active' : ''} ${isNHarmfulM ? 'harmful' : ''}" onclick="setStatus('${esc(habit.id)}', 'N', event)">
+                            <span>לא בוצע</span>
+                        </div>
+                        <div class="action-toggle btn-w-done ${isWActiveM ? 'active' : ''}" style="${wStyleM}" onclick="setStatus('${esc(habit.id)}', 'W', event)">
+                            <span>${esc(wTextM)}</span>
+                        </div>
+                    </div>
+                </div>` +
+                createCardNotesHTML(habit.id);
+
+            card.querySelector('[data-habit-title]').textContent = habit.title;
+            card.querySelector(`#noteText-${CSS.escape(habit.id)}`).value = currentDayTextVal;
+            return { card, mTarget, isNHarmfulM, todayStatus };
+        }
+
+        // ---- כרטיס להרגל שבועי (weekly) ----
+        function createWeeklyHabitCard(habit, todayStatus, mStats, currentDayTextVal) {
+            const firstDayDate = getFirstHebrewDayDate(mainScreenDatePointer);
+            const firstDayGregorian = firstDayDate;
+            const totalDaysInMonth = calculateDaysInBrowsingMonth(mainScreenDatePointer);
+            const wTarget = (habit.weeklyDayTargets && habit.weeklyDayTargets[currentDayOfWeek]) || 1;
+
+            let wText = wTarget === 1 ? "בוצע" : `${wTarget}`;
+            let wStyle = "";
+            let isWActive = false;
+
+            if (wTarget > 1) {
+                if (todayStatus === 'W') {
+                    wText = "בוצע"; wStyle = getStatusProgressStyle(100); isWActive = true;
+                } else if (typeof todayStatus === 'number') {
+                    const rem = wTarget - todayStatus;
+                    wText = rem > 0 ? `${rem}` : `בוצע`;
+                    wStyle = getStatusProgressStyle(Math.round((todayStatus / wTarget) * 100));
+                }
+            } else {
+                isWActive = (todayStatus === 'W');
+            }
+
+            const isNActive = (todayStatus === 'N');
+            const isNHarmful = isWeeklyNHarmful(habit, actualCurrentMonthKey, currentHebrewDayIndex, firstDayDate.getDay(), firstDayGregorian, totalDaysInMonth);
+
+            const card = createBaseCard(habit);
+            card.innerHTML =
+                createCardMenuHTML(habit.id) +
+                createCardHeaderHTML(habit, mStats) +
+                `<div class="controls-row">
+                    <div class="status-buttons-group">
+                        <div class="action-toggle btn-w-skip ${isNActive ? 'active' : ''} ${isNHarmful ? 'harmful' : ''}" onclick="setStatus('${esc(habit.id)}', 'N', event)">
+                            <span>לא בוצע</span>
+                        </div>
+                        <div class="action-toggle btn-w-done ${isWActive ? 'active' : ''}" style="${wStyle}" onclick="setStatus('${esc(habit.id)}', 'W', event)">
+                            <span>${esc(wText)}</span>
+                        </div>
+                    </div>
+                </div>` +
+                createCardNotesHTML(habit.id);
+
+            card.querySelector('[data-habit-title]').textContent = habit.title;
+            card.querySelector(`#noteText-${CSS.escape(habit.id)}`).value = currentDayTextVal;
+            return { card, wTarget, isNHarmful, todayStatus };
+        }
+
+        // ---- כרטיס להרגל יומי (x_times / regular) ----
+        function createDailyHabitCard(habit, todayStatus, target, mStats, currentDayTextVal) {
+            let vText = "בוצע";
+            let vStyle = "";
+            let isVActive = false;
+
+            if (habit.type === 'x_times' || habit.type === 'regular') {
+                if (typeof todayStatus === 'number') {
+                    const rem = target - todayStatus;
+                    vText = rem > 0 ? `${rem}` : `בוצע`;
+                    vStyle = getStatusProgressStyle(Math.round((todayStatus / target) * 100));
+                    isVActive = (todayStatus >= target);
+                } else if (todayStatus === 'V') {
+                    vText = `בוצע`;
+                    vStyle = getStatusProgressStyle(100);
+                    isVActive = true;
+                } else {
+                    vText = target === 1 ? `בוצע` : `${target}`;
+                }
+            } else {
+                isVActive = (todayStatus === 'V');
+            }
+
+            const card = createBaseCard(habit);
+            card.innerHTML =
+                createCardMenuHTML(habit.id) +
+                createCardHeaderHTML(habit, mStats) +
+                `<div class="controls-row">
+                    <div class="status-buttons-group">
+                        <div class="action-toggle btn-a ${todayStatus === 'א' ? 'active' : ''}" onclick="setStatus('${esc(habit.id)}', 'א', event)">
+                            <span>אונס</span>
+                        </div>
+                        <div class="action-toggle btn-x ${todayStatus === 'X' ? 'active' : ''}" onclick="setStatus('${esc(habit.id)}', 'X', event)">
+                            <span>פספוס</span>
+                        </div>
+                        <div class="action-toggle btn-v ${isVActive ? 'active' : ''}" style="${vStyle}" onclick="setStatus('${esc(habit.id)}', 'V', event)">
+                            <span>${esc(vText)}</span>
+                        </div>
+                    </div>
+                </div>` +
+                createCardNotesHTML(habit.id);
+
+            card.querySelector('[data-habit-title]').textContent = habit.title;
+            card.querySelector(`#noteText-${CSS.escape(habit.id)}`).value = currentDayTextVal;
+            return card;
+        }
+
         function renderHabits() {
             const grid = document.getElementById('habitsGrid');
             grid.innerHTML = "";
@@ -81,7 +259,7 @@
 
             const dragHint = document.getElementById('dragHintMessage');
             if (dragHint) dragHint.style.display = (activeHabitsList.length > 1 && !searchTerm) ? 'block' : 'none';
-            
+
             if (habits.length === 0) {
                 grid.innerHTML = `<div class="empty-state-message">לא הוגדרו הרגלים, אנא לחץ על כפתור "הוסף הרגל" כדי להתחיל.</div>`;
                 document.getElementById('statTotalHabits').innerText = 0;
@@ -90,12 +268,10 @@
                 return;
             }
 
-            // פילטר לפי סימניה פעילה
             const bookmarkFilteredList = activeBookmarkFilter
                 ? activeHabitsList.filter(h => h.theme === activeBookmarkFilter)
                 : activeHabitsList;
 
-            // פילטר לפי "לא סומן היום" — עובד בשילוב עם פילטר הסימניות
             const unsignedFilteredList = showUnsignedOnly
                 ? bookmarkFilteredList.filter(h => !isHabitSignedToday(h))
                 : bookmarkFilteredList;
@@ -137,23 +313,10 @@
                 const isVisibleInSearch = visibleHabitsList.includes(habit);
                 const currentMonthHistory = peekMonthHistory(habit, actualCurrentMonthKey);
                 const todayStatus = currentMonthHistory[currentHebrewDayIndex];
-                
                 const target = getTargetForDay(habit, currentDayOfWeek);
-
-                if (habit.type === 'weekly' || habit.type === 'monthly') {
-                    // מטופל בתוך הבלוק הייעודי
-                } else if (typeof todayStatus === 'number') {
-                    todayV += todayStatus;
-                    todayActive += target;
-                } else if(todayStatus === "V") { 
-                    todayV += target; 
-                    todayActive += target; 
-                } else if(todayStatus === "X") { 
-                    todayActive += target; 
-                }
-
                 const mStats = calculateStatsForMonth(habit, actualCurrentMonthKey);
-                if(mStats.text !== "-") {
+
+                if (mStats.text !== "-") {
                     sumMonthAverages += mStats.pct;
                     countMonthAverages++;
                 }
@@ -162,237 +325,27 @@
                 const dayNoteObj = habit.notesLog.find(n => n.dateStr === currentLetterDayOnly && n.monthKey === actualCurrentMonthKey);
                 const currentDayTextVal = dayNoteObj ? dayNoteObj.text : "";
 
-                let vText = "בוצע";
-                let vStyle = "";
-                let isVActive = false;
-
-                if (habit.type === 'x_times' || habit.type === 'regular') {
-                    if (typeof todayStatus === 'number') {
-                        const rem = target - todayStatus;
-                        vText = rem > 0 ? `${rem}` : `בוצע`;
-                        const pct = Math.round((todayStatus / target) * 100);
-                        vStyle = getStatusProgressStyle(pct);
-                        isVActive = (todayStatus >= target);
-                    } else if (todayStatus === 'V') {
-                        vText = `בוצע`;
-                        vStyle = getStatusProgressStyle(100);
-                        isVActive = true;
-                    } else {
-                        vText = target === 1 ? `בוצע` : `${target}`;
-                    }
-                } else {
-                    isVActive = (todayStatus === 'V');
-                }
-
-                const card = document.createElement('div');
-                card.className = 'habit-card';
-                card.style.borderRight = `5px solid ${getThemeColor(habit.theme)}`;
-                setupCardDragAndDrop(card, habit.id);
-                card.onclick = () => openMonthView(habit.id);
-
-                let badgeText = (habit.type === 'x_times' || habit.type === 'regular') ? `${target} ביום` : habit.type === 'weekly' ? `${getEffectiveWeeklyTargetNow(habit)}x בשבוע` : `${target} ביום`;
+                let card;
 
                 if (habit.type === 'monthly') {
-                    const mTarget = (habit.monthlyDayTargets && habit.monthlyDayTargets[currentDayOfWeek]) || 1;
-                    const isNHarmfulM = isMonthlyNHarmful(habit, actualCurrentMonthKey, currentHebrewDayIndex);
-                    const isNActiveM = (todayStatus === 'N');
-                    const monthlyPctText = calculateMonthlyPctForCurrentMonth(habit, actualCurrentMonthKey);
-
-                    let wTextM = mTarget === 1 ? "בוצע" : `${mTarget}`;
-                    let wStyleM = "";
-                    let isWActiveM = false;
-                    if (todayStatus === 'W') {
-                        wTextM = "בוצע";
-                        wStyleM = getStatusProgressStyle(100);
-                        isWActiveM = true;
-                    } else if (mTarget > 1 && typeof todayStatus === 'number') {
-                        const rem = mTarget - todayStatus;
-                        wTextM = rem > 0 ? `${rem}` : "בוצע";
-                        const pct = Math.round((todayStatus / mTarget) * 100);
-                        wStyleM = getStatusProgressStyle(pct);
-                        isWActiveM = false;
-                    }
-
-                    const badgeTextM = `${getEffectiveMonthlyTargetForMonth(habit, actualCurrentMonthKey)}x בחודש`;
-                    const mStatsM = calculateStatsForMonth(habit, actualCurrentMonthKey);
-
-                    if (typeof todayStatus === 'number') {
-                        todayV += todayStatus / mTarget;
-                        todayActive += 1;
-                    } else if (todayStatus === 'W') {
-                        todayV += 1;
-                        todayActive += 1;
-                    } else if (todayStatus === 'N' && isNHarmfulM) {
-                        todayActive += 1;
-                    }
-
-                    const card = document.createElement('div');
-                    card.className = 'habit-card';
-                    card.style.borderRight = `5px solid ${getThemeColor(habit.theme)}`;
-                    setupCardDragAndDrop(card, habit.id);
-                    card.onclick = () => openMonthView(habit.id);
-                    card.innerHTML = `
-                        <button class="btn-card-menu" onclick="toggleCardMenu('${esc(habit.id)}', event)">⋮</button>
-                        <div id="cardMenu-${esc(habit.id)}" class="card-menu-dropdown">
-                            <div class="card-menu-item" onclick="editHabitFromHome('${esc(habit.id)}', event); closeAllCardMenus();">ערוך הרגל</div>
-                            <div class="card-menu-item" onclick="duplicateHabit('${esc(habit.id)}', event); closeAllCardMenus();">שכפל הרגל</div>
-                            <div class="card-menu-item" onclick="toggleHabitArchive('${esc(habit.id)}', event); closeAllCardMenus();">העבר לארכיון</div>
-                            <div class="card-menu-item danger" onclick="deleteHabit('${esc(habit.id)}', event); closeAllCardMenus();">מחק הרגל</div>
-                        </div>
-                        <div class="habit-header">
-                            <span class="habit-title" data-habit-title></span>
-                            <div style="display:flex; align-items:center; gap:4px;">
-                                <span class="btn-drag-handle" title="גרור לסידור מחדש">⠿⠿</span>
-                                <span class="habit-stats-summary">חודשי: <span style="color: ${getScoreColor(mStatsM.pct, habit, mStatsM.text)}; padding: 1px 6px; border-radius: 4px; font-weight: 700;">${esc(mStatsM.text)}</span></span>
-                            </div>
-                        </div>
-                        <div class="controls-row">
-                            <div class="status-buttons-group">
-                                <div class="action-toggle btn-w-skip ${isNActiveM ? 'active' : ''} ${isNHarmfulM ? 'harmful' : ''}" onclick="setStatus('${esc(habit.id)}', 'N', event)">
-                                    <span>לא בוצע</span>
-                                </div>
-                                <div class="action-toggle btn-w-done ${isWActiveM ? 'active' : ''}" style="${wStyleM}" onclick="setStatus('${esc(habit.id)}', 'W', event)">
-                                    <span>${esc(wTextM)}</span>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="card-notes-container" onclick="event.stopPropagation();">
-                            <textarea id="noteText-${esc(habit.id)}" class="card-notes-textarea" placeholder="רשום הערה ליום זה..."></textarea>
-                            <button class="btn-card-notes-save" onclick="saveCardNote('${esc(habit.id)}', event)">שמור</button>
-                        </div>
-                    `;
-                    card.querySelector('[data-habit-title]').textContent = habit.title;
-                    card.querySelector(`#noteText-${CSS.escape(habit.id)}`).value = currentDayTextVal;
-                    if (isVisibleInSearch) { grid.appendChild(card); attachDragHandle(card, habit.id); }
-                    return;
+                    const { card: mCard, mTarget, isNHarmfulM } = createMonthlyHabitCard(habit, todayStatus, mStats, currentDayTextVal);
+                    card = mCard;
+                    if (typeof todayStatus === 'number') { todayV += todayStatus / mTarget; todayActive += 1; }
+                    else if (todayStatus === 'W') { todayV += 1; todayActive += 1; }
+                    else if (todayStatus === 'N' && isNHarmfulM) { todayActive += 1; }
+                } else if (habit.type === 'weekly') {
+                    const { card: wCard, wTarget, isNHarmful } = createWeeklyHabitCard(habit, todayStatus, mStats, currentDayTextVal);
+                    card = wCard;
+                    if (typeof todayStatus === 'number') { todayV += todayStatus / wTarget; todayActive += 1; }
+                    else if (todayStatus === 'W') { todayV += 1; todayActive += 1; }
+                    else if (todayStatus === 'N' && isNHarmful) { todayActive += 1; }
+                } else {
+                    card = createDailyHabitCard(habit, todayStatus, target, mStats, currentDayTextVal);
+                    if (typeof todayStatus === 'number') { todayV += todayStatus; todayActive += target; }
+                    else if (todayStatus === "V") { todayV += target; todayActive += target; }
+                    else if (todayStatus === "X") { todayActive += target; }
                 }
 
-                if (habit.type === 'weekly') {
-                    const firstDayDate = getFirstHebrewDayDate(mainScreenDatePointer);
-                    const firstDayGregorian = firstDayDate;
-                    const totalDaysInMonth = calculateDaysInBrowsingMonth(mainScreenDatePointer);
-                    const wTarget = (habit.weeklyDayTargets && habit.weeklyDayTargets[currentDayOfWeek]) || 1;
-
-                    let wText = wTarget === 1 ? "בוצע" : `${wTarget}`;
-                    let wStyle = "";
-                    let isWActive = false;
-                    let isNActive = false;
-                    let isNHarmful = false;
-
-                    if (wTarget > 1) {
-                        if (todayStatus === 'W') {
-                            wText = "בוצע";
-                            wStyle = getStatusProgressStyle(100);
-                            isWActive = true;
-                        } else if (typeof todayStatus === 'number') {
-                            const rem = wTarget - todayStatus;
-                            wText = rem > 0 ? `${rem}` : `בוצע`;
-                            const pct = Math.round((todayStatus / wTarget) * 100);
-                            wStyle = getStatusProgressStyle(pct);
-                            isWActive = false;
-                        }
-                    } else {
-                        isWActive = (todayStatus === 'W');
-                    }
-
-                    isNActive = (todayStatus === 'N');
-                    isNHarmful = isWeeklyNHarmful(habit, actualCurrentMonthKey, currentHebrewDayIndex, firstDayDate.getDay(), firstDayGregorian, totalDaysInMonth);
-
-                    const mStats = calculateStatsForMonth(habit, actualCurrentMonthKey);
-
-                    if (typeof todayStatus === 'number') {
-                        todayV += todayStatus / wTarget;
-                        todayActive += 1;
-                    } else if (todayStatus === 'W') {
-                        todayV += 1;
-                        todayActive += 1;
-                    } else if (todayStatus === 'N' && isNHarmful) {
-                        todayActive += 1;
-                    }
-
-                    const card = document.createElement('div');
-                    card.className = 'habit-card';
-                    card.style.borderRight = `5px solid ${getThemeColor(habit.theme)}`;
-                    setupCardDragAndDrop(card, habit.id);
-                    card.onclick = () => openMonthView(habit.id);
-
-                    card.innerHTML = `
-                        <button class="btn-card-menu" onclick="toggleCardMenu('${esc(habit.id)}', event)">⋮</button>
-                        <div id="cardMenu-${esc(habit.id)}" class="card-menu-dropdown">
-                            <div class="card-menu-item" onclick="editHabitFromHome('${esc(habit.id)}', event); closeAllCardMenus();">ערוך הרגל</div>
-                            <div class="card-menu-item" onclick="duplicateHabit('${esc(habit.id)}', event); closeAllCardMenus();">שכפל הרגל</div>
-                            <div class="card-menu-item" onclick="toggleHabitArchive('${esc(habit.id)}', event); closeAllCardMenus();">העבר לארכיון</div>
-                            <div class="card-menu-item danger" onclick="deleteHabit('${esc(habit.id)}', event); closeAllCardMenus();">מחק הרגל</div>
-                        </div>
-
-                        <div class="habit-header">
-                            <span class="habit-title" data-habit-title></span>
-                            <div style="display:flex; align-items:center; gap:4px;">
-                                <span class="btn-drag-handle" title="גרור לסידור מחדש">⠿⠿</span>
-                                <span class="habit-stats-summary">חודשי: <span style="color: ${getScoreColor(mStats.pct, habit, mStats.text)}; padding: 1px 6px; border-radius: 4px; font-weight: 700;">${esc(mStats.text)}</span></span>
-                            </div>
-                        </div>
-
-                        <div class="controls-row">
-                            <div class="status-buttons-group">
-                                <div class="action-toggle btn-w-skip ${isNActive ? 'active' : ''} ${isNHarmful ? 'harmful' : ''}" onclick="setStatus('${esc(habit.id)}', 'N', event)">
-                                    <span>לא בוצע</span>
-                                </div>
-                                <div class="action-toggle btn-w-done ${isWActive ? 'active' : ''}" style="${wStyle}" onclick="setStatus('${esc(habit.id)}', 'W', event)">
-                                    <span>${esc(wText)}</span>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="card-notes-container" onclick="event.stopPropagation();">
-                            <textarea id="noteText-${esc(habit.id)}" class="card-notes-textarea" placeholder="רשום הערה ליום זה..."></textarea>
-                            <button class="btn-card-notes-save" onclick="saveCardNote('${esc(habit.id)}', event)">שמור</button>
-                        </div>
-                    `;
-                    card.querySelector('[data-habit-title]').textContent = habit.title;
-                    card.querySelector(`#noteText-${CSS.escape(habit.id)}`).value = currentDayTextVal;
-                    if (isVisibleInSearch) { grid.appendChild(card); attachDragHandle(card, habit.id); }
-                    return;
-                }
-
-                card.innerHTML = `
-                    <button class="btn-card-menu" onclick="toggleCardMenu('${esc(habit.id)}', event)">⋮</button>
-                    <div id="cardMenu-${esc(habit.id)}" class="card-menu-dropdown">
-                        <div class="card-menu-item" onclick="editHabitFromHome('${esc(habit.id)}', event); closeAllCardMenus();">ערוך הרגל</div>
-                        <div class="card-menu-item" onclick="duplicateHabit('${esc(habit.id)}', event); closeAllCardMenus();">שכפל הרגל</div>
-                        <div class="card-menu-item" onclick="toggleHabitArchive('${esc(habit.id)}', event); closeAllCardMenus();">העבר לארכיון</div>
-                        <div class="card-menu-item danger" onclick="deleteHabit('${esc(habit.id)}', event); closeAllCardMenus();">מחק הרגל</div>
-                    </div>
-
-                    <div class="habit-header">
-                        <span class="habit-title" data-habit-title></span>
-                        <div style="display:flex; align-items:center; gap:4px;">
-                            <span class="btn-drag-handle" title="גרור לסידור מחדש">⠿⠿</span>
-                            <span class="habit-stats-summary">חודשי: <span style="color: ${getScoreColor(mStats.pct, habit, mStats.text)}; padding: 1px 6px; border-radius: 4px; font-weight: 700;">${esc(mStats.text)}</span></span>
-                        </div>
-                    </div>
-
-                    <div class="controls-row">
-                        <div class="status-buttons-group">
-                            <div class="action-toggle btn-a ${todayStatus === 'א' ? 'active' : ''}" onclick="setStatus('${esc(habit.id)}', 'א', event)">
-                                <span>אונס</span>
-                            </div>
-                            <div class="action-toggle btn-x ${todayStatus === 'X' ? 'active' : ''}" onclick="setStatus('${esc(habit.id)}', 'X', event)">
-                                <span>פספוס</span>
-                            </div>
-                            <div class="action-toggle btn-v ${isVActive ? 'active' : ''}" style="${vStyle}" onclick="setStatus('${esc(habit.id)}', 'V', event)">
-                                <span>${esc(vText)}</span>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="card-notes-container" onclick="event.stopPropagation();">
-                        <textarea id="noteText-${esc(habit.id)}" class="card-notes-textarea" placeholder="רשום הערה ליום זה..."></textarea>
-                        <button class="btn-card-notes-save" onclick="saveCardNote('${esc(habit.id)}', event)">שמור</button>
-                    </div>
-                `;
-                card.querySelector('[data-habit-title]').textContent = habit.title;
-                card.querySelector(`#noteText-${CSS.escape(habit.id)}`).value = currentDayTextVal;
                 if (isVisibleInSearch) { grid.appendChild(card); attachDragHandle(card, habit.id); }
             });
 
