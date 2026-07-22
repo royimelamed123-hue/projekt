@@ -1,0 +1,215 @@
+        /* ---- מצב כהה: מודל הגדרת הרגל ---- */
+
+        /* כפתורי סוג הרגל (יומי/שבועי/חודשי) */
+        body.dark-mode #habitConfigModal .type-radio-btn {
+            background: #1e293b !important;
+            border-color: #475569 !important;
+            color: #cbd5e1 !important;
+        }
+        body.dark-mode #habitConfigModal .type-radio-btn.active {
+            background: #1e3a5f !important;
+            border-color: #3b82f6 !important;
+            color: #93c5fd !important;
+        }
+
+        /* כפתורי ימי עבודה */
+        body.dark-mode #habitConfigModal .weekday-checkbox-btn {
+            background: #1e293b !important;
+            border-color: #475569 !important;
+            color: #cbd5e1 !important;
+        }
+        body.dark-mode #habitConfigModal .weekday-checkbox-btn.active {
+            background: #14532d !important;
+            border-color: #22c55e !important;
+            color: #86efac !important;
+        }
+
+        /* סקשן הגדרות יעד (targets-config-section) */
+        body.dark-mode #habitConfigModal .targets-config-section {
+            background: #0f172a !important;
+            border-color: #334155 !important;
+        }
+
+        /* סקציות uniform — inline background */
+        body.dark-mode #habitConfigModal #xTimesUniformSection,
+        body.dark-mode #habitConfigModal #monthlyUniformSection,
+        body.dark-mode #habitConfigModal #weeklyUniformSection {
+            background: #1e293b !important;
+            border-color: #334155 !important;
+        }
+        body.dark-mode #habitConfigModal #xTimesUniformSection label,
+        body.dark-mode #habitConfigModal #monthlyUniformSection label,
+        body.dark-mode #habitConfigModal #weeklyUniformSection label {
+            color: #cbd5e1 !important;
+        }
+
+        /* כפתורי uniform/custom בתוך targets */
+        body.dark-mode #habitConfigModal .targets-config-section .type-radio-btn {
+            background: #1e293b !important;
+            border-color: #475569 !important;
+            color: #cbd5e1 !important;
+        }
+        body.dark-mode #habitConfigModal .targets-config-section .type-radio-btn.active {
+            background: #1e3a5f !important;
+            border-color: #3b82f6 !important;
+            color: #93c5fd !important;
+        }
+
+        /* שורת יעד שבועי/חודשי */
+        body.dark-mode #habitConfigModal .weekly-target-row {
+            background: #1e293b !important;
+            border-color: #334155 !important;
+        }
+        body.dark-mode #habitConfigModal .weekly-target-row label {
+            color: #cbd5e1 !important;
+        }
+
+        /* day-target-box */
+        body.dark-mode #habitConfigModal .day-target-box {
+            background: #1e293b !important;
+            border-color: #475569 !important;
+        }
+        body.dark-mode #habitConfigModal .day-target-box span {
+            color: #94a3b8 !important;
+        }
+        body.dark-mode #habitConfigModal .day-target-box input {
+            background: #0f172a !important;
+            border-color: #475569 !important;
+            color: #e2e8f0 !important;
+        }
+
+        /* סקשן ציונים — inline background #f8fafc */
+        body.dark-mode #habitConfigModal .modal-card-inner > div[style*="background: #f8fafc"],
+        body.dark-mode #habitConfigModal .modal-card-inner > div[style*="background:#f8fafc"] {
+            background: #0f172a !important;
+            border-color: #334155 !important;
+            color: #cbd5e1 !important;
+        }
+
+        /* כל הטקסטים הכהים בתוך סקשן הציונים */
+        body.dark-mode #habitConfigModal .modal-card-inner > div[style*="background: #f8fafc"] *,
+        body.dark-mode #habitConfigModal .modal-card-inner > div[style*="background:#f8fafc"] * {
+            color: #cbd5e1;
+        }
+        /* אבל צבעים בעלי משמעות (ירוק/אדום/כתום) לא נדרסים */
+        body.dark-mode #habitConfigModal .modal-card-inner > div[style*="background: #f8fafc"] span[style*="color:#22a84a"],
+        body.dark-mode #habitConfigModal .modal-card-inner > div[style*="background:#f8fafc"] span[style*="color:#22a84a"] {
+            color: #4ade80 !important;
+        }
+        body.dark-mode #habitConfigModal .modal-card-inner > div[style*="background: #f8fafc"] span[style*="color:#e74c3c"],
+        body.dark-mode #habitConfigModal .modal-card-inner > div[style*="background:#f8fafc"] span[style*="color:#e74c3c"] {
+            color: #f87171 !important;
+        }
+        body.dark-mode #habitConfigModal .modal-card-inner > div[style*="background: #f8fafc"] span[style*="color:#d97706"],
+        body.dark-mode #habitConfigModal .modal-card-inner > div[style*="background:#f8fafc"] span[style*="color:#d97706"] {
+            color: #fbbf24 !important;
+        }
+
+        /* שדות קלט בסקשן ציונים */
+        body.dark-mode #habitConfigModal #passingScoreInput,
+        body.dark-mode #habitConfigModal #minScoreInput {
+            background: #0f172a !important;
+            border-color: #475569 !important;
+            color: #e2e8f0 !important;
+        }
+
+        /* label של ציון קניין / הגזמה */
+        body.dark-mode #habitConfigModal label[style*="color: #475569"],
+        body.dark-mode #habitConfigModal label[style*="color:#475569"] {
+            color: #94a3b8 !important;
+        }
+
+        /* כפתורי "שמור להרגלים הבאים" / "עדכן הרגלים קיימים"
+           הרקע/צבע מנוהל ישירות ע"י _renderScoreToggleBtn ב-JS (inline style) —
+           כאן רק מגדירים font-family כדי שהגופן ייראה תקין */
+        body.dark-mode #habitConfigModal #btnScoreDefaultToggle,
+        body.dark-mode #habitConfigModal #btnScoreApplyAllToggle {
+            font-family: inherit;
+        }
+
+        /* שם סימניות (ללא שם) */
+        body.dark-mode #habitConfigModal #habitColorSwatches span {
+            color: #94a3b8 !important;
+        }
+
+        /* modal-section-title */
+        body.dark-mode #habitConfigModal .modal-section-title {
+            color: #94a3b8 !important;
+        }
+
+        /* שדות טקסט ראשיים */
+        body.dark-mode #habitConfigModal .modal-text-input {
+            background: #0f172a !important;
+            border-color: #475569 !important;
+            color: #e2e8f0 !important;
+        }
+        body.dark-mode #habitConfigModal .modal-text-input::placeholder {
+            color: #475569 !important;
+        }
+
+        /* modal-actions */
+        body.dark-mode #habitConfigModal .modal-actions {
+            background: #1e293b !important;
+            border-top-color: #334155 !important;
+        }
+
+        /* טקסט הסבר קטן בתוך sections */
+        body.dark-mode #habitConfigModal div[style*="font-size: 10px"],
+        body.dark-mode #habitConfigModal div[style*="font-size:10px"] {
+            color: #64748b !important;
+        }
+        body.dark-mode #habitConfigModal div[style*="font-size: 10px"] b,
+        body.dark-mode #habitConfigModal div[style*="font-size:10px"] b {
+            color: #94a3b8 !important;
+        }
+
+        /* כפתורי ציון ברירת מחדל — תאימות לאחור (ה-JS מטפל בהם ישירות) */
+
+        /* ---- מצב כהה: מודל הוספת הערה ---- */
+        body.dark-mode #addNoteModal .modal-card {
+            background: #1e293b !important;
+            border-color: #334155 !important;
+        }
+        body.dark-mode #addNoteModal .modal-card h4 {
+            color: #e2e8f0 !important;
+        }
+        body.dark-mode #addNoteModal .modal-section-title {
+            color: #94a3b8 !important;
+        }
+        body.dark-mode #addNoteModal .modal-days-grid {
+            background: #0f172a !important;
+            border-color: #334155 !important;
+        }
+        body.dark-mode #addNoteModal .modal-day-btn {
+            background: #1e293b !important;
+            border-color: #475569 !important;
+            color: #e2e8f0 !important;
+        }
+        body.dark-mode #addNoteModal .modal-day-btn.selected {
+            outline-color: #3b82f6 !important;
+        }
+        body.dark-mode #addNoteModal .modal-textarea {
+            background: #0f172a !important;
+            border-color: #475569 !important;
+            color: #e2e8f0 !important;
+        }
+        body.dark-mode #addNoteModal .modal-textarea::placeholder {
+            color: #475569 !important;
+        }
+
+        /* ---- מצב כהה: modal overlay כללי ---- */
+        body.dark-mode .modal-overlay .modal-card {
+            background: #1e293b;
+            color: #e2e8f0;
+        }
+        body.dark-mode .modal-overlay .modal-card h4 {
+            color: #e2e8f0;
+        }
+        body.dark-mode .btn-modal-cancel {
+            background: #1e293b;
+            color: #cbd5e1;
+            border-color: #475569;
+        }
+        body.dark-mode .btn-modal-cancel:hover {
+            background: #334155;
+        }

@@ -1,0 +1,27 @@
+{
+  "schemaVersion": 1,
+  "sdkVersion": "1.x",
+  "id": "il.otzaria.habit-tracker",
+  "name": "קניין הרגלים",
+  "version": "1.0.0",
+  "description": "תוסף למעקב הרגלים עבור קניין הרגלים",
+  "author": "הלומד",
+  "type": "webapp",
+  "category": "Utilities",
+  "stability": "stable",
+  "minAppVersion": "0.9.91",
+  "entrypoint": "index.html",
+  "permissions": [
+    "plugin.storage.read",
+    "plugin.storage.write",
+    "ui.feedback",
+    "notifications.system",
+    "events.subscribe:theme.changed"
+  ],
+  "contributes": {
+    "toolTab": {
+      "title": "קניין הרגלים",
+      "iconName": "arrow_trending_24_regular"
+    }
+  }
+}

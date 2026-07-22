@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <title>קניין הרגלים אוצריא</title>
+    <link rel="stylesheet" href="css/main.css">
+    <link rel="stylesheet" href="css/modal.css">
+    <link rel="stylesheet" href="css/modal-dark.css">
+</head>
+<body>
+
+    <button id="undoFloatingBtn" onclick="undoLastAction()" style="display:none; position:fixed; bottom:20px; left:20px; z-index:2000; background:#0f172a; color:#fff; border:none; border-radius:24px; padding:10px 18px; font-size:13px; font-weight:600; box-shadow:0 4px 12px rgba(0,0,0,0.25); cursor:pointer; align-items:center; gap:6px; direction:rtl;">
+        <span>↩ בטל פעולה אחרונה</span>
+    </button>
+
+    <div id="mainAppScreen" class="app-container">
+        <header>
+            <h1>קניין הרגלים</h1>
+            <div class="day-navigation-container">
+                <button class="btn-day-nav" onclick="adjustMainScreenDay(-1)" title="יום קודם">→</button>
+                <div id="hebrewDateBadge" class="date-badge">טוען תאריך...</div>
+                <button class="btn-day-nav" onclick="adjustMainScreenDay(1)" title="יום הבא">←</button>
+                <button id="btnMainJumpToday" class="btn-jump-today-main" onclick="resetMainScreenToToday()">חזרה להיום</button>
+                <label class="theme-toggle-switch" title="החלף מצב כהה/בהיר">
+                    <input type="checkbox" id="btnDarkModeToggle" onchange="toggleDarkMode()">
+                    <span class="theme-toggle-track">
+                        <span class="theme-toggle-icon theme-toggle-icon-sun">
+                            <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+                                <circle cx="12" cy="12" r="4"></circle>
+                                <line x1="12" y1="2" x2="12" y2="4"></line>
+                                <line x1="12" y1="20" x2="12" y2="22"></line>
+                                <line x1="4.2" y1="4.2" x2="5.6" y2="5.6"></line>
+                                <line x1="18.4" y1="18.4" x2="19.8" y2="19.8"></line>
+                                <line x1="2" y1="12" x2="4" y2="12"></line>
+                                <line x1="20" y1="12" x2="22" y2="12"></line>
+                                <line x1="4.2" y1="19.8" x2="5.6" y2="18.4"></line>
+                                <line x1="18.4" y1="5.6" x2="19.8" y2="4.2"></line>
+                            </svg>
+                        </span>
+                        <span class="theme-toggle-icon theme-toggle-icon-moon">
+                            <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                            </svg>
+                        </span>
+                        <span class="theme-toggle-knob"></span>
+                    </span>
+                </label>
+            </div>
+        </header>
+
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="label">הרגלים במעקב</div>
+                <div id="statTotalHabits" class="value">0</div>
+            </div>
+            <div class="stat-card">
+                <div class="label">ציון כולל לחודש זה</div>
+                <div id="statAvgSuccess" class="value">-</div>
+            </div>
+            <div class="stat-card">
+                <div class="label">ציון יומי</div>
+                <div id="statTodaySuccess" class="value">-</div>
+            </div>
+        </div>
+
+        <div class="action-bar" style="gap: 8px;">
+            <button class="btn-primary" onclick="openHabitConfigModal(false)">הוסף הרגל</button>
+            <button class="btn-edit-habit-trigger" onclick="openBackupModal()" title="ייבוא, ייצוא וגיבוי אוטומטי">ייבוא / ייצוא</button>
+            <button class="btn-edit-habit-trigger" onclick="toggleArchiveView()" id="btnShowArchive">ארכיון</button>
+        </div>
+
+        <div style="margin-bottom: 14px;">
+            <input type="text" id="habitSearchInput" placeholder="🔎 חיפוש הרגל..." oninput="renderHabits()" style="width: 100%; box-sizing: border-box; padding: 8px 14px; border: 1px solid var(--divider-color, #cbd5e1); border-radius: 10px; font-size: 14px; background: var(--input-background-color, #ffffff); color: var(--text-color, #1e293b);">
+        </div>
+
+        <div id="dragHintMessage" style="display:none; text-align: center; font-size: 12px; color: #94a3b8; margin-bottom: 12px;">💡 ניתן לשנות את סדר ההרגלים על ידי גרירת הידית <span style="letter-spacing: -2px;">⠿⠿</span></div>
+
+        <div style="text-align: center; margin-bottom: 14px;">
+            <button class="btn-edit-habit-trigger" onclick="openComparisonModal()" style="font-size: 14px; padding: 8px 18px;">
+                השווה הרגלים
+            </button>
+        </div>
+
+        <div id="habitsGrid" class="habits-grid"></div>
+        <div id="archiveSection" style="margin-top: 20px; display: none;"></div>
+    </div>
+
+        <div id="monthViewScreen" class="month-view-container">
+        <div class="month-view-header">
+            <div class="month-header-top">
+                <div class="month-title-area">
+                    <div style="display: flex; align-items: center; gap: 8px;">
+                        <span style="font-size: 20px; font-weight: 700; color: var(--text-color, #0f172a); white-space: nowrap;">מציג הרגל:</span>
+                        <select id="habitSelectDropdown" class="month-select-dropdown" style="font-size: 20px; font-weight: 700; min-width: 200px;" onchange="onHabitSelectChange()"></select>
+                        <button class="btn-edit-habit-trigger" onclick="openHabitConfigModal(true)">ערוך הרגל זה</button>
+                    </div>
+                    
+                    <div class="navigation-wrapper">
+                        <div class="day-navigation-container" style="margin-bottom: 0;">
+                            <button class="btn-day-nav" onclick="adjustBrowsingMonth(-1)" title="חודש קודם">→</button>
+                            <div id="monthDisplayBadge" class="date-badge">טוען חודש...</div>
+                            <button class="btn-day-nav" onclick="adjustBrowsingMonth(1)" title="חודש הבא">←</button>
+                        </div>
+                        <button id="btnMonthJumpToday" class="btn-jump-today" onclick="jumpToCurrentMonth()">חזרה לחודש הנוכחי</button>
+                    </div>
+
+                    <div style="display: flex; gap: 5px; align-items: center; flex-wrap: nowrap;">
+                        <button class="btn-month-action-archive" onclick="archiveCurrentHabitFromMonthView()">העבר לארכיון</button>
+                        <button class="btn-reset-action" onclick="resetCurrentMonthData()">אפס חודש</button>
+                        <button class="btn-reset-action" onclick="resetTotalHabitData()">אפס הרגל</button>
+                        <button class="btn-reset-action" onclick="deleteCurrentHabitFromMonthView()">מחק הרגל</button>
+                        <button class="btn-back" onclick="closeMonthView()">חזור ←</button>
+                    </div>
+                </div>
+            </div>
+            <div id="habitViewDescriptionContainer"></div>
+        </div>
+
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="label">ציון לחודש זה</div>
+                <div id="browsingMonthAvg" class="value">-</div>
+            </div>
+            <div class="stat-card">
+                <div class="label">ציון כולל להרגל</div>
+                <div id="habitTotalAvg" class="value">-</div>
+            </div>
+        </div>
+
+        <div class="month-content-layout">
+            <div class="calendar-section">
+                <div style="display: flex; gap: 8px; margin-bottom: 12px; flex-wrap: wrap;">
+                    <div id="tabCalendar" class="type-radio-btn active" onclick="switchMonthTab('calendar')" style="font-size: 13px; padding: 6px 14px;">לוח חודשי</div>
+                    <div id="tabGraph" class="type-radio-btn" onclick="switchMonthTab('graph')" style="font-size: 13px; padding: 6px 14px;">גרף</div>
+                    <div id="tabComparison" class="type-radio-btn" onclick="switchMonthTab('comparison')" style="font-size: 13px; padding: 6px 14px;">השוואה</div>
+                </div>
+
+                <div id="calendarView">
+                    <div class="calendar-wrapper">
+                        <div class="calendar-week-header">א</div>
+                        <div class="calendar-week-header">ב</div>
+                        <div class="calendar-week-header">ג</div>
+                        <div class="calendar-week-header">ד</div>
+                        <div class="calendar-week-header">ה</div>
+                        <div class="calendar-week-header">ו</div>
+                        <div class="calendar-week-header">ש</div>
+                    </div>
+                    <div id="fullMonthGrid" class="calendar-wrapper" style="margin-top: 8px;"></div>
+                </div>
+
+                <div id="graphView" style="display: none; padding: 8px 0;">
+                    <canvas id="monthGraphCanvas" style="width: 100%; height: 280px;"></canvas>
+                </div>
+
+                <div id="comparisonView" style="display: none; padding: 4px 0;">
+                    <div id="comparisonList" style="display: flex; flex-direction: column; gap: 8px;"></div>
+                </div>
+            </div>
+            
+            <div class="notes-space-card" id="monthNotesContainer">
+                <div class="notes-header-row">
+                    <h3>הערות שנרשמו</h3>
+                    <button class="btn-add-note-trigger" onclick="openAddNoteModal()">הוסף הערה +</button>
+                </div>
+                <div id="notesList"></div>
+            </div>
+        </div>
+    </div>
+
+    <div id="addNoteModal" class="modal-overlay">
+        <div class="modal-card">
+            <h4 id="modalHabitTitle">הוספת הערה חדשה</h4>
+            <div>
+                <div class="modal-section-title">1. בחר יום בחודש:</div>
+                <div id="modalDaysGrid" class="modal-days-grid"></div>
+            </div>
+            <div>
+                <div class="modal-section-title">2. תוכן ההערה:</div>
+                <textarea id="modalNoteText" class="modal-textarea" placeholder="הקלד את ההערה כאן..."></textarea>
+            </div>
+            <div class="modal-actions">
+                <button class="btn-modal-cancel" onclick="closeAddNoteModal()">ביטול</button>
+                <button class="btn-modal-save" onclick="saveModalNote()">שמור</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="comparisonModal" class="modal-overlay" style="display: none;">
+        <div class="modal-card" style="max-width: 900px; max-height: 90vh; overflow-y: auto;">
+            <div id="comparisonModalContent"></div>
+        </div>
+    </div>
+
+    <div id="habitConfigModal" class="modal-overlay">
+        <div class="modal-card">
+        <div class="modal-card-inner">
+            <div>
+                <div class="modal-section-title">שם ההרגל:</div>
+                <input type="text" id="configHabitTitle" class="modal-text-input" placeholder=" ">
+            </div>
+
+            <div>
+                <div class="modal-section-title">הערה / תיאור:</div>
+                <input type="text" id="configHabitDesc" class="modal-text-input" placeholder=" ">
+            </div>
+
+            <div>
+                <div class="modal-section-title">סימניה (לחץ על השם כדי לשנות):</div>
+                <div id="habitColorSwatches" style="display: flex; gap: 8px; flex-wrap: wrap;"></div>
+            </div>
+
+            <div>
+                <div class="modal-section-title">סוג ההרגל:</div>
+                <div class="type-selector-group">
+                    <div id="typeBtnXTimes" class="type-radio-btn active" onclick="setConfigHabitType('x_times')">יומי</div>
+                    <div id="typeBtnWeekly" class="type-radio-btn" onclick="setConfigHabitType('weekly')">שבועי</div>
+                    <div id="typeBtnMonthly" class="type-radio-btn" onclick="setConfigHabitType('monthly')">חודשי</div>
+                </div>
+            </div>
+
+            <div>
+                <div class="modal-section-title">בחר ימי עבודה:</div>
+                <div class="weekdays-selection-container">
+                    <div id="weekday-0" class="weekday-checkbox-btn active" onclick="toggleConfigWeekday(0)">ראשון</div>
+                    <div id="weekday-1" class="weekday-checkbox-btn active" onclick="toggleConfigWeekday(1)">שני</div>
+                    <div id="weekday-2" class="weekday-checkbox-btn active" onclick="toggleConfigWeekday(2)">שלישי</div>
+                    <div id="weekday-3" class="weekday-checkbox-btn active" onclick="toggleConfigWeekday(3)">רביעי</div>
+                    <div id="weekday-4" class="weekday-checkbox-btn active" onclick="toggleConfigWeekday(4)">חמישי</div>
+                    <div id="weekday-5" class="weekday-checkbox-btn active" onclick="toggleConfigWeekday(5)">שישי</div>
+                    <div id="weekday-6" class="weekday-checkbox-btn active" onclick="toggleConfigWeekday(6)">שבת</div>
+                </div>
+            </div>
+
+            <div id="xTimesConfigSection" class="targets-config-section">
+                <div style="display: flex; gap: 10px; margin-bottom: 10px;">
+                    <div id="xTimesModeUniform" class="type-radio-btn active" onclick="setXTimesMode('uniform')">כל הימים אותה כמות</div>
+                    <div id="xTimesModeCustom" class="type-radio-btn" onclick="setXTimesMode('custom')">שונה מיום ליום</div>
+                </div>
+                <div id="xTimesUniformSection" style="display: flex; align-items: center; gap: 10px; padding: 10px 12px; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px;">
+                    <label style="font-size: 13px; font-weight: 600; color: #475569; white-space: nowrap;">כמות פעמים ביום:</label>
+                    <input type="number" id="uniformTargetInput" min="1" value="1" style="width: 60px; text-align: center; border: 1px solid #cbd5e1; border-radius: 6px; padding: 4px 6px; font-size: 14px; font-weight: 600;">
+                </div>
+                <div id="xTimesCustomSection" style="display: none;">
+                    <div class="modal-section-title" style="margin-bottom: 4px;">כמות פעמים לכל יום:</div>
+                    <div class="days-targets-inputs-grid">
+                        <div class="day-target-box" id="targetBox-0"><span>א'</span><input type="number" id="targetDay-0" min="1" value="1"></div>
+                        <div class="day-target-box" id="targetBox-1"><span>ב'</span><input type="number" id="targetDay-1" min="1" value="1"></div>
+                        <div class="day-target-box" id="targetBox-2"><span>ג'</span><input type="number" id="targetDay-2" min="1" value="1"></div>
+                        <div class="day-target-box" id="targetBox-3"><span>ד'</span><input type="number" id="targetDay-3" min="1" value="1"></div>
+                        <div class="day-target-box" id="targetBox-4"><span>ה'</span><input type="number" id="targetDay-4" min="1" value="1"></div>
+                        <div class="day-target-box" id="targetBox-5"><span>ו'</span><input type="number" id="targetDay-5" min="1" value="1"></div>
+                        <div class="day-target-box" id="targetBox-6"><span>ש'</span><input type="number" id="targetDay-6" min="1" value="1"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="monthlyConfigSection" class="targets-config-section" style="display: none;">
+                <div style="display: flex; gap: 10px; margin-bottom: 10px;">
+                    <div id="monthlyModeUniform" class="type-radio-btn active" onclick="setMonthlyMode('uniform')">כל הימים אותה כמות</div>
+                    <div id="monthlyModeCustom" class="type-radio-btn" onclick="setMonthlyMode('custom')">שונה מיום ליום</div>
+                </div>
+                <div id="monthlyUniformSection" style="display: flex; align-items: center; gap: 10px; padding: 10px 12px; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px;">
+                    <label style="font-size: 13px; font-weight: 600; color: #475569; white-space: nowrap;">כמות פעמים ביום:</label>
+                    <input type="number" id="monthlyUniformTargetInput" min="1" value="1" style="width: 60px; text-align: center; border: 1px solid #cbd5e1; border-radius: 6px; padding: 4px 6px; font-size: 14px; font-weight: 600;">
+                </div>
+                <div id="monthlyCustomSection" style="display: none;">
+                    <div class="modal-section-title" style="margin-bottom: 4px;">כמות פעמים לכל יום:</div>
+                    <div class="days-targets-inputs-grid">
+                        <div class="day-target-box" id="monthlyTargetBox-0"><span>א'</span><input type="number" id="monthlyTargetDay-0" min="1" value="1"></div>
+                        <div class="day-target-box" id="monthlyTargetBox-1"><span>ב'</span><input type="number" id="monthlyTargetDay-1" min="1" value="1"></div>
+                        <div class="day-target-box" id="monthlyTargetBox-2"><span>ג'</span><input type="number" id="monthlyTargetDay-2" min="1" value="1"></div>
+                        <div class="day-target-box" id="monthlyTargetBox-3"><span>ד'</span><input type="number" id="monthlyTargetDay-3" min="1" value="1"></div>
+                        <div class="day-target-box" id="monthlyTargetBox-4"><span>ה'</span><input type="number" id="monthlyTargetDay-4" min="1" value="1"></div>
+                        <div class="day-target-box" id="monthlyTargetBox-5"><span>ו'</span><input type="number" id="monthlyTargetDay-5" min="1" value="1"></div>
+                        <div class="day-target-box" id="monthlyTargetBox-6"><span>ש'</span><input type="number" id="monthlyTargetDay-6" min="1" value="1"></div>
+                    </div>
+                </div>
+                <div class="weekly-target-row">
+                    <label>כמות פעמים שאפשר לא לעשות בחודש:</label>
+                    <input type="number" id="monthlyFreqInput" min="0" value="0">
+                </div>
+                <div style="font-size: 10px; color: #64748b; line-height: 1.5; margin-top: 4px;">
+                    מכיוון שחודש עברי הוא 29 או 30 ימים, מגדירים כאן כמה פעמים מותר <b>לא</b> לעשות את ההרגל בחודש. היעד בפועל = מספר ימי החודש פחות כמות הדילוגים, ומתעדכן לבד לפי אורך החודש.
+                </div>
+            </div>
+
+            <div id="weeklyConfigSection" class="targets-config-section" style="display: none;">
+                <div style="display: flex; gap: 10px; margin-bottom: 10px;">
+                    <div id="weeklyModeUniform" class="type-radio-btn active" onclick="setWeeklyMode('uniform')">כל הימים אותה כמות</div>
+                    <div id="weeklyModeCustom" class="type-radio-btn" onclick="setWeeklyMode('custom')">שונה מיום ליום</div>
+                </div>
+                <div id="weeklyUniformSection" style="display: flex; align-items: center; gap: 10px; padding: 10px 12px; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px;">
+                    <label style="font-size: 13px; font-weight: 600; color: #475569; white-space: nowrap;">כמות פעמים ביום:</label>
+                    <input type="number" id="weeklyUniformTargetInput" min="1" value="1" style="width: 60px; text-align: center; border: 1px solid #cbd5e1; border-radius: 6px; padding: 4px 6px; font-size: 14px; font-weight: 600;">
+                </div>
+                <div id="weeklyCustomSection" style="display: none;">
+                    <div class="modal-section-title" style="margin-bottom: 4px;">כמות פעמים לכל יום:</div>
+                    <div class="days-targets-inputs-grid">
+                        <div class="day-target-box" id="weeklyTargetBox-0"><span>א'</span><input type="number" id="weeklyTargetDay-0" min="1" value="1"></div>
+                        <div class="day-target-box" id="weeklyTargetBox-1"><span>ב'</span><input type="number" id="weeklyTargetDay-1" min="1" value="1"></div>
+                        <div class="day-target-box" id="weeklyTargetBox-2"><span>ג'</span><input type="number" id="weeklyTargetDay-2" min="1" value="1"></div>
+                        <div class="day-target-box" id="weeklyTargetBox-3"><span>ד'</span><input type="number" id="weeklyTargetDay-3" min="1" value="1"></div>
+                        <div class="day-target-box" id="weeklyTargetBox-4"><span>ה'</span><input type="number" id="weeklyTargetDay-4" min="1" value="1"></div>
+                        <div class="day-target-box" id="weeklyTargetBox-5"><span>ו'</span><input type="number" id="weeklyTargetDay-5" min="1" value="1"></div>
+                        <div class="day-target-box" id="weeklyTargetBox-6"><span>ש'</span><input type="number" id="weeklyTargetDay-6" min="1" value="1"></div>
+                    </div>
+                </div>
+                <div class="weekly-target-row">
+                    <label>כמות פעמים שאפשר לא לעשות בשבוע:</label>
+                    <input type="number" id="weeklyFreqInput" min="0" max="7" value="0">
+                </div>
+                <div style="font-size: 10px; color: #64748b; line-height: 1.5; margin-top: 4px;">
+                    מגדירים כאן כמה פעמים מותר <b>לא</b> לעשות את ההרגל בשבוע. היעד בפועל = 7 פחות כמות הדילוגים.
+                </div>
+            </div>
+
+                        <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 6px 10px;">
+                <div style="display: flex; align-items: flex-start; gap: 10px;">
+                    <div style="flex: 1; font-size: 10px; color: #64748b; line-height: 1.6;">
+                        מכתב מאליהו מסביר שהמלחמה של כל אחד עם היצר היא כמו שתי מדינות: יש את <span style="color:#e74c3c; font-weight:600;">מדינת האויב</span> ששם אין לנו יד ורגל, <span style="color:#22a84a; font-weight:600;">המדינה שלנו</span> ששם אין לאויב יד ורגל, <span style="color:#d97706; font-weight:600;">וגבול המלחמה</span> ששם מתבצעת המלחמה.<br>
+                        יצרתי אפשרות לבדוק מה נמצא <span style="color:#22a84a; font-weight:600;">בשטח שלנו</span> (מעל קניין), מה <span style="color:#e74c3c; font-weight:600;">בשטח האויב</span> (מתחת להגזמה) ומה <span style="color:#d97706; font-weight:600;">בגבול המלחמה</span> (בין לבין).<br>
+                        תבחר את ציון <span style="color:#22a84a; font-weight:600;">השטח שלך</span> ואת ציון <span style="color:#e74c3c; font-weight:600;">שטח האויב</span> — בסוף החודש תבדוק לאן שייך הרגל זה.<br>
+                        ניתן להגדיר רק קניין — אז מעליו הציון יהיה <span style="color:#22a84a; font-weight:600;">ירוק</span> ומתחתיו <span style="color:#e74c3c; font-weight:600;">אדום</span>.<br>
+                        או רק הגזמה — אז מעליה <span style="color:#22a84a; font-weight:600;">ירוק</span> ומתחתיה <span style="color:#e74c3c; font-weight:600;">אדום</span>.
+                    </div>
+                    <div style="display:flex; flex-direction:column; gap:3px; white-space:nowrap; font-size:10px; padding-top:2px; flex-shrink:0;">
+                        <span><span style="color:#22a84a;">■</span> ירוק = השטח שלנו</span>
+                        <span><span style="color:#e74c3c;">■</span> אדום = שטח האויב</span>
+                        <span><span style="color:#d97706;">■</span> כתום = גבול המלחמה</span>
+                    </div>
+                </div>
+                <div style="display: flex; gap: 10px; margin-top: 6px;">
+                    <div style="flex: 1;">
+                        <label style="font-size: 11px; font-weight: 600; color: #475569; display: block; margin-bottom: 2px;">ציון קניין — <span style="color:#22a84a;">השטח שלנו</span> (%)</label>
+                        <input type="number" min="0" max="100" step="1" id="passingScoreInput" style="width: 100%; text-align: center; border: 1px solid #cbd5e1; border-radius: 6px; padding: 3px 6px; font-size: 13px; font-weight: 600; box-sizing: border-box;">
+                    </div>
+                    <div style="flex: 1;">
+                        <label style="font-size: 11px; font-weight: 600; color: #475569; display: block; margin-bottom: 2px;">ציון הגזמה — <span style="color:#e74c3c;">שטח האויב</span> (%)</label>
+                        <input type="number" min="0" max="100" step="1" id="minScoreInput" style="width: 100%; text-align: center; border: 1px solid #cbd5e1; border-radius: 6px; padding: 3px 6px; font-size: 13px; font-weight: 600; box-sizing: border-box;">
+                    </div>
+                </div>
+                <div style="display: flex; gap: 8px; margin-top: 7px; flex-wrap: wrap;">
+                    <button type="button" id="btnScoreDefaultToggle" onclick="toggleScoreDefaultMark()" style="flex:1; min-width:0; font-family:inherit; font-size:11px; font-weight:700; padding:5px 8px; border-radius:7px; border:1.5px solid #2563eb; background:#eff6ff; color:#1d4ed8; cursor:pointer; white-space:nowrap; transition: all 0.18s;" title="סמן כדי לשמור ציונים אלו כברירת מחדל לכל ההרגלים הבאים">שמור להרגלים הבאים</button>
+                    <button type="button" id="btnScoreApplyAllToggle" onclick="toggleScoreApplyAllMark()" style="flex:1; min-width:0; font-family:inherit; font-size:11px; font-weight:700; padding:5px 8px; border-radius:7px; border:1.5px solid #7c3aed; background:#f5f3ff; color:#6d28d9; cursor:pointer; white-space:nowrap; transition: all 0.18s;" title="סמן כדי לעדכן את כל ההרגלים הקיימים עם ציונים אלו">עדכן הרגלים קיימים</button>
+                </div>
+            </div>
+
+        </div><!-- /modal-card-inner -->
+            <div class="modal-actions">
+                <button class="btn-modal-cancel" onclick="closeHabitConfigModal()">ביטול</button>
+                <button class="btn-modal-save" onclick="saveHabitConfig()">שמור</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- קבצי JavaScript מפוצלים — נטענים בסדר תלות (classic scripts, ללא ES modules) -->
+    <script src="js/constants.js"></script>
+    <script src="js/storage.js"></script>
+    <script src="js/access-lock.js"></script>
+    <script src="js/hebrew-date.js"></script>
+    <script src="js/storage-io.js"></script>
+    <script src="js/modals-config.js"></script>
+    <script src="js/stats-graph.js"></script>
+    <script src="js/habits-actions.js"></script>
+    <script src="js/habits-logic.js"></script>
+    <script src="js/interactions.js"></script>
+    <script src="js/render.js"></script>
+    <script src="js/reminders.js"></script>
+    <script src="js/app.js"></script>
+</body>
+</html>
