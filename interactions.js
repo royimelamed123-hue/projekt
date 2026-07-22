@@ -110,6 +110,8 @@
 
         function calculateTotalHabitAvg(habit) {
             if(!habit.history) return "-";
+            // מטמון: מחזיר ערך שמור אם קיים
+            if (totalAvgCache.has(habit.id)) return totalAvgCache.get(habit.id);
             let sumPct = 0;
             let countMonths = 0;
             for(let monthKey in habit.history) {
@@ -119,7 +121,9 @@
                     countMonths++;
                 }
             }
-            return countMonths > 0 ? `${Math.round(sumPct / countMonths)}%` : "-";
+            const result = countMonths > 0 ? `${Math.round(sumPct / countMonths)}%` : "-";
+            totalAvgCache.set(habit.id, result);
+            return result;
         }
 
 
