@@ -46,9 +46,16 @@
                     saveToStorage();
                 }
             } else if (action.type === 'duplicate') {
-                habits = habits.filter(h => h.id !== action.newHabitId);
+            habits = habits.filter(h => h.id !== action.newHabitId);
+            saveToStorage();
+        } else if (action.type === 'note') {
+            const habit = habits.find(h => h.id === action.habitId);
+            if (habit) {
+                habit.notesLog = JSON.parse(JSON.stringify(action.previousNotesLog));
+                habit.lastTextareaVal = action.previousLastTextareaVal;
                 saveToStorage();
             }
+        }
 
             updateUndoButtonVisibility();
         }
@@ -167,9 +174,10 @@
             const textarea = document.getElementById(`noteText-${habitId}`);
             const textVal = textarea.value.trim();
 
-            habit.lastTextareaVal = textVal;
+            pushUndoAction({ type: 'note', habitId, previousNotesLog: JSON.parse(JSON.stringify(habit.notesLog || [])), previousLastTextareaVal: habit.lastTextareaVal });
+        habit.lastTextareaVal = textVal;
 
-            if(!habit.notesLog) habit.notesLog = [];
+        if(!habit.notesLog) habit.notesLog = [];
             
             habit.notesLog = habit.notesLog.filter(n => !(n.dateStr === currentLetterDayOnly && n.monthKey === actualCurrentMonthKey));
             
@@ -190,9 +198,10 @@
             const habit = habits.find(h => h.id === selectedHabitIdForView);
             if(!habit || !habit.notesLog) return;
 
-            const noteToDelete = habit.notesLog.find(n => n.id === noteId);
-            habit.notesLog = habit.notesLog.filter(n => n.id !== noteId);
-
+            pushUndoAction({ type: 'note', habitId: habit.id, previousNotesLog: JSON.parse(JSON.stringify(habit.notesLog)), previousLastTextareaVal: habit.lastTextareaVal });
+        const noteToDelete = habit.notesLog.find(n => n.id === noteId);
+        habit.notesLog = habit.notesLog.filter(n => n.id !== noteId);
+                
             if (noteToDelete && noteToDelete.dateStr === currentLetterDayOnly && noteToDelete.monthKey === actualCurrentMonthKey) {
                 habit.lastTextareaVal = "";
             }
@@ -213,9 +222,10 @@
             if (note.isEditing) {
                 const textarea = document.getElementById(`editInput-${noteId}`);
                 const newVal = textarea.value.trim();
-                note.text = newVal;
+                pushUndoAction({ type: 'note', habitId: habit.id, previousNotesLog: JSON.parse(JSON.stringify(habit.notesLog)), previousLastTextareaVal: habit.lastTextareaVal });
+            note.text = newVal;
                 note.isEditing = false;
-
+                    
                 if (note.dateStr === currentLetterDayOnly && note.monthKey === actualCurrentMonthKey) {
                     habit.lastTextareaVal = newVal;
                 }
@@ -326,10 +336,10 @@
             else if (letterDay === "טו") letterDay = 'ט"ו';
             else if (letterDay === "טז") letterDay = 'ט"ז';
 
-            if(!habit.notesLog) habit.notesLog = [];
+            pushUndoAction({ type: 'note', habitId: habit.id, previousNotesLog: JSON.parse(JSON.stringify(habit.notesLog || [])), previousLastTextareaVal: habit.lastTextareaVal });
+        if(!habit.notesLog) habit.notesLog = [];
 
             habit.notesLog = habit.notesLog.filter(n => !(n.dateStr === letterDay && n.monthKey === targetMonthComps.key));
-
             habit.notesLog.push({
                 id: Date.now().toString() + Math.random().toString(36).substr(2, 5), 
                 text: textVal,
