@@ -245,26 +245,26 @@
 
         function setXTimesMode(mode) {
             xTimesMode = mode;
-            const u = document.getElementById('xTimesModeUniform'); if(u) u.classList.toggle('active', mode === 'uniform');
-            const c = document.getElementById('xTimesModeCustom'); if(c) c.classList.toggle('active', mode === 'custom');
-            const us = document.getElementById('xTimesUniformSection'); if(us) us.style.display = mode === 'uniform' ? 'flex' : 'none';
-            const cs = document.getElementById('xTimesCustomSection'); if(cs) cs.style.display = mode === 'custom' ? 'block' : 'none';
+            const u = document.getElementById('xTimesModeUniform'); if(u) { if(mode==='uniform'){if(!u.classList.contains('active'))u.classList.add('active');}else{u.classList.remove('active');} }
+            const c = document.getElementById('xTimesModeCustom'); if(c) { if(mode==='custom'){if(!c.classList.contains('active'))c.classList.add('active');}else{c.classList.remove('active');} }
+            const us = document.getElementById('xTimesUniformSection'); if(us && us.style.display !== (mode==='uniform'?'flex':'none')) us.style.display = mode==='uniform' ? 'flex' : 'none';
+            const cs = document.getElementById('xTimesCustomSection'); if(cs && cs.style.display !== (mode==='custom'?'block':'none')) cs.style.display = mode==='custom' ? 'block' : 'none';
         }
 
         function setWeeklyMode(mode) {
             weeklyDayMode = mode;
-            const u = document.getElementById('weeklyModeUniform'); if(u) u.classList.toggle('active', mode === 'uniform');
-            const c = document.getElementById('weeklyModeCustom'); if(c) c.classList.toggle('active', mode === 'custom');
-            const us = document.getElementById('weeklyUniformSection'); if(us) us.style.display = mode === 'uniform' ? 'flex' : 'none';
-            const cs = document.getElementById('weeklyCustomSection'); if(cs) cs.style.display = mode === 'custom' ? 'block' : 'none';
+            const u = document.getElementById('weeklyModeUniform'); if(u) { if(mode==='uniform'){if(!u.classList.contains('active'))u.classList.add('active');}else{u.classList.remove('active');} }
+            const c = document.getElementById('weeklyModeCustom'); if(c) { if(mode==='custom'){if(!c.classList.contains('active'))c.classList.add('active');}else{c.classList.remove('active');} }
+            const us = document.getElementById('weeklyUniformSection'); if(us && us.style.display !== (mode==='uniform'?'flex':'none')) us.style.display = mode==='uniform' ? 'flex' : 'none';
+            const cs = document.getElementById('weeklyCustomSection'); if(cs && cs.style.display !== (mode==='custom'?'block':'none')) cs.style.display = mode==='custom' ? 'block' : 'none';
         }
 
         function setMonthlyMode(mode) {
             monthlyDayMode = mode;
-            const u = document.getElementById('monthlyModeUniform'); if(u) u.classList.toggle('active', mode === 'uniform');
-            const c = document.getElementById('monthlyModeCustom'); if(c) c.classList.toggle('active', mode === 'custom');
-            const us = document.getElementById('monthlyUniformSection'); if(us) us.style.display = mode === 'uniform' ? 'flex' : 'none';
-            const cs = document.getElementById('monthlyCustomSection'); if(cs) cs.style.display = mode === 'custom' ? 'block' : 'none';
+            const u = document.getElementById('monthlyModeUniform'); if(u) { if(mode==='uniform'){if(!u.classList.contains('active'))u.classList.add('active');}else{u.classList.remove('active');} }
+            const c = document.getElementById('monthlyModeCustom'); if(c) { if(mode==='custom'){if(!c.classList.contains('active'))c.classList.add('active');}else{c.classList.remove('active');} }
+            const us = document.getElementById('monthlyUniformSection'); if(us && us.style.display !== (mode==='uniform'?'flex':'none')) us.style.display = mode==='uniform' ? 'flex' : 'none';
+            const cs = document.getElementById('monthlyCustomSection'); if(cs && cs.style.display !== (mode==='custom'?'block':'none')) cs.style.display = mode==='custom' ? 'block' : 'none';
         }
 
         function readDayTargetsFromUI() {
