@@ -272,8 +272,8 @@
             if (!selectedHabitIdForView) return;
             const habit = habits.find(h => h.id === selectedHabitIdForView);
             if (!habit) return;
-            if (!confirm(`להעביר את ההרגל "${habit.title}" לארכיון?`)) return;
-            habit.archived = true;
+            pushUndoAction({ type: 'archive', habitId: habit.id, previousArchived: habit.archived });
+            habit.archived = !habit.archived;
             closeMonthView();
             saveToStorage();
         }
