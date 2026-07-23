@@ -9,7 +9,7 @@
   "type": "webapp",
   "category": "Utilities",
   "stability": "stable",
-  "minAppVersion": "0.9.91",
+  "minAppVersion": "0.9.96",
   "entrypoint": "index.html",
   "permissions": [
     "plugin.storage.read",
