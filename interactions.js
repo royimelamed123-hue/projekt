@@ -168,6 +168,9 @@
                 card.classList.add('dragging');
                 e.dataTransfer.effectAllowed = 'move';
                 e.dataTransfer.setData('text/plain', habitId);
+                // הצג את הכרטיס המלא בזמן גרירה
+                const rect = card.getBoundingClientRect();
+                e.dataTransfer.setDragImage(card, e.clientX - rect.left, e.clientY - rect.top);
             });
             handle.addEventListener('dragend', () => {
                 draggedHabitId = null;
