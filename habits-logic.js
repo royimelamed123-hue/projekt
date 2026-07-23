@@ -366,7 +366,7 @@
             const habit = habits.find(h => h.id === selectedHabitIdForView);
             const btn = document.querySelector('.btn-month-action-archive');
             if (btn && habit) {
-                btn.textContent = habit.archived ? 'הסר מארכיון' : 'העבר לארכיון';
+                btn.textContent = habit.archived ? 'הסר מארכיון' : 'הוסף לארכיון';
             }
         }
 
