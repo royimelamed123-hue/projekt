@@ -212,6 +212,7 @@
             if (event) event.stopPropagation();
             const habit = habits.find(h => h.id === id);
             if (!habit) return;
+            pushUndoAction({ type: 'archive', habitId: id, previousArchived: habit.archived });
             habit.archived = !habit.archived;
             saveToStorage();
         }
