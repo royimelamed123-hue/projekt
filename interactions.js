@@ -439,7 +439,7 @@
             if (!container) {
                 container = document.createElement('div');
                 container.id = 'bookmarkFilterBar';
-                container.style.cssText = 'display:flex; flex-direction:column; gap:6px; margin-bottom:14px; align-items:center;';
+                container.style.cssText = 'display:flex; flex-direction:column; gap:6px; margin-top:14px; margin-bottom:14px; align-items:center;';
                 const searchBox = document.getElementById('habitSearchInput');
                 if (searchBox && searchBox.parentNode) {
                     searchBox.parentNode.insertBefore(container, searchBox.nextSibling);
