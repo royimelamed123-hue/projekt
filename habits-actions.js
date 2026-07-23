@@ -114,6 +114,7 @@
             if (isModalEditMode) {
                 const habit = habits.find(h => h.id === selectedHabitIdForView);
                 if (!habit) return;
+                const habitSnapshot = JSON.parse(JSON.stringify(habit)); // snapshot לפני עריכה
                 
                 const isTypeChanged = habit.type !== configSelectedType;
                 
