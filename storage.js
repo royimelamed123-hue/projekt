@@ -78,19 +78,14 @@
                     statsCache.delete(key);
                 }
             }
-            // מנקה גם את מטמון ה-avg וה-streak של הרגל זה
             totalAvgCache.delete(habitId);
-            streakCache.delete(habitId);
         }
 
         function invalidateAllStatsCache() {
             statsCache.clear();
             totalAvgCache.clear();
-            streakCache.clear();
         }
         // ---- סיום מטמון ----
 
-        // ---- מטמון לחישובים כבדים (totalAvg ו-streak) ----
         const totalAvgCache = new Map();
-        const streakCache = new Map();
         // ---- סיום מטמון כבד ----
