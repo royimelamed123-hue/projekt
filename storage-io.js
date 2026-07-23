@@ -1,7 +1,17 @@
 
+        // debounce על השמירה: אם נקראת כמה פעמים ברצף מהיר —
+        // תחכה 500ms ואז תשמור פעם אחת בלבד (חוסך כתיבות מיותרות ל-SQLite)
+        let _saveDebounceTimer = null;
+        function _debouncedSave() {
+            if (_saveDebounceTimer) clearTimeout(_saveDebounceTimer);
+            _saveDebounceTimer = setTimeout(() => {
+                storageSaveAsync('otzarya_habits', habits);
+                _saveDebounceTimer = null;
+            }, 500);
+        }
+
         function saveToStorage() {
-            storageSaveAsync('otzarya_habits', habits);
-            // תיקון 4: לא מנקה את כל המטמון — רק מרנדר מחדש את מה שצריך
+            _debouncedSave();
             renderHabits();
             if(selectedHabitIdForView) {
                 renderFullMonthGrid();
@@ -12,7 +22,7 @@
         // גרסה של saveToStorage שמנקה את המטמון של הרגל ספציפי בלבד
         function saveToStorageForHabit(habitId) {
             invalidateStatsCache(habitId);
-            storageSaveAsync('otzarya_habits', habits);
+            _debouncedSave();
             renderHabits();
             if(selectedHabitIdForView) {
                 renderFullMonthGrid();
