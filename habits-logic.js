@@ -9,8 +9,14 @@
         let undoStack = [];
         let undoButtonTimer = null;
 
-        function pushUndoAction(habitId, monthKey, dayIndex, previousValue) {
-            undoStack.push({ habitId, monthKey, dayIndex, previousValue });
+        // סוגי פעולות הניתנות לביטול:
+        // { type: 'status', habitId, monthKey, dayIndex, previousValue } — שינוי סטטוס יום
+        // { type: 'archive', habitId, previousArchived }               — ארכיון / הסרה מארכיון
+        // { type: 'edit', habitId, previousHabit }                     — עריכת הרגל
+        // { type: 'duplicate', newHabitId }                            — שכפול הרגל
+
+        function pushUndoAction(action) {
+            undoStack.push(action);
             if (undoStack.length > 30) undoStack.shift();
             updateUndoButtonVisibility();
         }
@@ -18,12 +24,32 @@
         function undoLastAction() {
             const action = undoStack.pop();
             if (!action) return;
-            const habit = habits.find(h => h.id === action.habitId);
-            if (habit && habit.history && habit.history[action.monthKey]) {
-                habit.history[action.monthKey][action.dayIndex] = action.previousValue;
-                invalidateStatsCache(action.habitId);
+
+            if (action.type === 'status') {
+                const habit = habits.find(h => h.id === action.habitId);
+                if (habit && habit.history && habit.history[action.monthKey]) {
+                    habit.history[action.monthKey][action.dayIndex] = action.previousValue;
+                    invalidateStatsCache(action.habitId);
+                    saveToStorage();
+                }
+            } else if (action.type === 'archive') {
+                const habit = habits.find(h => h.id === action.habitId);
+                if (habit) {
+                    habit.archived = action.previousArchived;
+                    saveToStorage();
+                }
+            } else if (action.type === 'edit') {
+                const idx = habits.findIndex(h => h.id === action.habitId);
+                if (idx !== -1) {
+                    habits[idx] = JSON.parse(JSON.stringify(action.previousHabit));
+                    invalidateStatsCache(action.habitId);
+                    saveToStorage();
+                }
+            } else if (action.type === 'duplicate') {
+                habits = habits.filter(h => h.id !== action.newHabitId);
                 saveToStorage();
             }
+
             updateUndoButtonVisibility();
         }
 
@@ -55,7 +81,7 @@
             const habit = habits.find(h => h.id === habitId);
             const monthHistory = getMonthHistory(habit, actualCurrentMonthKey);
             const currentStatus = monthHistory[currentHebrewDayIndex];
-            pushUndoAction(habitId, actualCurrentMonthKey, currentHebrewDayIndex, currentStatus);
+            pushUndoAction({ type: 'status', habitId, monthKey: actualCurrentMonthKey, dayIndex: currentHebrewDayIndex, previousValue: currentStatus });
             
             const target = getTargetForDay(habit, currentDayOfWeek);
 
@@ -403,7 +429,7 @@
             const comps = getHebrewDateComponents(browsingDatePointer);
             const monthHistory = getMonthHistory(habit, comps.key);
             const currentStatus = monthHistory[dayIndex];
-            pushUndoAction(selectedHabitIdForView, comps.key, dayIndex, currentStatus);
+            pushUndoAction({ type: 'status', habitId: selectedHabitIdForView, monthKey: comps.key, dayIndex, previousValue: currentStatus });
             
             const firstDayDate = getFirstHebrewDayDate(browsingDatePointer);
             const cellDayOfWeek = (firstDayDate.getDay() + dayIndex) % 7;
