@@ -3,7 +3,7 @@
   "sdkVersion": "1.x",
   "id": "il.otzaria.habit-tracker",
   "name": "קניין הרגלים",
-  "version": "1.0.0",
+  "version": "2.0.0",
   "description": "תוסף למעקב הרגלים עבור קניין הרגלים",
   "author": "הלומד",
   "type": "webapp",
