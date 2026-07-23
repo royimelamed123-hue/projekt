@@ -244,7 +244,7 @@
             // כותרת ארכיון
             const headerDiv = document.createElement('div');
             headerDiv.innerHTML = `
-                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+                <div style="display:flex; justify-content:center; align-items:center; margin-bottom:12px;">
                     <div style="font-size:16px; color:${getMutedTextColor()}; font-weight:700; text-align:center;">ארכיון (${archivedList.length})</div>
                 </div>
             `;
