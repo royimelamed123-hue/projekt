@@ -198,6 +198,7 @@
                 habit.theme = selectedHabitTheme;
                 habit.schemaVersion = HABIT_SCHEMA_VERSION;
 
+                pushUndoAction({ type: 'edit', habitId: habit.id, previousHabit: JSON.parse(JSON.stringify(habitSnapshot)) });
                 invalidateStatsCache(habit.id);
                 updateHabitDropdownDisplay();
             } else {
@@ -265,6 +266,7 @@
             newHabit.lastTextareaVal = "";
 
             habits.push(newHabit);
+            pushUndoAction({ type: 'duplicate', newHabitId: newHabit.id });
             saveToStorage();
         }
 
