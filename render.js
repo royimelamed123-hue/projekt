@@ -66,10 +66,9 @@
         }
         // ---- סיום ייצוא לאקסל ----
 
-        // ---- יוצר את תפריט שלוש הנקודות של כרטיס ----
+        // ---- יוצר את ה-dropdown של תפריט הכרטיס ----
         function createCardMenuHTML(habitId) {
             return `
-                <button class="btn-card-menu" onclick="toggleCardMenu('${esc(habitId)}', event)">⋮</button>
                 <div id="cardMenu-${esc(habitId)}" class="card-menu-dropdown">
                     <div class="card-menu-item" onclick="editHabitFromHome('${esc(habitId)}', event); closeAllCardMenus();">ערוך הרגל</div>
                     <div class="card-menu-item" onclick="duplicateHabit('${esc(habitId)}', event); closeAllCardMenus();">שכפל הרגל</div>
@@ -78,14 +77,19 @@
                 </div>`;
         }
 
-        // ---- יוצר את חלק ה-header של כרטיס (כותרת + ממוצע חודשי) ----
+        // ---- יוצר את חלק ה-header של כרטיס ----
+        // שורה 1: ציון (ימין) | ידית (מרכז) | שלוש נקודות (שמאל)
+        // שורה 2: שם ההרגל
         function createCardHeaderHTML(habit, mStats) {
             return `
                 <div class="habit-header">
-                    <span class="habit-title" data-habit-title></span>
-                    <div style="display:flex; align-items:center; gap:4px;">
-                        <span class="btn-drag-handle" title="גרור לסידור מחדש">⠿⠿</span>
-                        <span class="habit-stats-summary">חודשי: <span style="color: ${getScoreColor(mStats.pct, habit, mStats.text)}; padding: 1px 6px; border-radius: 4px; font-weight: 700;">${esc(mStats.text)}</span></span>
+                    <div style="display:flex; align-items:center; justify-content:space-between; width:100%;">
+                        <button class="btn-card-menu" onclick="toggleCardMenu('${esc(habit.id)}', event)" style="position:static; margin:0;">⋮</button>
+                        <span class="btn-drag-handle" title="גרור לסידור מחדש" style="flex:1; text-align:center;">⠿⠿</span>
+                        <span class="habit-stats-summary" style="margin:0;">חודשי: <span style="color: ${getScoreColor(mStats.pct, habit, mStats.text)}; padding: 1px 6px; border-radius: 4px; font-weight: 700;">${esc(mStats.text)}</span></span>
+                    </div>
+                    <div style="width:100%; margin-top:4px;">
+                        <span class="habit-title" data-habit-title style="display:block; width:100%;"></span>
                     </div>
                 </div>`;
         }
