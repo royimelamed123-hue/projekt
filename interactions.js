@@ -314,7 +314,6 @@
                     }
 
                     card.innerHTML = `
-                        <button class="btn-card-menu" onclick="toggleCardMenu('${esc(habit.id)}', event)">⋮</button>
                         <div id="cardMenu-${esc(habit.id)}" class="card-menu-dropdown">
                             <div class="card-menu-item" onclick="editHabitFromHome('${esc(habit.id)}', event); closeAllCardMenus();">ערוך הרגל</div>
                             <div class="card-menu-item" onclick="duplicateHabit('${esc(habit.id)}', event); closeAllCardMenus();">שכפל הרגל</div>
@@ -322,9 +321,12 @@
                             <div class="card-menu-item danger" onclick="deleteHabit('${esc(habit.id)}', event); closeAllCardMenus();">מחק הרגל</div>
                         </div>
                         <div class="habit-header">
-                            <span class="habit-title" data-habit-title></span>
-                            <div style="display:flex; align-items:center; gap:4px;">
-                                <span class="habit-stats-summary">חודשי: <span style="color: ${getScoreColor(mStats.pct, habit, mStats.text)}; padding: 1px 6px; border-radius: 4px; font-weight: 700;">${esc(mStats.text)}</span></span>
+                            <div style="display:flex; align-items:center; justify-content:space-between; width:100%;">
+                                <button class="btn-card-menu" onclick="toggleCardMenu('${esc(habit.id)}', event)" style="position:static; margin:0;">⋮</button>
+                                <span class="habit-stats-summary" style="margin:0;">חודשי: <span style="color: ${getScoreColor(mStats.pct, habit, mStats.text)}; padding: 1px 6px; border-radius: 4px; font-weight: 700;">${esc(mStats.text)}</span></span>
+                            </div>
+                            <div style="width:100%; margin-top:4px;">
+                                <span class="habit-title" data-habit-title style="display:block; width:100%;"></span>
                             </div>
                         </div>
                         <div class="controls-row">
@@ -363,7 +365,6 @@
                     }
 
                     card.innerHTML = `
-                        <button class="btn-card-menu" onclick="toggleCardMenu('${esc(habit.id)}', event)">⋮</button>
                         <div id="cardMenu-${esc(habit.id)}" class="card-menu-dropdown">
                             <div class="card-menu-item" onclick="editHabitFromHome('${esc(habit.id)}', event); closeAllCardMenus();">ערוך הרגל</div>
                             <div class="card-menu-item" onclick="duplicateHabit('${esc(habit.id)}', event); closeAllCardMenus();">שכפל הרגל</div>
@@ -371,9 +372,12 @@
                             <div class="card-menu-item danger" onclick="deleteHabit('${esc(habit.id)}', event); closeAllCardMenus();">מחק הרגל</div>
                         </div>
                         <div class="habit-header">
-                            <span class="habit-title" data-habit-title></span>
-                            <div style="display:flex; align-items:center; gap:4px;">
-                                <span class="habit-stats-summary">חודשי: <span style="color: ${getScoreColor(mStats.pct, habit, mStats.text)}; padding: 1px 6px; border-radius: 4px; font-weight: 700;">${esc(mStats.text)}</span></span>
+                            <div style="display:flex; align-items:center; justify-content:space-between; width:100%;">
+                                <button class="btn-card-menu" onclick="toggleCardMenu('${esc(habit.id)}', event)" style="position:static; margin:0;">⋮</button>
+                                <span class="habit-stats-summary" style="margin:0;">חודשי: <span style="color: ${getScoreColor(mStats.pct, habit, mStats.text)}; padding: 1px 6px; border-radius: 4px; font-weight: 700;">${esc(mStats.text)}</span></span>
+                            </div>
+                            <div style="width:100%; margin-top:4px;">
+                                <span class="habit-title" data-habit-title style="display:block; width:100%;"></span>
                             </div>
                         </div>
                         <div class="controls-row">
