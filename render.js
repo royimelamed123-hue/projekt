@@ -258,7 +258,7 @@
             const activeHabitsList = habits.filter(h => !h.archived);
             const archivedHabitsList = habits.filter(h => h.archived);
 
-            renderArchiveSection(archivedHabitsList);
+            if (archiveViewOpen) renderArchiveSection(archivedHabitsList);
             renderBookmarkFilterBar();
 
             const dragHint = document.getElementById('dragHintMessage');
