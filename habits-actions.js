@@ -32,9 +32,9 @@
 
         function updateConfigModalUI() {
             const safeEl = (id) => document.getElementById(id);
-            const safeToggle = (id, cls, val) => { const el = safeEl(id); if(el) el.classList.toggle(cls, val); };
-            const safeDisplay = (id, val) => { const el = safeEl(id); if(el) el.style.display = val; };
-
+            const safeToggle = (id, cls, val) => { const el = safeEl(id); if(el) { if(val) { if(!el.classList.contains(cls)) el.classList.add(cls); } else { el.classList.remove(cls); } } };
+            const safeDisplay = (id, val) => { const el = safeEl(id); if(el && el.style.display !== val) el.style.display = val; };
+                
             safeToggle('typeBtnXTimes', 'active', configSelectedType === 'x_times' || configSelectedType === 'regular');
             safeToggle('typeBtnWeekly', 'active', configSelectedType === 'weekly');
             safeToggle('typeBtnMonthly', 'active', configSelectedType === 'monthly');
