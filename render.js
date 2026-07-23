@@ -72,7 +72,7 @@
                 <div id="cardMenu-${esc(habitId)}" class="card-menu-dropdown">
                     <div class="card-menu-item" onclick="editHabitFromHome('${esc(habitId)}', event); closeAllCardMenus();">ערוך הרגל</div>
                     <div class="card-menu-item" onclick="duplicateHabit('${esc(habitId)}', event); closeAllCardMenus();">שכפל הרגל</div>
-                    <div class="card-menu-item" onclick="toggleHabitArchive('${esc(habitId)}', event); closeAllCardMenus();">העבר לארכיון</div>
+                    <div class="card-menu-item" onclick="toggleHabitArchive('${esc(habitId)}', event); closeAllCardMenus();">הוסף לארכיון</div>
                     <div class="card-menu-item danger" onclick="deleteHabit('${esc(habitId)}', event); closeAllCardMenus();">מחק הרגל</div>
                 </div>`;
         }
