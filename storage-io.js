@@ -23,7 +23,8 @@
         function saveToStorageForHabit(habitId) {
             invalidateStatsCache(habitId);
             _debouncedSave();
-            renderHabits();
+            // עדכן רק את הכרטיס שהשתנה במקום כל הכרטיסים
+            updateCardInPlace(habitId);
             if(selectedHabitIdForView) {
                 renderFullMonthGrid();
                 renderMonthNotesList();
