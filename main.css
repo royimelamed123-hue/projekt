@@ -629,7 +629,7 @@ html, body {
         .btn-card-menu {
             background: none;
             border: none;
-            color: #94a3b8;
+            color: #475569;
             cursor: pointer;
             padding: 4px 8px;
             display: flex;
@@ -682,7 +682,7 @@ html, body {
 
         .btn-drag-handle {
             cursor: grab;
-            color: #cbd5e1;
+            color: #64748b;
             display: flex;
             align-items: center;
             justify-content: center;
