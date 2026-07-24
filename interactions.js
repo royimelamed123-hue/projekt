@@ -436,8 +436,15 @@
             return status === 'V' || status === 'X' || status === 'א' || typeof status === 'number';
         }
 
+        let _lastBookmarkBarState = null;
+
         function renderBookmarkFilterBar() {
             const namedBookmarks = BOOKMARK_COLORS.filter(c => bookmarkLabels[c] && bookmarkLabels[c].trim() !== '');
+
+            // דלג על בנייה מחדש אם המצב לא השתנה
+            const currentState = JSON.stringify({ namedBookmarks, activeBookmarkFilter, showUnsignedOnly, dark: isDarkModeEnabled() });
+            if (_lastBookmarkBarState === currentState && document.getElementById('bookmarkFilterBar')) return;
+            _lastBookmarkBarState = currentState;
 
             let container = document.getElementById('bookmarkFilterBar');
             if (!container) {
