@@ -282,6 +282,7 @@
                 card.style.borderRight = `5px solid ${getThemeColor(habit.theme)}`;
                 card.style.opacity = '0.85';
                 card.style.position = 'relative';
+                card.dataset.habitId = habit.id;
                 setupCardDragAndDrop(card, habit.id);
                 card.onclick = () => openMonthView(habit.id);
 
