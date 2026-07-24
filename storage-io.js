@@ -10,6 +10,18 @@
             }, 500);
         }
 
+        // שמירה מיידית אם התוסף עובר להשהיה (best effort לפי המלצת מפתחי אוצריא)
+        function _flushSaveIfPending() {
+            if (_saveDebounceTimer) {
+                clearTimeout(_saveDebounceTimer);
+                _saveDebounceTimer = null;
+                storageSaveAsync('otzarya_habits', habits);
+            }
+        }
+        if (typeof Otzaria !== 'undefined') {
+            Otzaria.on('plugin.suspended', _flushSaveIfPending);
+        }
+
         function saveToStorage() {
             _debouncedSave();
             renderHabits();
