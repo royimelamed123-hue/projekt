@@ -229,12 +229,20 @@
             }
         }
 
+        let _lastArchiveState = null;
+
         function renderArchiveSection(archivedList) {
             const container = document.getElementById('archiveSection');
             if (!container) return;
 
             const btn = document.getElementById('btnShowArchive');
             if (btn) btn.innerText = `${archiveViewOpen ? 'סגור ארכיון' : 'ארכיון'}${archivedList.length ? ` (${archivedList.length})` : ''}`;
+
+            // דלג על בנייה מחדש אם הארכיון סגור או שהמצב לא השתנה
+            if (!archiveViewOpen) { _lastArchiveState = null; return; }
+            const currentState = JSON.stringify(archivedList.map(h => ({ id: h.id, archived: h.archived, theme: h.theme })));
+            if (_lastArchiveState === currentState) return;
+            _lastArchiveState = currentState;
 
             if (!archivedList || archivedList.length === 0) {
                 container.innerHTML = `<div style="text-align:center; color:${getMutedTextColor()}; font-size:13px; padding:10px;">הארכיון ריק.</div>`;
