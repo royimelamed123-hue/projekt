@@ -108,6 +108,7 @@
             const card = document.createElement('div');
             card.className = 'habit-card';
             card.style.borderRight = `5px solid ${getThemeColor(habit.theme)}`;
+            card.dataset.habitId = habit.id;
             setupCardDragAndDrop(card, habit.id);
             card.onclick = () => openMonthView(habit.id);
             return card;
@@ -246,6 +247,135 @@
             card.querySelector('[data-habit-title]').textContent = habit.title;
             card.querySelector(`#noteText-${CSS.escape(habit.id)}`).value = currentDayTextVal;
             return card;
+        }
+
+
+        // ---- עדכון כרטיס בודד במקום (ללא renderHabits מלא) ----
+        function updateCardInPlace(habitId) {
+            const card = document.querySelector(`[data-habit-id="${CSS.escape(habitId)}"]`);
+            if (!card) { renderHabits(); return; }
+
+            const habit = habits.find(h => h.id === habitId);
+            if (!habit) { renderHabits(); return; }
+
+            const currentMonthHistory = peekMonthHistory(habit, actualCurrentMonthKey);
+            const todayStatus = currentMonthHistory[currentHebrewDayIndex];
+            const target = getTargetForDay(habit, currentDayOfWeek);
+            const mStats = calculateStatsForMonth(habit, actualCurrentMonthKey);
+
+            // עדכון ציון חודשי
+            const scoreEl = card.querySelector('.habit-stats-summary span');
+            if (scoreEl) {
+                scoreEl.textContent = mStats.text;
+                scoreEl.style.color = getScoreColor(mStats.pct, habit, mStats.text);
+            }
+
+            if (habit.type === 'monthly') {
+                const mTarget = (habit.monthlyDayTargets && habit.monthlyDayTargets[currentDayOfWeek]) || 1;
+                const isNHarmfulM = isMonthlyNHarmful(habit, actualCurrentMonthKey, currentHebrewDayIndex);
+                const isNActiveM = (todayStatus === 'N');
+                let wTextM = mTarget === 1 ? 'בוצע' : `${mTarget}`;
+                let wStyleM = '';
+                let isWActiveM = false;
+                if (todayStatus === 'W') { wTextM = 'בוצע'; wStyleM = getStatusProgressStyle(100); isWActiveM = true; }
+                else if (mTarget > 1 && typeof todayStatus === 'number') {
+                    const rem = mTarget - todayStatus;
+                    wTextM = rem > 0 ? `${rem}` : 'בוצע';
+                    wStyleM = getStatusProgressStyle(Math.round((todayStatus / mTarget) * 100));
+                }
+                const btnSkip = card.querySelector('.btn-w-skip');
+                const btnDone = card.querySelector('.btn-w-done');
+                if (btnSkip) { btnSkip.classList.toggle('active', isNActiveM); btnSkip.classList.toggle('harmful', isNHarmfulM); }
+                if (btnDone) { btnDone.classList.toggle('active', isWActiveM); btnDone.style.cssText = wStyleM; btnDone.querySelector('span').textContent = wTextM; }
+
+            } else if (habit.type === 'weekly') {
+                const wTarget = (habit.weeklyDayTargets && habit.weeklyDayTargets[currentDayOfWeek]) || 1;
+                const firstDayDate = getFirstHebrewDayDate(mainScreenDatePointer);
+                const isNHarmful = isWeeklyNHarmful(habit, actualCurrentMonthKey, currentHebrewDayIndex, firstDayDate.getDay(), firstDayDate, calculateDaysInBrowsingMonth(mainScreenDatePointer));
+                const isNActive = (todayStatus === 'N');
+                let wText = wTarget === 1 ? 'בוצע' : `${wTarget}`;
+                let wStyle = '';
+                let isWActive = false;
+                if (wTarget > 1) {
+                    if (todayStatus === 'W') { wText = 'בוצע'; wStyle = getStatusProgressStyle(100); isWActive = true; }
+                    else if (typeof todayStatus === 'number') {
+                        const rem = wTarget - todayStatus;
+                        wText = rem > 0 ? `${rem}` : 'בוצע';
+                        wStyle = getStatusProgressStyle(Math.round((todayStatus / wTarget) * 100));
+                    }
+                } else { isWActive = (todayStatus === 'W'); }
+                const btnSkip = card.querySelector('.btn-w-skip');
+                const btnDone = card.querySelector('.btn-w-done');
+                if (btnSkip) { btnSkip.classList.toggle('active', isNActive); btnSkip.classList.toggle('harmful', isNHarmful); }
+                if (btnDone) { btnDone.classList.toggle('active', isWActive); btnDone.style.cssText = wStyle; btnDone.querySelector('span').textContent = wText; }
+
+            } else {
+                // יומי
+                let vText = 'בוצע';
+                let vStyle = '';
+                let isVActive = false;
+                if (habit.type === 'x_times' || habit.type === 'regular') {
+                    if (typeof todayStatus === 'number') {
+                        const rem = target - todayStatus;
+                        vText = rem > 0 ? `${rem}` : 'בוצע';
+                        vStyle = getStatusProgressStyle(Math.round((todayStatus / target) * 100));
+                        isVActive = (todayStatus >= target);
+                    } else if (todayStatus === 'V') { vText = 'בוצע'; vStyle = getStatusProgressStyle(100); isVActive = true; }
+                    else { vText = target === 1 ? 'בוצע' : `${target}`; }
+                } else { isVActive = (todayStatus === 'V'); }
+                const btnA = card.querySelector('.btn-a');
+                const btnX = card.querySelector('.btn-x');
+                const btnV = card.querySelector('.btn-v');
+                if (btnA) btnA.classList.toggle('active', todayStatus === 'א');
+                if (btnX) btnX.classList.toggle('active', todayStatus === 'X');
+                if (btnV) { btnV.classList.toggle('active', isVActive); btnV.style.cssText = vStyle; btnV.querySelector('span').textContent = vText; }
+            }
+
+            // עדכון textarea
+            if (!habit.notesLog) habit.notesLog = [];
+            const dayNoteObj = habit.notesLog.find(n => n.dateStr === currentLetterDayOnly && n.monthKey === actualCurrentMonthKey);
+            const textarea = card.querySelector(`#noteText-${CSS.escape(habitId)}`);
+            if (textarea) textarea.value = dayNoteObj ? dayNoteObj.text : '';
+
+            updateStatsOnly();
+        }
+
+        // ---- עדכון סטטיסטיקות כלליות בלבד ----
+        function updateStatsOnly() {
+            const activeHabitsList = habits.filter(h => !h.archived);
+            let sumMonthAverages = 0, countMonthAverages = 0, todayV = 0, todayActive = 0;
+
+            activeHabitsList.forEach(habit => {
+                const mStats = calculateStatsForMonth(habit, actualCurrentMonthKey);
+                if (mStats.text !== '-') { sumMonthAverages += mStats.pct; countMonthAverages++; }
+
+                const currentMonthHistory = peekMonthHistory(habit, actualCurrentMonthKey);
+                const todayStatus = currentMonthHistory[currentHebrewDayIndex];
+                const target = getTargetForDay(habit, currentDayOfWeek);
+
+                if (habit.type === 'monthly') {
+                    const mTarget = (habit.monthlyDayTargets && habit.monthlyDayTargets[currentDayOfWeek]) || 1;
+                    const isNHarmfulM = isMonthlyNHarmful(habit, actualCurrentMonthKey, currentHebrewDayIndex);
+                    if (typeof todayStatus === 'number') { todayV += todayStatus / mTarget; todayActive += 1; }
+                    else if (todayStatus === 'W') { todayV += 1; todayActive += 1; }
+                    else if (todayStatus === 'N' && isNHarmfulM) { todayActive += 1; }
+                } else if (habit.type === 'weekly') {
+                    const wTarget = (habit.weeklyDayTargets && habit.weeklyDayTargets[currentDayOfWeek]) || 1;
+                    const firstDayDate = getFirstHebrewDayDate(mainScreenDatePointer);
+                    const isNHarmful = isWeeklyNHarmful(habit, actualCurrentMonthKey, currentHebrewDayIndex, firstDayDate.getDay(), firstDayDate, calculateDaysInBrowsingMonth(mainScreenDatePointer));
+                    if (typeof todayStatus === 'number') { todayV += todayStatus / wTarget; todayActive += 1; }
+                    else if (todayStatus === 'W') { todayV += 1; todayActive += 1; }
+                    else if (todayStatus === 'N' && isNHarmful) { todayActive += 1; }
+                } else {
+                    if (typeof todayStatus === 'number') { todayV += todayStatus; todayActive += target; }
+                    else if (todayStatus === 'V') { todayV += target; todayActive += target; }
+                    else if (todayStatus === 'X') { todayActive += target; }
+                }
+            });
+
+            document.getElementById('statTotalHabits').innerText = activeHabitsList.length;
+            document.getElementById('statAvgSuccess').innerText = countMonthAverages > 0 ? `${Math.round(sumMonthAverages / countMonthAverages)}%` : '-';
+            document.getElementById('statTodaySuccess').innerText = todayActive > 0 ? `${Math.round((todayV / todayActive) * 100)}%` : '-';
         }
 
         function renderHabits() {
