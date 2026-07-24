@@ -488,12 +488,22 @@
             document.getElementById('statTodaySuccess').innerText = todayActive > 0 ? `${Math.round((todayV / todayActive) * 100)}%` : "-";
         }
 
+        let _lastFullMonthGridState = null;
+
         function renderFullMonthGrid() {
             const grid = document.getElementById('fullMonthGrid');
-            grid.innerHTML = "";
             
             const habit = habits.find(h => h.id === selectedHabitIdForView);
             if(!habit) return;
+
+            // דלג על בנייה מחדש אם המצב לא השתנה
+            const targetMonthCompsCheck = getHebrewDateComponents(browsingDatePointer);
+            const monthHistoryCheck = peekMonthHistory(habit, targetMonthCompsCheck.key);
+            const currentState = JSON.stringify({ habitId: habit.id, monthKey: targetMonthCompsCheck.key, history: monthHistoryCheck, tab: currentMonthTab });
+            if (_lastFullMonthGridState === currentState) return;
+            _lastFullMonthGridState = currentState;
+
+            grid.innerHTML = "";
 
             const isDaily = (habit.type === 'x_times' || habit.type === 'regular');
             const isComparable = (habit.type === 'weekly' || habit.type === 'monthly');
