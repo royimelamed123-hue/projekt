@@ -63,16 +63,6 @@ html, body {
         body.dark-mode .targets-config-section,
         body.dark-mode .day-target-box,
         body.dark-mode .card-notes-textarea,
-        body.dark-mode .btn-card-menu {
-            color: #94a3b8;
-        }
-        body.dark-mode .btn-card-menu:hover {
-            color: #e2e8f0;
-            background: rgba(255,255,255,0.08);
-        }
-        body.dark-mode .btn-drag-handle {
-            color: #94a3b8;
-        }
         body.dark-mode .card-menu-dropdown {
             background-color: var(--card-color, #1e293b) !important;
             border-color: var(--divider-color, #334155) !important;
