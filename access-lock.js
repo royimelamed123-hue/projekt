@@ -263,7 +263,8 @@
             if (enabledCheckbox) {
                 enabledCheckbox.onchange = () => {
                     if (modeSection) modeSection.style.display = enabledCheckbox.checked ? 'block' : 'none';
-                    if (currentPasswordRow) currentPasswordRow.style.display = (enabledCheckbox.checked && isAccessLockEnabled()) ? 'block' : 'none';
+                    // שדה סיסמה נוכחית נשאר גלוי תמיד כשהנעילה פעילה — גם אחרי ביטול checkbox
+                    if (currentPasswordRow) currentPasswordRow.style.display = isAccessLockEnabled() ? 'block' : 'none';
                 };
             }
 
