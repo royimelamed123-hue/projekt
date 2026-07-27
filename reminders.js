@@ -15,19 +15,6 @@
             try {
                 const parsed = await storageGet(REMINDER_STORAGE_KEY);
                 if (!parsed) return getDefaultReminders();
-                // תאימות לגרסה ישנה (אובייקט בודד)
-                if (parsed && typeof parsed.hour === 'number') {
-                    return {
-                        enabled: !!parsed.enabled,
-                        reminders: parsed.enabled ? [{
-                            id: 'legacy',
-                            hour: parsed.hour,
-                            minute: parsed.minute || 0,
-                            text: '',
-                            days: [0,1,2,3,4,5,6]
-                        }] : []
-                    };
-                }
                 return parsed;
             } catch(e) {
                 return getDefaultReminders();
@@ -60,14 +47,9 @@
 
         function sendReminderNotification(customText) {
             const body = (customText && customText.trim()) ? customText.trim() : 'זמן לבדוק את ההרגלים שלך';
-            if (HAS_OTZARIA) {
-                // תיקון באג 1: השם הנכון של המתודה הוא notifications.sendSystem (לא notifications.send)
-                try {
-                    Otzaria.call('notifications.sendSystem', { title: 'קניין הרגלים', body });
-                } catch(e) {}
-            } else if ('Notification' in window && Notification.permission === 'granted') {
-                new Notification('קניין הרגלים', { body, icon: 'icon.png', lang: 'he', dir: 'rtl' });
-            }
+            try {
+                Otzaria.call('notifications.sendSystem', { title: 'קניין הרגלים', body });
+            } catch(e) {}
         }
 
         function startReminderInterval() {
@@ -84,18 +66,7 @@
         }
 
         async function requestNotificationPermission() {
-            if (HAS_OTZARIA) return true; // אוצריא מנהל הרשאות בעצמה
-            if (!('Notification' in window)) {
-                alert('הדפדפן שלך לא תומך בהתראות. נסה דפדפן מעודכן יותר.');
-                return false;
-            }
-            if (Notification.permission === 'granted') return true;
-            if (Notification.permission === 'denied') {
-                alert('ההתראות חסומות בהגדרות הדפדפן. יש לאפשר אותן ידנית בהגדרות האתר.');
-                return false;
-            }
-            const result = await Notification.requestPermission();
-            return result === 'granted';
+            return true; // אוצריא מנהל הרשאות התראות בעצמה
         }
 
         // ---- בניית ממשק התזכורות ----
