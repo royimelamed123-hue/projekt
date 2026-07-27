@@ -225,7 +225,7 @@
             if (btn) {
                 const archivedCount = habits.filter(h => h.archived).length;
                 const countSuffix = archivedCount ? ` (${archivedCount})` : '';
-                btn.innerText = archiveViewOpen ? `סגור ארכיון${countSuffix}` : `ארכיון${countSuffix}`;
+                btn.innerText = archiveViewOpen ? `סגור ארכיון${countSuffix}` : `פתח ארכיון${countSuffix}`;
             }
         }
 
@@ -236,7 +236,7 @@
             if (!container) return;
 
             const btn = document.getElementById('btnShowArchive');
-            if (btn) btn.innerText = `${archiveViewOpen ? 'סגור ארכיון' : 'ארכיון'}${archivedList.length ? ` (${archivedList.length})` : ''}`;
+            if (btn) btn.innerText = `${archiveViewOpen ? 'סגור ארכיון' : 'פתח ארכיון'}${archivedList.length ? ` (${archivedList.length})` : ''}`;
 
             // דלג על בנייה מחדש אם הארכיון סגור או שהמצב לא השתנה
             if (!archiveViewOpen) { _lastArchiveState = null; return; }
