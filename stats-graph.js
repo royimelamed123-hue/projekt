@@ -95,8 +95,7 @@
                 if (idx === 0) ctx.moveTo(x, y);
                 else ctx.lineTo(x, y);
             });
-            const finalLevel = points[points.length - 1].level;
-            ctx.strokeStyle = finalLevel >= 0 ? '#22c55e' : '#ef4444';
+            ctx.strokeStyle = '#22c55e';
             ctx.stroke();
 
             points.forEach(p => {
