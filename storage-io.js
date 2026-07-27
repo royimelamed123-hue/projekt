@@ -106,13 +106,23 @@
                         return;
                     }
 
-                    const choice = confirm(
-                        `נמצאו ${importedHabits.length} הרגלים בקובץ הגיבוי.\n` +
-                        `לחץ "אישור" כדי להוסיף אותם להרגלים הקיימים (${habits.length}).\n` +
-                        `לחץ "ביטול" כדי לבטל את הייבוא.`
+                    // שאלה ראשונה — הוספה או דריסה?
+                    const addMode = confirm(
+                        `נמצאו ${importedHabits.length} הרגלים בקובץ הגיבוי.\n\n` +
+                        `לחץ "אישור" להוספה לנתונים הקיימים (${habits.length} הרגלים).\n` +
+                        `לחץ "ביטול" לדריסת כל הנתונים הקיימים.`
                     );
 
-                    if (!choice) { event.target.value = ''; return; }
+                    // אם בחר דריסה — אישור נוסף
+                    if (!addMode) {
+                        const confirmOverwrite = confirm(
+                            `האם אתה בטוח שברצונך למחוק את כל ${habits.length} ההרגלים הקיימים ולהחליפם?\n` +
+                            `פעולה זו אינה ניתנת לביטול.`
+                        );
+                        if (!confirmOverwrite) { event.target.value = ''; return; }
+                        habits = [];
+                        invalidateAllStatsCache();
+                    }
 
                     importedHabits.forEach(h => {
                         h.id = Date.now().toString() + '-' + Math.random().toString(36).slice(2, 8);
