@@ -172,11 +172,11 @@
                             <input type="password" id="accessLockCurrentPasswordInput" class="modal-text-input" placeholder="הקלד סיסמה נוכחית" autocomplete="current-password">
                         </div>
                         <div>
-                            <div class="modal-section-title">סיסמה חדשה:</div>
-                            <input type="password" id="accessLockNewPasswordInput" class="modal-text-input" placeholder="הקלד סיסמה חדשה" autocomplete="new-password">
+                            <div id="accessLockNewPasswordLabel" class="modal-section-title">סיסמה חדשה:</div>
+                            <input type="password" id="accessLockNewPasswordInput" class="modal-text-input" placeholder="הקלד סיסמה" autocomplete="new-password">
                         </div>
                         <div>
-                            <div class="modal-section-title">אימות סיסמה חדשה:</div>
+                            <div id="accessLockConfirmPasswordLabel" class="modal-section-title">אימות סיסמה חדשה:</div>
                             <input type="password" id="accessLockConfirmPasswordInput" class="modal-text-input" placeholder="הקלד שוב את הסיסמה" autocomplete="new-password">
                         </div>
                         <div class="access-lock-note" style="margin-top: 2px;">
@@ -263,15 +263,27 @@
             if (enabledCheckbox) {
                 enabledCheckbox.onchange = () => {
                     if (modeSection) modeSection.style.display = enabledCheckbox.checked ? 'block' : 'none';
-                    // שדה סיסמה נוכחית נשאר גלוי תמיד כשהנעילה פעילה — גם אחרי ביטול checkbox
+                    // אם הנעילה כבר הוגדרה — תמיד הצג שדה סיסמה נוכחית (גם בביטול)
                     if (currentPasswordRow) currentPasswordRow.style.display = isAccessLockEnabled() ? 'block' : 'none';
+                    // עדכן כותרות לפי מצב
+                    const firstTime = !isAccessLockEnabled();
+                    const nl = document.getElementById('accessLockNewPasswordLabel');
+                    const cl = document.getElementById('accessLockConfirmPasswordLabel');
+                    if (nl) nl.textContent = firstTime ? 'בחר סיסמה:' : 'סיסמה חדשה:';
+                    if (cl) cl.textContent = firstTime ? 'אישור סיסמה:' : 'אישור סיסמה חדשה:';
                 };
             }
 
-            if (currentPasswordRow) currentPasswordRow.style.display = isEnabled ? 'block' : 'none';
+            // הגדרה ראשונית: הסתר שדה נוכחית, שנה כותרות
+            const isFirstTime = !isEnabled;
+            if (currentPasswordRow) currentPasswordRow.style.display = isFirstTime ? 'none' : 'block';
+            const newLabel = document.getElementById('accessLockNewPasswordLabel');
+            const confirmLabel = document.getElementById('accessLockConfirmPasswordLabel');
+            if (newLabel) newLabel.textContent = isFirstTime ? 'בחר סיסמה:' : 'סיסמה חדשה:';
+            if (confirmLabel) confirmLabel.textContent = isFirstTime ? 'אישור סיסמה:' : 'אישור סיסמה חדשה:';
             if (currentPasswordInput) currentPasswordInput.value = '';
-            if (newPasswordInput) newPasswordInput.value = '';
-            if (confirmPasswordInput) confirmPasswordInput.value = '';
+            if (newPasswordInput) { newPasswordInput.value = ''; newPasswordInput.placeholder = isFirstTime ? 'הקלד סיסמה' : 'הקלד סיסמה חדשה'; }
+            if (confirmPasswordInput) { confirmPasswordInput.value = ''; confirmPasswordInput.placeholder = isFirstTime ? 'הקלד שוב את הסיסמה' : 'הקלד שוב את הסיסמה החדשה'; }
 
             modal.style.display = 'flex';
             if (currentPasswordInput && isEnabled) {
