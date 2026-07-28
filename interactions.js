@@ -687,12 +687,23 @@
                     <tbody>
             `;
 
+            // חישוב מינימום/מקסימום לספקטרום יחסי
+            const monthPcts = selectedHabitsArray.map(h => calculateStatsForMonth(h, comparisonMonthKey).pct).filter(p => p !== null && !isNaN(p));
+            const totalPcts = selectedHabitsArray.map(h => { const v = parseInt(calculateTotalHabitAvg(h)); return isNaN(v) ? null : v; }).filter(p => p !== null);
+            const minMonthPct = monthPcts.length ? Math.min(...monthPcts) : 0;
+            const maxMonthPct = monthPcts.length ? Math.max(...monthPcts) : 100;
+            const minTotalPct = totalPcts.length ? Math.min(...totalPcts) : 0;
+            const maxTotalPct = totalPcts.length ? Math.max(...totalPcts) : 100;
+
             selectedHabitsArray.forEach(habit => {
                 const mStats = calculateStatsForMonth(habit, comparisonMonthKey);
                 const totalAvg = calculateTotalHabitAvg(habit);
+                const totalAvgPct = parseInt(totalAvg);
                 const themeColor = getThemeColor(habit.theme);
                 const isArchived = habit.archived;
                 const rowBg = isArchived ? bgArchived : bgActive;
+                const monthColor = mStats.text !== '-' ? getRelativeSpectrumColor(mStats.pct, minMonthPct, maxMonthPct) : textColor;
+                const totalColor = !isNaN(totalAvgPct) ? getRelativeSpectrumColor(totalAvgPct, minTotalPct, maxTotalPct) : textColor;
                 
                 html += `
                     <tr style="background:${rowBg}; border-right:4px solid ${themeColor}; border-bottom:1px solid ${borderColor};">
@@ -702,8 +713,8 @@
                                 <span style="font-weight:600; color:${dark ? '#e2e8f0' : '#0f172a'};">${esc(habit.title)}</span>
                             </div>
                         </td>
-                        <td style="padding:12px 14px; text-align:center; font-weight:700; color:${getScoreColor(mStats.pct, habit, mStats.text)};">${esc(mStats.text)}</td>
-                        <td style="padding:12px 14px; text-align:center; font-weight:700; color:${getScoreColor(parseInt(totalAvg) || 0, habit, totalAvg)};">${esc(totalAvg)}</td>
+                        <td style="padding:12px 14px; text-align:center; font-weight:700; color:${monthColor};">${esc(mStats.text)}</td>
+                        <td style="padding:12px 14px; text-align:center; font-weight:700; color:${totalColor};">${esc(totalAvg)}</td>
                         <td style="padding:12px 14px; text-align:center;">
                             <span style="display:inline-block; padding:3px 10px; background:${isArchived ? (dark ? '#475569' : '#cbd5e1') : '#3b82f6'}; color:${isArchived ? (dark ? '#e2e8f0' : '#475569') : 'white'}; border-radius:12px; font-size:11px; font-weight:600;">${isArchived ? 'ארכיון' : 'פעיל'}</span>
                         </td>
