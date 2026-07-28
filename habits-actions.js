@@ -8,27 +8,7 @@
             updateConfigModalUI();
         }
 
-        function applyBulkTargetToActiveDays() {
-            const bulkEl = document.getElementById('bulkTargetInput');
-            const bulkVal = parseInt(bulkEl ? bulkEl.value : 1, 10);
-            if (isNaN(bulkVal) || bulkVal < 1) return;
-            for (let i = 0; i < 7; i++) {
-                if (configSelectedWeekdays[i]) {
-                    document.getElementById(`targetDay-${i}`).value = bulkVal;
-                }
-            }
-        }
 
-        function applyWeeklyBulkTargetToActiveDays() {
-            const weeklyBulkEl = document.getElementById('weeklyBulkTargetInput');
-            const bulkVal = parseInt(weeklyBulkEl ? weeklyBulkEl.value : 1, 10);
-            if (isNaN(bulkVal) || bulkVal < 1) return;
-            for (let i = 0; i < 7; i++) {
-                if (configSelectedWeekdays[i]) {
-                    document.getElementById(`weeklyTargetDay-${i}`).value = bulkVal;
-                }
-            }
-        }
 
         function updateConfigModalUI() {
             const safeEl = (id) => document.getElementById(id);
