@@ -143,6 +143,31 @@
             } catch(e) { return ''; }
         }
 
+
+        // חישוב ממוצע שבועי עבור הרגל יומי
+        function getWeeklyStatsForDailyHabit(habit, sundayDate) {
+            let totalV = 0, totalActive = 0, anyActionTaken = false;
+            for (let d = 0; d < 7; d++) {
+                const day = addDays(sundayDate, d);
+                const comps = getHebrewDateComponents(day);
+                const history = peekMonthHistory(habit, comps.key);
+                const dayOfWeek = day.getDay();
+                const target = getTargetForDay(habit, dayOfWeek);
+                // מצא את האינדקס של היום בחודש העברי
+                const startDate = getGregorianStartForMonthKey(comps.key);
+                const dayIndex = Math.round((day - startDate) / 86400000);
+                if (dayIndex < 0 || dayIndex >= history.length) continue;
+                const status = history[dayIndex];
+                if (status === '' || status === undefined) continue;
+                anyActionTaken = true;
+                if (typeof status === 'number') { totalV += status; totalActive += target; }
+                else if (status === 'V') { totalV += target; totalActive += target; }
+                else if (status === 'X') { totalActive += target; }
+            }
+            if (!anyActionTaken || totalActive === 0) return null;
+            return { pct: Math.round((totalV / totalActive) * 100), activeDays: totalActive, anyActionTaken };
+        }
+
         function renderComparisonView() {
             const habit = habits.find(h => h.id === selectedHabitIdForView);
             const container = document.getElementById('comparisonList');
@@ -161,24 +186,40 @@
             };
 
             if (habit.type === 'weekly') {
-                const today = new Date();
-                today.setHours(0, 0, 0, 0);
-                let sunday = getSundayOfWeek(today);
-                const rows = [];
+                const compModeW = window._comparisonModeWeekly || 'weeks';
+                const toggleBarW = document.createElement('div');
+                toggleBarW.style.cssText = 'display:flex; gap:8px; margin-bottom:12px; justify-content:center;';
+                const btnW = document.createElement('button');
+                btnW.textContent = 'שבועות';
+                btnW.style.cssText = `padding:4px 14px; border-radius:20px; border:1.5px solid ${compModeW==='weeks'?'#2563eb':'#cbd5e1'}; background:${compModeW==='weeks'?'#eff6ff':'transparent'}; color:${compModeW==='weeks'?'#2563eb':'#64748b'}; font-size:12px; font-weight:600; cursor:pointer;`;
+                btnW.onclick = () => { window._comparisonModeWeekly = 'weeks'; renderComparisonView(); };
+                const btnM = document.createElement('button');
+                btnM.textContent = 'חודשים';
+                btnM.style.cssText = `padding:4px 14px; border-radius:20px; border:1.5px solid ${compModeW==='months'?'#2563eb':'#cbd5e1'}; background:${compModeW==='months'?'#eff6ff':'transparent'}; color:${compModeW==='months'?'#2563eb':'#64748b'}; font-size:12px; font-weight:600; cursor:pointer;`;
+                btnM.onclick = () => { window._comparisonModeWeekly = 'months'; renderComparisonView(); };
+                toggleBarW.appendChild(btnW);
+                toggleBarW.appendChild(btnM);
+                container.appendChild(toggleBarW);
 
-                for (let i = 0; i < 12; i++) {
-                    const { doneScore, activeDays, remainingActive, weeklyFreq, anyActionTaken } = getWeeklyStatsForWeekByDate(habit, sunday);
-                    if (activeDays > 0 && anyActionTaken) {
-                        let pctVal;
-                        if ((doneScore + remainingActive) >= weeklyFreq) {
-                            pctVal = 100;
-                        } else {
-                            pctVal = Math.round(((doneScore + remainingActive) / weeklyFreq) * 100);
+                const rows = [];
+                if (compModeW === 'weeks') {
+                    const today = new Date(); today.setHours(0,0,0,0);
+                    let sunday = getSundayOfWeek(today);
+                    for (let i = 0; i < 12; i++) {
+                        const { doneScore, activeDays, remainingActive, weeklyFreq, anyActionTaken } = getWeeklyStatsForWeekByDate(habit, sunday);
+                        if (activeDays > 0 && anyActionTaken) {
+                            let pctVal = (doneScore + remainingActive) >= weeklyFreq ? 100 : Math.round(((doneScore + remainingActive) / weeklyFreq) * 100);
+                            const weekEnd = addDays(sunday, 6);
+                            rows.push({ label: `${formatHebrewShort(sunday)} — ${formatHebrewShort(weekEnd)}`, pct: pctVal });
                         }
-                        const weekEnd = addDays(sunday, 6);
-                        rows.push({ label: `${formatHebrewShort(sunday)} — ${formatHebrewShort(weekEnd)}`, pct: pctVal });
+                        sunday = addDays(sunday, -7);
                     }
-                    sunday = addDays(sunday, -7);
+                } else {
+                    const sortedMonths = Object.keys(habit.history || {}).reverse().slice(0, 12);
+                    for (const monthKey of sortedMonths) {
+                        const stats = calculateStatsForMonth(habit, monthKey);
+                        if (stats.text !== '-') rows.push({ label: monthKey, pct: stats.pct });
+                    }
                 }
 
                 if (rows.length === 0) { emptyMsg('אין עדיין נתונים להשוואה'); return; }
