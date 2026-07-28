@@ -415,21 +415,7 @@
             });
         }
 
-        function moveHabit(id, direction, event) {
-            if (event) event.stopPropagation();
-            const idx = habits.findIndex(h => h.id === id);
-            if (idx === -1) return;
-            const newIdx = idx + direction;
-            if (newIdx < 0 || newIdx >= habits.length) return;
-            [habits[idx], habits[newIdx]] = [habits[newIdx], habits[idx]];
-            saveToStorage();
-        }
 
-        // ---- פילטר סימניות + לא סומן ----
-        let activeBookmarkFilter = null; // null = הכל, colorKey = רק סימניה זו
-        let showUnsignedOnly = false;    // true = רק הרגלים שלא סומנו היום
-
-        // בודק אם הרגל מסוים סומן היום (כל סוג)
         function isHabitSignedToday(habit) {
             const history = peekMonthHistory(habit, actualCurrentMonthKey);
             const status = history[currentHebrewDayIndex];
