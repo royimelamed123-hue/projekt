@@ -166,24 +166,83 @@
                 otzShowMessage('הציונים נשמרו כברירת מחדל להרגלים הבאים.', 'success');
             }
             if (scoreApplyAllMarked) {
-                const count = habits.filter(h => !h.archived).length;
-                const msgParts = [];
-                if (passingScore !== null) msgParts.push(`ציון קניין: ${passingScore}%`);
-                if (minScore !== null) msgParts.push(`ציון הגזמה: ${minScore}%`);
-                const displayStr = msgParts.length > 0 ? msgParts.join(', ') : 'ריק (ללא ציון)';
-                if (confirm(`לעדכן את כל ${count} ההרגלים הקיימים עם הציונים הבאים?\n${displayStr}`)) {
-                    habits.forEach(h => {
-                        if (h.archived) return;
-                        h.passingScore = passingScore;
-                        h.minScore = minScore;
-                    });
-                    invalidateAllStatsCache();
-                    saveToStorage();
-                    otzShowMessage(`עודכנו ${count} הרגלים.`, 'success');
-                }
+                // פתח מודאל בחירת הרגלים
+                window._pendingApplyPassingScore = passingScore;
+                window._pendingApplyMinScore = minScore;
+                openApplyScoreModal();
+                scoreDefaultMarked = false;
+                scoreApplyAllMarked = false;
+                return; // המשך ב-confirmApplyScoreToSelected
             }
             scoreDefaultMarked = false;
             scoreApplyAllMarked = false;
+        }
+
+        function openApplyScoreModal() {
+            const modal = document.getElementById('applyScoreModal');
+            const list = document.getElementById('applyScoreList');
+            if (!modal || !list) return;
+
+            list.innerHTML = '';
+            const allHabits = habits;
+            allHabits.forEach(h => {
+                const row = document.createElement('div');
+                row.style.cssText = 'display:flex; align-items:center; gap:8px; padding:6px 4px; border-bottom:1px solid #f1f5f9;';
+                row.innerHTML = `
+                    <input type="checkbox" id="applyScore-${esc(h.id)}" value="${esc(h.id)}" style="cursor:pointer; width:16px; height:16px;">
+                    <label for="applyScore-${esc(h.id)}" style="cursor:pointer; flex:1; font-size:13px;">
+                        ${esc(h.title)}${h.archived ? ' <span style="color:#94a3b8; font-size:11px;">(ארכיון)</span>' : ''}
+                    </label>`;
+                list.appendChild(row);
+            });
+
+            // עדכן כפתור סמן הכל
+            _updateApplyScoreToggleBtn();
+            modal.style.display = 'flex';
+        }
+
+        function _updateApplyScoreToggleBtn() {
+            const list = document.getElementById('applyScoreList');
+            const btn = document.getElementById('applyScoreToggleAll');
+            if (!list || !btn) return;
+            const checkboxes = list.querySelectorAll('input[type="checkbox"]');
+            const allChecked = [...checkboxes].every(cb => cb.checked);
+            btn.textContent = allChecked ? 'בטל הכל' : 'סמן הכל';
+        }
+
+        function toggleApplyScoreAll() {
+            const list = document.getElementById('applyScoreList');
+            if (!list) return;
+            const checkboxes = list.querySelectorAll('input[type="checkbox"]');
+            const allChecked = [...checkboxes].every(cb => cb.checked);
+            checkboxes.forEach(cb => { cb.checked = !allChecked; });
+            _updateApplyScoreToggleBtn();
+        }
+
+        function confirmApplyScoreToSelected() {
+            const list = document.getElementById('applyScoreList');
+            if (!list) return;
+            const selectedIds = [...list.querySelectorAll('input[type="checkbox"]:checked')].map(cb => cb.value);
+            if (selectedIds.length === 0) {
+                alert('לא נבחרו הרגלים.');
+                return;
+            }
+            const passingScore = window._pendingApplyPassingScore;
+            const minScore = window._pendingApplyMinScore;
+
+            selectedIds.forEach(id => {
+                const h = habits.find(h => h.id === id);
+                if (!h) return;
+                h.passingScore = passingScore;
+                h.minScore = minScore;
+            });
+
+            invalidateAllStatsCache();
+            saveToStorage();
+            otzShowMessage(`עודכנו ${selectedIds.length} הרגלים.`, 'success');
+            document.getElementById('applyScoreModal').style.display = 'none';
+            window._pendingApplyPassingScore = null;
+            window._pendingApplyMinScore = null;
         }
 
         let xTimesMode = 'uniform';
