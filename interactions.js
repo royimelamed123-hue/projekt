@@ -170,8 +170,11 @@
                 e.dataTransfer.setData('text/plain', habitId);
             });
             handle.addEventListener('dragend', () => {
-                draggedHabitId = null;
-                document.querySelectorAll('.habit-card').forEach(c => c.classList.remove('dragging', 'drag-over-top', 'drag-over-bottom'));
+                // דחה את האיפוס כדי לאפשר ל-drop להגיע קודם
+                setTimeout(() => {
+                    draggedHabitId = null;
+                    document.querySelectorAll('.habit-card').forEach(c => c.classList.remove('dragging', 'drag-over-top', 'drag-over-bottom'));
+                }, 100);
             });
         }
 
