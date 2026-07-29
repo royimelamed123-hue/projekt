@@ -109,6 +109,7 @@
             card.className = 'habit-card';
             card.style.borderRight = `5px solid ${getThemeColor(habit.theme)}`;
             card.dataset.habitId = habit.id;
+            card.setAttribute('draggable', 'true');
             setupCardDragAndDrop(card, habit.id);
             card.onclick = () => openMonthView(habit.id);
             return card;
