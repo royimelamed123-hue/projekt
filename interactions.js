@@ -431,6 +431,20 @@
             return status === 'V' || status === 'X' || status === 'א' || typeof status === 'number';
         }
 
+        // ---- פילטר סימניות + לא סומן ----
+        let activeBookmarkFilter = null; // null = הכל, colorKey = רק סימניה זו
+        let showUnsignedOnly = false;    // true = רק הרגלים שלא סומנו היום
+
+        // בודק אם הרגל מסוים סומן היום (כל סוג)
+        function isHabitSignedToday(habit) {
+            const currentMonthHistory = peekMonthHistory(habit, actualCurrentMonthKey);
+            const todayStatus = currentMonthHistory[currentHebrewDayIndex];
+            if (habit.type === 'weekly' || habit.type === 'monthly') {
+                return todayStatus === 'W' || todayStatus === 'N' || typeof todayStatus === 'number';
+            }
+            return todayStatus === 'V' || todayStatus === 'X' || todayStatus === 'א' || typeof todayStatus === 'number';
+        }
+
         let _lastBookmarkBarState = null;
 
         function renderBookmarkFilterBar() {
