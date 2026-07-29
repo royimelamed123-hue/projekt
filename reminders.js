@@ -164,19 +164,6 @@
                     ? `תזכורות פעילות (${(config.reminders || []).length})`
                     : 'תזכורות כבויות';
                 statusColor = config.enabled ? '#0f766e' : '#64748b';
-            } else if (!('Notification' in window)) {
-                statusText = 'הדפדפן לא תומך בהתראות';
-                statusColor = '#b91c1c';
-            } else if (Notification.permission === 'denied') {
-                statusText = 'התראות חסומות — יש לאפשר בהגדרות הדפדפן';
-                statusColor = '#b91c1c';
-            } else if (Notification.permission === 'granted') {
-                statusText = config.enabled
-                    ? `תזכורות פעילות (${(config.reminders || []).length})`
-                    : 'הרשאות התראות אושרו';
-                statusColor = '#0f766e';
-            } else {
-                statusText = 'לחץ "שמור" כדי לאשר הרשאת התראות';
             }
 
             const existingRowsHTML = (config.reminders || []).map(r => buildReminderRowHTML(r)).join('');
