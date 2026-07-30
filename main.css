@@ -709,11 +709,7 @@ html, body {
         .habit-card.dragging {
             opacity: 0.4;
         }
-        .habit-card.drag-over-top {
-            outline: 2px dashed #2563eb;
-            outline-offset: -2px;
-        }
-        .habit-card.drag-over-bottom {
+        .habit-card.drag-over {
             outline: 2px dashed #2563eb;
             outline-offset: -2px;
         }
