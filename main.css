@@ -683,6 +683,8 @@ html, body {
         .btn-drag-handle {
             cursor: grab;
             color: #475569;
+            user-select: none;
+            touch-action: none;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -708,10 +710,12 @@ html, body {
             opacity: 0.4;
         }
         .habit-card.drag-over-top {
-            border-top: 3px solid #2563eb;
+            outline: 2px dashed #2563eb;
+            outline-offset: -2px;
         }
         .habit-card.drag-over-bottom {
-            border-bottom: 3px solid #2563eb;
+            outline: 2px dashed #2563eb;
+            outline-offset: -2px;
         }
 
         .controls-row {
