@@ -138,22 +138,58 @@
         function attachDragHandle(card, habitId) {
             const handle = card.querySelector('.btn-drag-handle');
             if (!handle) return;
-            handle.setAttribute('draggable', 'true');
-            handle.addEventListener('dragstart', (e) => {
+
+            // הסר draggable כדי למנוע התנגשות עם HTML5 drag
+            handle.removeAttribute('draggable');
+
+            handle.addEventListener('pointerdown', (e) => {
+                if (e.pointerType === 'mouse' && e.button !== 0) return;
+                e.preventDefault();
+                handle.setPointerCapture(e.pointerId);
+
                 draggedHabitId = habitId;
                 card.classList.add('dragging');
-                e.dataTransfer.effectAllowed = 'move';
-                e.dataTransfer.setData('text/plain', habitId);
-            });
-            handle.addEventListener('dragend', () => {
-                // דחה את האיפוס כדי לאפשר ל-drop להגיע קודם
-                setTimeout(() => {
+                let targetCard = null;
+                let insertBefore = false;
+
+                const onMove = (ev) => {
+                    // מצא את הכרטיס מתחת לסמן
+                    handle.style.pointerEvents = 'none';
+                    const el = document.elementFromPoint(ev.clientX, ev.clientY)?.closest?.('.habit-card');
+                    handle.style.pointerEvents = '';
+
+                    document.querySelectorAll('.habit-card').forEach(c => c.classList.remove('drag-over-top', 'drag-over-bottom'));
+
+                    if (el && el !== card && el.dataset.habitId) {
+                        targetCard = el;
+                        const rect = el.getBoundingClientRect();
+                        insertBefore = ev.clientY < rect.top + rect.height / 2;
+                        el.classList.add(insertBefore ? 'drag-over-top' : 'drag-over-bottom');
+                    } else {
+                        targetCard = null;
+                    }
+                };
+
+                const onUp = () => {
+                    handle.removeEventListener('pointermove', onMove);
+                    handle.removeEventListener('pointerup', onUp);
+                    handle.removeEventListener('pointercancel', onUp);
+
+                    card.classList.remove('dragging');
+                    document.querySelectorAll('.habit-card').forEach(c => c.classList.remove('drag-over-top', 'drag-over-bottom'));
+
+                    if (draggedHabitId && targetCard && targetCard.dataset.habitId !== draggedHabitId) {
+                        reorderHabits(draggedHabitId, targetCard.dataset.habitId, insertBefore);
+                    }
                     draggedHabitId = null;
-                    document.querySelectorAll('.habit-card').forEach(c => c.classList.remove('dragging', 'drag-over-top', 'drag-over-bottom'));
-                }, 100);
+                    targetCard = null;
+                };
+
+                handle.addEventListener('pointermove', onMove);
+                handle.addEventListener('pointerup', onUp);
+                handle.addEventListener('pointercancel', onUp);
             });
         }
-
         function reorderHabits(draggedId, targetId, insertBefore) {
             const draggedIdx = habits.findIndex(h => h.id === draggedId);
             if (draggedIdx === -1) return;
