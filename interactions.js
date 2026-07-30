@@ -133,61 +133,50 @@
         let dragState = null;
 
         function setupCardDragAndDrop(card, habitId) {
-            // pointer events מטפלות בגרירה — ראה attachDragHandle
+            // הגרירה מנוהלת ב-attachDragHandle עם pointer events
         }
         function attachDragHandle(card, habitId) {
             const handle = card.querySelector('.btn-drag-handle');
             if (!handle) return;
-
-            // הסר draggable כדי למנוע התנגשות עם HTML5 drag
             handle.removeAttribute('draggable');
 
-            handle.addEventListener('pointerdown', (e) => {
+            card.addEventListener('pointerdown', (e) => {
+                // רק מהידית
+                if (!e.target.closest('.btn-drag-handle')) return;
                 if (e.pointerType === 'mouse' && e.button !== 0) return;
+                // אל תפריע ללחיצות על כפתורים
+                if (e.target.closest('button:not(.btn-drag-handle), input, textarea, select')) return;
+
                 e.preventDefault();
-                handle.setPointerCapture(e.pointerId);
-
                 draggedHabitId = habitId;
+                let destHabitId = habitId;
                 card.classList.add('dragging');
-                let targetCard = null;
-                let insertBefore = false;
 
-                const onMove = (ev) => {
-                    // מצא את הכרטיס מתחת לסמן
-                    handle.style.pointerEvents = 'none';
-                    const el = document.elementFromPoint(ev.clientX, ev.clientY)?.closest?.('.habit-card');
-                    handle.style.pointerEvents = '';
-
-                    document.querySelectorAll('.habit-card').forEach(c => c.classList.remove('drag-over-top', 'drag-over-bottom'));
-
-                    if (el && el !== card && el.dataset.habitId) {
-                        targetCard = el;
-                        const rect = el.getBoundingClientRect();
-                        insertBefore = ev.clientY < rect.top + rect.height / 2;
-                        el.classList.add(insertBefore ? 'drag-over-top' : 'drag-over-bottom');
-                    } else {
-                        targetCard = null;
+                const move = ev => {
+                    const target = document.elementFromPoint(ev.clientX, ev.clientY)?.closest?.('.habit-card');
+                    document.querySelectorAll('.habit-card').forEach(c =>
+                        c.classList.toggle('drag-over', c === target && c !== card)
+                    );
+                    if (target && target !== card && target.dataset.habitId) {
+                        destHabitId = target.dataset.habitId;
                     }
                 };
 
-                const onUp = () => {
-                    handle.removeEventListener('pointermove', onMove);
-                    handle.removeEventListener('pointerup', onUp);
-                    handle.removeEventListener('pointercancel', onUp);
-
+                const finish = () => {
+                    document.removeEventListener('pointermove', move);
+                    document.removeEventListener('pointerup', finish);
+                    document.removeEventListener('pointercancel', finish);
+                    document.querySelectorAll('.habit-card').forEach(c => c.classList.remove('drag-over', 'dragging'));
                     card.classList.remove('dragging');
-                    document.querySelectorAll('.habit-card').forEach(c => c.classList.remove('drag-over-top', 'drag-over-bottom'));
-
-                    if (draggedHabitId && targetCard && targetCard.dataset.habitId !== draggedHabitId) {
-                        reorderHabits(draggedHabitId, targetCard.dataset.habitId, insertBefore);
+                    if (draggedHabitId && destHabitId && destHabitId !== draggedHabitId) {
+                        reorderHabits(draggedHabitId, destHabitId, false);
                     }
                     draggedHabitId = null;
-                    targetCard = null;
                 };
 
-                handle.addEventListener('pointermove', onMove);
-                handle.addEventListener('pointerup', onUp);
-                handle.addEventListener('pointercancel', onUp);
+                document.addEventListener('pointermove', move);
+                document.addEventListener('pointerup', finish);
+                document.addEventListener('pointercancel', finish);
             });
         }
         function reorderHabits(draggedId, targetId, insertBefore) {
