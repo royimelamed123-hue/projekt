@@ -133,32 +133,8 @@
         let dragState = null;
 
         function setupCardDragAndDrop(card, habitId) {
-            card.addEventListener('dragover', (e) => {
-                e.preventDefault();
-                if (!draggedHabitId || draggedHabitId === habitId) return;
-                const rect = card.getBoundingClientRect();
-                card.classList.remove('drag-over-top', 'drag-over-bottom');
-                const sameRow = e.clientY >= rect.top && e.clientY <= rect.bottom;
-                const insertBefore = sameRow
-                    ? e.clientX < rect.left + rect.width  * 0.5
-                    : e.clientY < rect.top  + rect.height * 0.5;
-                card.classList.add(insertBefore ? 'drag-over-top' : 'drag-over-bottom');
-            });
-
-            card.addEventListener('dragleave', () => {
-                card.classList.remove('drag-over-top', 'drag-over-bottom');
-            });
-
-            card.addEventListener('drop', (e) => {
-                e.preventDefault();
-                e.stopPropagation();
-                const insertBefore = card.classList.contains('drag-over-top');
-                card.classList.remove('drag-over-top', 'drag-over-bottom');
-                if (!draggedHabitId || draggedHabitId === habitId) return;
-                reorderHabits(draggedHabitId, habitId, insertBefore);
-            });
+            // pointer events מטפלות בגרירה — ראה attachDragHandle
         }
-
         function attachDragHandle(card, habitId) {
             const handle = card.querySelector('.btn-drag-handle');
             if (!handle) return;
