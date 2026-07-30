@@ -152,6 +152,8 @@
                 let destHabitId = habitId;
                 card.classList.add('dragging');
 
+                let insertBefore = false;
+
                 const move = ev => {
                     const target = document.elementFromPoint(ev.clientX, ev.clientY)?.closest?.('.habit-card');
                     document.querySelectorAll('.habit-card').forEach(c =>
@@ -159,6 +161,8 @@
                     );
                     if (target && target !== card && target.dataset.habitId) {
                         destHabitId = target.dataset.habitId;
+                        const rect = target.getBoundingClientRect();
+                        insertBefore = ev.clientY < rect.top + rect.height / 2;
                     }
                 };
 
@@ -169,7 +173,7 @@
                     document.querySelectorAll('.habit-card').forEach(c => c.classList.remove('drag-over', 'dragging'));
                     card.classList.remove('dragging');
                     if (draggedHabitId && destHabitId && destHabitId !== draggedHabitId) {
-                        reorderHabits(draggedHabitId, destHabitId, false);
+                        reorderHabits(draggedHabitId, destHabitId, insertBefore);
                     }
                     draggedHabitId = null;
                 };
