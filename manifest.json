@@ -16,7 +16,9 @@
     "plugin.storage.write",
     "ui.feedback",
     "notifications.system",
-    "events.subscribe:theme.changed"
+    "events.subscribe:theme.changed",
+    "events.subscribe:plugin.suspended",
+    "events.subscribe:plugin.resumed"
   ],
   "contributes": {
     "toolTab": {
