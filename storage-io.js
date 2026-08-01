@@ -18,8 +18,8 @@
                 storageSaveAsync('otzarya_habits', habits);
             }
         }
-        if (HAS_OTZARIA) {
-            try { Otzaria.on('plugin.suspended', _flushSaveIfPending); } catch(e) {}
+        if (typeof Otzaria !== 'undefined') {
+            Otzaria.on('plugin.suspended', _flushSaveIfPending);
         }
 
         function saveToStorage() {
