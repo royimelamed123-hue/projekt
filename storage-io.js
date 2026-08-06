@@ -19,7 +19,7 @@
             }
         }
         if (typeof Otzaria !== 'undefined') {
-            Otzaria.on('plugin.suspended', _flushSaveIfPending);
+            window.addEventListener('plugin.suspended', () => _flushSaveIfPending());
         }
 
         function saveToStorage() {
