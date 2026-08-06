@@ -258,8 +258,8 @@
 
             // תיקון באג 5: עצירה והפעלה מחדש של הטיימר עם אירועי plugin.suspended/resumed
             if (HAS_OTZARIA) {
-                try { Otzaria.on('plugin.suspended', stopReminderInterval); } catch(e) {}
-                try { Otzaria.on('plugin.resumed', startReminderInterval); } catch(e) {}
+                window.addEventListener('plugin.suspended', () => stopReminderInterval());
+                window.addEventListener('plugin.resumed', () => startReminderInterval());
             }
 
             const actionBar = document.querySelector('.action-bar');
