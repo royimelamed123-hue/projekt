@@ -427,7 +427,7 @@
 
         // האזנה לאירוע אוצריא plugin.suspended (מופעל כשהמשתמש עוזב את התוסף)
         if (HAS_OTZARIA) {
-            try { Otzaria.on('plugin.suspended', lockAppOnHide); } catch(e) {}
+            window.addEventListener('plugin.suspended', () => lockAppOnHide());
         }
 
         // fallback לדפדפן רגיל
