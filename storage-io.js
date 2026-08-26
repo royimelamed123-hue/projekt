@@ -35,8 +35,12 @@
         function saveToStorageForHabit(habitId) {
             invalidateStatsCache(habitId);
             _debouncedSave();
-            // עדכן רק את הכרטיס שהשתנה במקום כל הכרטיסים
-            updateCardInPlace(habitId);
+            // אם פילטר "לא סומן" פעיל — רנדר מחדש כדי להסיר הרגלים שסומנו
+            if (showUnsignedOnly) {
+                renderHabits();
+            } else {
+                updateCardInPlace(habitId);
+            }
             if(selectedHabitIdForView) {
                 renderFullMonthGrid();
                 renderMonthNotesList();
