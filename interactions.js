@@ -434,8 +434,11 @@
 
 
         function isHabitSignedToday(habit) {
-            const history = peekMonthHistory(habit, actualCurrentMonthKey);
-            const status = history[currentHebrewDayIndex];
+            // בדוק לפי היום שנבחר בניווט (לא בהכרח היום האמיתי)
+            const comps = getHebrewDateComponents(mainScreenDatePointer);
+            const history = peekMonthHistory(habit, comps.key);
+            const dayIdx = comps.dayIndex !== undefined ? comps.dayIndex : currentHebrewDayIndex;
+            const status = history[dayIdx];
             if (status === '' || status === undefined || status === null) return false;
 
             if (habit.type === 'weekly') {
