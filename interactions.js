@@ -86,6 +86,7 @@
 
             let totalActive = 0;
             let totalV = 0;
+            let hasAnyAction = false;
             
             for(let i = 0; i < 30; i++) {
                 const status = history[i];
@@ -93,16 +94,27 @@
                 const target = getTargetForDay(habit, cellDayOfWeek);
                 
                 if (typeof status === 'number') {
+                    // ביצוע חלקי
                     totalV += status;
                     totalActive += target;
+                    hasAnyAction = true;
                 } else if(status === "V") { 
+                    // בוצע
                     totalV += target; 
-                    totalActive += target; 
+                    totalActive += target;
+                    hasAnyAction = true;
                 } else if(status === "X") { 
-                    totalActive += target; 
+                    // פספוס — לא מוסיף לV, כן מוסיף לactive
+                    totalActive += target;
+                    hasAnyAction = true;
+                } else if(status === undefined || status === "" || status === null) {
+                    // ריק — נחשב כבוצע אבל רק אם יש פעולה אחרת בחודש
+                    totalV += target;
+                    totalActive += target;
                 }
+                // א — לא נספר בכלל
             }
-            if(totalActive === 0) return { pct: 0, text: "-" };
+            if(!hasAnyAction) return { pct: 0, text: "-" };
             const pct = Math.round((totalV / totalActive) * 100);
             return { pct: pct, text: `${pct}%` };
         }
