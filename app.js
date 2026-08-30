@@ -90,6 +90,29 @@
         // גרסת הסכמה הנוכחית של אובייקט ההרגל. מיגרציה רצה פעם אחת בלבד לכל הרגל.
         const HABIT_SCHEMA_VERSION = 2;
 
+
+        // מיגרציה: N ביום לא פעיל → N_auto
+        function migrateNAutoForHabit(habit) {
+            if (!habit.workdays || !habit.history) return;
+            if ((habit.type !== 'weekly' && habit.type !== 'monthly')) return;
+            
+            for (const monthKey in habit.history) {
+                const history = habit.history[monthKey];
+                const firstDate = getGregorianStartForMonthKey(monthKey);
+                const startDayOfWeek = firstDate.getDay();
+                
+                for (let i = 0; i < 30; i++) {
+                    if (history[i] === 'N') {
+                        const dayOfWeek = (startDayOfWeek + i) % 7;
+                        const isActive = habit.workdays[dayOfWeek];
+                        if (!isActive) {
+                            history[i] = 'N_auto';
+                        }
+                    }
+                }
+            }
+        }
+
         function migrateHabitToAllowedSkips(habit) {
             if (!habit || typeof habit !== 'object') return;
             if (habit.schemaVersion >= HABIT_SCHEMA_VERSION) return;
