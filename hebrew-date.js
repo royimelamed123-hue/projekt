@@ -231,7 +231,7 @@
                     // תיקון 3 נכנס לפעולה כאן: getGregorianStartForMonthKey משתמשת ב-new Date() כ-anchor
                     const firstHebrewDayDate = getGregorianStartForMonthKey(monthKey);
                     const startDayOfWeek = firstHebrewDayDate.getDay();
-                    const offValue = (habit.type === 'weekly' || habit.type === 'monthly') ? "N" : "א";
+                    const offValue = (habit.type === 'weekly' || habit.type === 'monthly') ? "N_auto" : "א";
                     for (let i = 0; i < 30; i++) {
                         const currentDayOfWeek = (startDayOfWeek + i) % 7;
                         if (!habit.workdays[currentDayOfWeek]) {
@@ -250,7 +250,7 @@
             const firstHebrewDayDate = getGregorianStartForMonthKey(monthKey);
             const startDayOfWeek = firstHebrewDayDate.getDay(); 
 
-            const offValue = (habit.type === 'weekly' || habit.type === 'monthly') ? "N" : "א";
+            const offValue = (habit.type === 'weekly' || habit.type === 'monthly') ? "N_auto" : "א";
             
             for (let i = 0; i < 30; i++) {
                 const currentDayOfWeek = (startDayOfWeek + i) % 7;
