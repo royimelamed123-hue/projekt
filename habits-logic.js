@@ -107,7 +107,13 @@
                         }
                     }
                 } else if (statusType === 'N') {
-                    monthHistory[currentHebrewDayIndex] = (currentStatus === 'N') ? "" : 'N';
+                    const isActiveDay = habit.workdays && habit.workdays[currentDayOfWeek];
+                    if (!isActiveDay) {
+                        // יום לא פעיל — המשתמש לחץ N, שמור N_auto (אל תשנה)
+                        monthHistory[currentHebrewDayIndex] = 'N_auto';
+                    } else {
+                        monthHistory[currentHebrewDayIndex] = (currentStatus === 'N') ? "" : 'N';
+                    }
                 }
                 invalidateStatsCache(habitId);
                 saveToStorageForHabit(habitId);
@@ -129,10 +135,12 @@
                         }
                     }
                 } else if (statusType === 'N') {
-                    if (currentStatus === 'N') {
-                        monthHistory[currentHebrewDayIndex] = "";
+                    const isActiveDay = habit.workdays && habit.workdays[currentDayOfWeek];
+                    if (!isActiveDay) {
+                        // יום לא פעיל — המשתמש לחץ N, שמור N_auto (אל תשנה)
+                        monthHistory[currentHebrewDayIndex] = 'N_auto';
                     } else {
-                        monthHistory[currentHebrewDayIndex] = 'N';
+                        monthHistory[currentHebrewDayIndex] = (currentStatus === 'N') ? "" : 'N';
                     }
                 }
                 invalidateStatsCache(habitId);
@@ -592,6 +600,9 @@
                 const target = (dayTargets && dayTargets[dow]) || 1;
                 const isEmpty = (status === "" || status === undefined);
 
+                // N_auto = יום לא פעיל שסומן אוטומטית — לא נספר בכלל (כמו יום לא פעיל)
+                if (status === 'N_auto') continue;
+
                 if (!isEmpty) {
                     activeDays++;
                     if (typeof status === 'number') {
@@ -727,3 +738,4 @@
         function getScoreBgColor(pct, habit) {
             return '';
         }
+
