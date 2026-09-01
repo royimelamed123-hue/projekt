@@ -125,6 +125,9 @@ html, body {
             color: #dcfce7;
         }
         body.dark-mode .action-toggle.btn-x.active,
+        /* N_auto dark mode */
+        body.dark-mode .action-toggle.btn-w-skip.n-auto { opacity: 0.4; color: #64748b; }
+        body.dark-mode .action-toggle.btn-w-skip.n-auto.active { background-color: #1e293b; border-color: #334155; color: #64748b; }
         body.dark-mode .action-toggle.btn-w-skip.harmful.active {
             background-color: #7f1d1d;
             border-color: #ef4444;
@@ -759,6 +762,9 @@ html, body {
         .action-toggle.btn-w-done.active { background-color: #bbf7d0; border-color: #86efac; }
         .action-toggle.btn-w-skip.active:not(.harmful) { background-color: #e2e8f0; border-color: #cbd5e1; }
         .action-toggle.btn-w-skip.harmful.active { background-color: #fecaca; border-color: #fca5a5; }
+        /* N_auto = יום לא פעיל שסומן אוטומטית — מעומעם, לא אדום */
+        .action-toggle.btn-w-skip.n-auto { opacity: 0.45; color: #94a3b8; }
+        .action-toggle.btn-w-skip.n-auto.active { background-color: #f1f5f9; border-color: #e2e8f0; color: #94a3b8; }
 
         /* צבע m-status בלוח חודשי לשבועי */
         .m-status-N-safe { background-color: #e2e8f0 !important; color: #475569; }
@@ -1414,3 +1420,4 @@ html, body {
             box-sizing: border-box;
             text-align: right;
         }
+
