@@ -144,6 +144,8 @@
         function migrateAllHabits(list) {
             if (!Array.isArray(list)) return;
             list.forEach(migrateHabitToAllowedSkips);
+            // מיגרציה: N ביום לא פעיל → N_auto (שבועי וחודשי)
+            list.forEach(migrateNAutoForHabit);
         }
         // ---- סיום מיגרציה ----
 
@@ -185,3 +187,4 @@
                 initializeApp();
             }
         }
+
