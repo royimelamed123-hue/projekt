@@ -119,6 +119,7 @@
             const mTarget = (habit.monthlyDayTargets && habit.monthlyDayTargets[currentDayOfWeek]) || 1;
             const isNHarmfulM = isMonthlyNHarmful(habit, actualCurrentMonthKey, currentHebrewDayIndex);
             const isNActiveM = (todayStatus === 'N');
+            const isNAutoM = (todayStatus === 'N_auto');
 
             let wTextM = mTarget === 1 ? "בוצע" : `${mTarget}`;
             let wStyleM = "";
@@ -140,7 +141,7 @@
                 createCardHeaderHTML(habit, mStats) +
                 `<div class="controls-row">
                     <div class="status-buttons-group">
-                        <div class="action-toggle btn-w-skip ${isNActiveM ? 'active' : ''} ${isNHarmfulM ? 'harmful' : ''}" onclick="setStatus('${esc(habit.id)}', 'N', event)">
+                        <div class="action-toggle btn-w-skip ${isNActiveM ? 'active' : ''} ${isNHarmfulM ? 'harmful' : ''} ${isNAutoM ? 'n-auto' : ''}" onclick="setStatus('${esc(habit.id)}', 'N', event)">
                             <span>לא בוצע</span>
                         </div>
                         <div class="action-toggle btn-w-done ${isWActiveM ? 'active' : ''}" style="${wStyleM}" onclick="setStatus('${esc(habit.id)}', 'W', event)">
@@ -179,6 +180,7 @@
             }
 
             const isNActive = (todayStatus === 'N');
+            const isNAuto = (todayStatus === 'N_auto');
             const isNHarmful = isWeeklyNHarmful(habit, actualCurrentMonthKey, currentHebrewDayIndex, firstDayDate.getDay(), firstDayGregorian, totalDaysInMonth);
 
             const card = createBaseCard(habit);
@@ -187,7 +189,7 @@
                 createCardHeaderHTML(habit, mStats) +
                 `<div class="controls-row">
                     <div class="status-buttons-group">
-                        <div class="action-toggle btn-w-skip ${isNActive ? 'active' : ''} ${isNHarmful ? 'harmful' : ''}" onclick="setStatus('${esc(habit.id)}', 'N', event)">
+                        <div class="action-toggle btn-w-skip ${isNActive ? 'active' : ''} ${isNHarmful ? 'harmful' : ''} ${isNAuto ? 'n-auto' : ''}" onclick="setStatus('${esc(habit.id)}', 'N', event)">
                             <span>לא בוצע</span>
                         </div>
                         <div class="action-toggle btn-w-done ${isWActive ? 'active' : ''}" style="${wStyle}" onclick="setStatus('${esc(habit.id)}', 'W', event)">
@@ -274,6 +276,8 @@
                 const mTarget = (habit.monthlyDayTargets && habit.monthlyDayTargets[currentDayOfWeek]) || 1;
                 const isNHarmfulM = isMonthlyNHarmful(habit, actualCurrentMonthKey, currentHebrewDayIndex);
                 const isNActiveM = (todayStatus === 'N');
+                const isNAutoM = (todayStatus === 'N_auto');
+            const isNAutoM = (todayStatus === 'N_auto');
                 let wTextM = mTarget === 1 ? 'בוצע' : `${mTarget}`;
                 let wStyleM = '';
                 let isWActiveM = false;
@@ -285,7 +289,7 @@
                 }
                 const btnSkip = card.querySelector('.btn-w-skip');
                 const btnDone = card.querySelector('.btn-w-done');
-                if (btnSkip) { btnSkip.classList.toggle('active', isNActiveM); btnSkip.classList.toggle('harmful', isNHarmfulM); }
+                if (btnSkip) { btnSkip.classList.toggle('active', isNActiveM); btnSkip.classList.toggle('harmful', isNHarmfulM); btnSkip.classList.toggle('n-auto', isNAutoM); }
                 if (btnDone) { btnDone.classList.toggle('active', isWActiveM); btnDone.style.cssText = wStyleM; btnDone.querySelector('span').textContent = wTextM; }
 
             } else if (habit.type === 'weekly') {
@@ -293,6 +297,8 @@
                 const firstDayDate = getFirstHebrewDayDate(mainScreenDatePointer);
                 const isNHarmful = isWeeklyNHarmful(habit, actualCurrentMonthKey, currentHebrewDayIndex, firstDayDate.getDay(), firstDayDate, calculateDaysInBrowsingMonth(mainScreenDatePointer));
                 const isNActive = (todayStatus === 'N');
+                const isNAuto = (todayStatus === 'N_auto');
+            const isNAuto = (todayStatus === 'N_auto');
                 let wText = wTarget === 1 ? 'בוצע' : `${wTarget}`;
                 let wStyle = '';
                 let isWActive = false;
@@ -306,7 +312,7 @@
                 } else { isWActive = (todayStatus === 'W'); }
                 const btnSkip = card.querySelector('.btn-w-skip');
                 const btnDone = card.querySelector('.btn-w-done');
-                if (btnSkip) { btnSkip.classList.toggle('active', isNActive); btnSkip.classList.toggle('harmful', isNHarmful); }
+                if (btnSkip) { btnSkip.classList.toggle('active', isNActive); btnSkip.classList.toggle('harmful', isNHarmful); btnSkip.classList.toggle('n-auto', isNAuto); }
                 if (btnDone) { btnDone.classList.toggle('active', isWActive); btnDone.style.cssText = wStyle; btnDone.querySelector('span').textContent = wText; }
 
             } else {
@@ -598,6 +604,9 @@
                         const harmful = isWeeklyNHarmfulByDate(habit, dayGregorian);
                         cell.classList.add(harmful ? 'm-status-X' : 'm-status-א');
                         statusLabel = "לא בוצע";
+                    } else if (status === 'N_auto') {
+                        cell.classList.add('m-status-א');
+                        statusLabel = "לא פעיל";
                     }
                 } else if (habit.type === 'monthly') {
                     const mTarget = (habit.monthlyDayTargets && habit.monthlyDayTargets[cellDayOfWeek]) || 1;
@@ -613,6 +622,9 @@
                         const harmful = isMonthlyNHarmful(habit, targetMonthComps.key, i);
                         cell.classList.add(harmful ? 'm-status-X' : 'm-status-א');
                         statusLabel = "לא בוצע";
+                    } else if (status === 'N_auto') {
+                        cell.classList.add('m-status-א');
+                        statusLabel = "לא פעיל";
                     }
                 } else {
                     if (typeof status === 'number') {
@@ -764,3 +776,4 @@
                 if (checkbox) checkbox.checked = true;
             }
         }
+
