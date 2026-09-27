@@ -975,3 +975,117 @@
             return comps.month;
         }
         // ---- סיום מודל השוואת הרגלים ----
+        // ---- מודל ממוצע הרגלים ספציפיים ----
+        let avgHabitsSelectedHabits = new Set();
+
+        function openAvgHabitsModal() {
+            avgHabitsSelectedHabits.clear();
+            showAvgHabitsSelectionScreen();
+            document.getElementById('avgHabitsModal').style.display = 'flex';
+        }
+
+        function closeAvgHabitsModal() {
+            document.getElementById('avgHabitsModal').style.display = 'none';
+            avgHabitsSelectedHabits.clear();
+        }
+
+        function showAvgHabitsSelectionScreen() {
+            const content = document.getElementById('avgHabitsModalContent');
+            if (!content) return;
+            const dark = isDarkModeEnabled();
+            const mutedColor = getMutedTextColor();
+            const activeHabits = habits.filter(h => !h.archived);
+            const archivedHabits = habits.filter(h => h.archived);
+
+            let html = `<h3 style="margin: 0 0 20px 0; text-align: center; font-size: 20px; color: ${dark ? '#e2e8f0' : '#0f172a'};">בחר הרגלים לממוצע</h3><div style="margin-bottom: 20px;">`;
+
+            if (activeHabits.length > 0) {
+                html += `<div style="margin-bottom: 16px; font-size: 14px; font-weight: 600; color: ${mutedColor};">הרגלים פעילים:</div>`;
+                activeHabits.forEach(habit => {
+                    const isChecked = avgHabitsSelectedHabits.has(habit.id);
+                    const themeColor = getThemeColor(habit.theme);
+                    html += `<label style="display: flex; align-items: center; gap: 10px; padding: 10px 12px; background: ${dark ? '#1e293b' : '#f8fafc'}; border: 1px solid ${dark ? '#334155' : '#e2e8f0'}; border-radius: 8px; margin-bottom: 8px; cursor: pointer;" onmouseover="this.style.background='${dark ? '#293548' : '#f1f5f9'}'" onmouseout="this.style.background='${dark ? '#1e293b' : '#f8fafc'}'"><input type="checkbox" ${isChecked ? 'checked' : ''} onchange="toggleAvgHabit('${esc(habit.id)}')" style="width: 18px; height: 18px; cursor: pointer; accent-color: ${themeColor};"><span style="width: 10px; height: 10px; border-radius: 50%; background: ${themeColor}; flex-shrink: 0;"></span><span style="flex: 1; font-size: 14px; color: ${dark ? '#e2e8f0' : '#0f172a'}; font-weight: 500;">${esc(habit.title)}</span></label>`;
+                });
+            }
+
+            if (archivedHabits.length > 0) {
+                html += `<div style="margin: 24px 0 16px 0; font-size: 14px; font-weight: 600; color: ${mutedColor};">ארכיון:</div>`;
+                archivedHabits.forEach(habit => {
+                    const isChecked = avgHabitsSelectedHabits.has(habit.id);
+                    const themeColor = getThemeColor(habit.theme);
+                    html += `<label style="display: flex; align-items: center; gap: 10px; padding: 10px 12px; background: ${dark ? '#1e293b' : '#f8fafc'}; border: 1px solid ${dark ? '#334155' : '#e2e8f0'}; border-radius: 8px; margin-bottom: 8px; cursor: pointer; opacity: 0.85;" onmouseover="this.style.background='${dark ? '#293548' : '#f1f5f9'}'; this.style.opacity='1'" onmouseout="this.style.background='${dark ? '#1e293b' : '#f8fafc'}'; this.style.opacity='0.85'"><input type="checkbox" ${isChecked ? 'checked' : ''} onchange="toggleAvgHabit('${esc(habit.id)}')" style="width: 18px; height: 18px; cursor: pointer; accent-color: ${themeColor};"><span style="width: 10px; height: 10px; border-radius: 50%; background: ${themeColor}; flex-shrink: 0;"></span><span style="flex: 1; font-size: 14px; color: ${dark ? '#cbd5e1' : '#475569'}; font-weight: 500;">${esc(habit.title)}</span></label>`;
+                });
+            }
+
+            html += `</div><div style="display: flex; gap: 10px; justify-content: center;"><button class="btn-modal-cancel" onclick="closeAvgHabitsModal()">ביטול</button><button class="btn-modal-save" onclick="showAvgHabitsResultScreen()" id="btnShowAvg" ${avgHabitsSelectedHabits.size < 1 ? 'disabled style="opacity: 0.5; cursor: not-allowed;"' : ''}>הצג ממוצע (<span id="avgSelectedCount">${avgHabitsSelectedHabits.size}</span>)</button></div>`;
+            content.innerHTML = html;
+        }
+
+        function toggleAvgHabit(habitId) {
+            if (avgHabitsSelectedHabits.has(habitId)) {
+                avgHabitsSelectedHabits.delete(habitId);
+            } else {
+                avgHabitsSelectedHabits.add(habitId);
+            }
+            const countEl = document.getElementById('avgSelectedCount');
+            const btnShow = document.getElementById('btnShowAvg');
+            if (countEl) countEl.textContent = avgHabitsSelectedHabits.size;
+            if (btnShow) {
+                if (avgHabitsSelectedHabits.size < 1) { btnShow.disabled = true; btnShow.style.opacity = '0.5'; btnShow.style.cursor = 'not-allowed'; }
+                else { btnShow.disabled = false; btnShow.style.opacity = '1'; btnShow.style.cursor = 'pointer'; }
+            }
+        }
+
+        function showAvgHabitsResultScreen() {
+            const content = document.getElementById('avgHabitsModalContent');
+            if (!content || avgHabitsSelectedHabits.size === 0) return;
+
+            const selectedHabits = Array.from(avgHabitsSelectedHabits).map(id => habits.find(h => h.id === id)).filter(h => h);
+            if (selectedHabits.length === 0) { closeAvgHabitsModal(); return; }
+
+            const dark = isDarkModeEnabled();
+            const textColor = dark ? '#cbd5e1' : '#475569';
+            const borderColor = dark ? '#475569' : '#e2e8f0';
+
+            // כל מפתחות החודשים מכל ההרגלים שנבחרו
+            const allMonthKeys = new Set();
+            selectedHabits.forEach(habit => { Object.keys(habit.history || {}).forEach(k => allMonthKeys.add(k)); });
+
+            // רק חודשים שיש בהם נתונים לכל ההרגלים
+            const validMonths = Array.from(allMonthKeys).filter(monthKey => {
+                return selectedHabits.every(habit => {
+                    const stats = calculateStatsForMonth(habit, monthKey);
+                    return stats.text !== '-';
+                });
+            });
+
+            // מיון מהחדש לישן
+            validMonths.sort((a, b) => b.localeCompare(a));
+
+            const rows = validMonths.map(monthKey => {
+                const pcts = selectedHabits.map(habit => calculateStatsForMonth(habit, monthKey).pct).filter(p => p !== null && !isNaN(p));
+                const avg = pcts.length ? Math.round(pcts.reduce((s, p) => s + p, 0) / pcts.length) : null;
+                return { label: monthKey, pct: avg };
+            }).filter(r => r.pct !== null);
+
+            let html = `<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;"><h3 style="margin: 0; font-size: 20px; color: ${dark ? '#e2e8f0' : '#0f172a'};">ממוצע הרגלים ספציפיים</h3><button class="btn-edit-habit-trigger" onclick="showAvgHabitsSelectionScreen()" style="font-size: 13px; padding: 6px 14px;">שנה בחירה</button></div>`;
+
+            if (rows.length === 0) {
+                html += `<div style="text-align:center; color:${textColor}; padding: 24px; font-size: 13px;">אין חודשים עם נתונים לכל ההרגלים שנבחרו</div>`;
+            } else {
+                const pcts = rows.map(r => r.pct);
+                const minPct = Math.min(...pcts);
+                const maxPct = Math.max(...pcts);
+                html += `<div style="display: flex; flex-direction: column; gap: 8px;">`;
+                rows.forEach(r => {
+                    const color = getRelativeSpectrumColor(r.pct, minPct, maxPct);
+                    html += `<div style="display:flex; justify-content:space-between; align-items:center; padding:11px 16px; border-radius:8px; border:1px solid ${borderColor}; background:${dark ? '#1e293b' : '#f8fafc'};"><span style="font-size:13px; color:${textColor}; font-weight:600;">${r.label}</span><span style="font-size:16px; font-weight:700; color:${color};">${r.pct}%</span></div>`;
+                });
+                html += `</div>`;
+            }
+
+            html += `<div style="display: flex; gap: 10px; justify-content: center; margin-top: 20px;"><button class="btn-modal-cancel" onclick="closeAvgHabitsModal()">סגור</button></div>`;
+            content.innerHTML = html;
+        }
+        // ---- סיום מודל ממוצע הרגלים ספציפיים ----
+
