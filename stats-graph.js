@@ -9,6 +9,10 @@
             const firstDayDate = getGregorianStartForMonthKey(comps.key);
             const totalDays = calculateDaysInBrowsingMonth(browsingDatePointer);
 
+            // חתוך ימים עתידיים אם זה החודש הנוכחי
+            const _isCurrentMonth = (comps.key === actualCurrentMonthKey);
+            const activeDaysCount = _isCurrentMonth ? Math.min(currentHebrewDayIndex + 1, totalDays) : totalDays;
+
             const canvas = document.getElementById('monthGraphCanvas');
             const dpr = window.devicePixelRatio || 1;
             const W = canvas.offsetWidth || 600;
@@ -24,7 +28,7 @@
             const points = [];
             let level = 0;
 
-            for (let i = 0; i < totalDays; i++) {
+            for (let i = 0; i < activeDaysCount; i++) {
                 const dow = (firstDayDate.getDay() + i) % 7;
                 const status = history[i];
                 const target = getTargetForDay(habit, dow);
@@ -59,7 +63,7 @@
             const gW = W - padL - padR;
             const gH = H - padT - padB;
 
-            const toX = (day) => padL + ((day - 1) / (totalDays - 1 || 1)) * gW;
+            const toX = (day) => padL + ((day - 1) / (activeDaysCount - 1 || 1)) * gW;
             const toY = (lv) => padT + gH - ((lv - minLevel) / range) * gH;
 
             const zeroY = toY(0);
@@ -82,7 +86,7 @@
 
             ctx.textAlign = 'center';
             // תיקון 5: משתמשים ב-hebrewDays הגלובלי, לא מגדירים מקומי
-            for (let i = 0; i < totalDays; i += 5) {
+            for (let i = 0; i < activeDaysCount; i += 5) {
                 ctx.fillStyle = '#94a3b8';
                 ctx.fillText(hebrewDays[i], toX(i + 1), H - padB + 16);
             }
@@ -107,6 +111,47 @@
                 ctx.fillStyle = p.type === 'v' ? '#16a34a' : p.type === 'partial' ? '#84cc16' : '#ef4444';
                 ctx.fill();
             });
+
+            // Tooltip on hover
+            canvas._graphPoints = points.map(p => ({ x: toX(p.day), y: toY(p.level), level: p.level, day: p.day, type: p.type }));
+            canvas._graphToX = toX;
+            canvas._graphToY = toY;
+            canvas._graphActiveDays = activeDaysCount;
+
+            if (!canvas._tooltipListenerAdded) {
+                canvas._tooltipListenerAdded = true;
+                let _tooltip = null;
+
+                canvas.addEventListener('mousemove', function(e) {
+                    const rect = canvas.getBoundingClientRect();
+                    const mx = e.clientX - rect.left;
+                    const my = e.clientY - rect.top;
+                    const pts = canvas._graphPoints || [];
+                    let closest = null, minDist = Infinity;
+                    pts.forEach(p => {
+                        const dist = Math.abs(p.x - mx);
+                        if (dist < minDist && dist < 20) { minDist = dist; closest = p; }
+                    });
+                    if (!_tooltip) {
+                        _tooltip = document.createElement('div');
+                        _tooltip.style.cssText = 'position:fixed; background:#1e293b; color:#f8fafc; padding:4px 10px; border-radius:6px; font-size:12px; font-weight:600; pointer-events:none; z-index:9999; white-space:nowrap; box-shadow:0 2px 8px rgba(0,0,0,0.25);';
+                        document.body.appendChild(_tooltip);
+                        canvas._tooltip = _tooltip;
+                    }
+                    if (closest) {
+                        _tooltip.textContent = `יום ${closest.day}: ${Math.round(closest.level * 10) / 10}`;
+                        _tooltip.style.display = 'block';
+                        _tooltip.style.left = (e.clientX + 12) + 'px';
+                        _tooltip.style.top = (e.clientY - 28) + 'px';
+                    } else {
+                        _tooltip.style.display = 'none';
+                    }
+                });
+
+                canvas.addEventListener('mouseleave', function() {
+                    if (canvas._tooltip) canvas._tooltip.style.display = 'none';
+                });
+            }
         }
         // ---- סיום תיקון 5 ----
 
