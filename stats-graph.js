@@ -247,7 +247,21 @@
                 rows.forEach(r => renderRow(r.label, r.pct, minPct, maxPct));
 
             } else {
-                emptyMsg('השוואה זמינה רק להרגלים שבועיים או חודשיים');
+                let cursor = new Date();
+                const rows = [];
+                for (let i = 0; i < 12; i++) {
+                    const comps = getHebrewDateComponents(cursor);
+                    const stats = calculateStatsForMonth(habit, comps.key);
+                    if (stats.text !== '-') {
+                        rows.push({ label: comps.key, pct: stats.pct });
+                    }
+                    const firstDay = getGregorianStartForMonthKey(comps.key);
+                    cursor = addDays(firstDay, -1);
+                }
+                if (rows.length === 0) { emptyMsg('אין עדיין נתונים להשוואה'); return; }
+                const pcts = rows.map(r => r.pct);
+                const minPct = Math.min(...pcts), maxPct = Math.max(...pcts);
+                rows.forEach(r => renderRow(r.label, r.pct, minPct, maxPct));
             }
         }
 
