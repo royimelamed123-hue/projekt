@@ -248,6 +248,20 @@
             </div>
 
             <div>
+                <div class="modal-section-title">שיטת חישוב ציון:</div>
+                <div style="display: flex; flex-direction: column; gap: 8px; margin-bottom: 4px;">
+                    <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+                        <div id="scoreBtnAdditive" class="type-radio-btn" onclick="setScoreMethod('additive')">הולך ומוסיף</div>
+                        <div id="scoreBtnSubtractive" class="type-radio-btn" onclick="setScoreMethod('subtractive')">הולך ופוחת</div>
+                        <div id="scoreBtnStatic" class="type-radio-btn active" onclick="setScoreMethod('static')">מצב סטטי</div>
+                    </div>
+                    <div id="scoreMethodDesc" style="font-size: 12px; color: #64748b; padding: 6px 10px; background: #f8fafc; border-radius: 8px; border: 1px solid #e2e8f0;">
+                        מצב נתון של <span style="color:#16a34a; font-weight:700;">הצלחה</span> מול <span style="color:#dc2626; font-weight:700;">פספוס</span>
+                    </div>
+                </div>
+            </div>
+
+            <div>
                 <div class="modal-section-title">בחר ימי עבודה:</div>
                 <div class="weekdays-selection-container">
                     <div id="weekday-0" class="weekday-checkbox-btn active" onclick="toggleConfigWeekday(0)">ראשון</div>
