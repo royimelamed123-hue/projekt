@@ -192,6 +192,7 @@
                     weeklyDayTargets: configSelectedType === 'weekly' ? weeklyDayTargets : undefined,
                     weeklyAllowedSkips: configSelectedType === 'weekly' ? weeklyAllowedSkips : undefined,
                     monthlyDayTargets: configSelectedType === 'monthly' ? monthlyDayTargets : undefined,
+                    scoreMethod: window._configScoreMethod || 'static',
                     monthlyAllowedSkips: configSelectedType === 'monthly' ? monthlyAllowedSkips : undefined,
                     passingScore: passingScore,
                     minScore: minScore,
