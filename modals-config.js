@@ -326,6 +326,30 @@
             const cs = document.getElementById('monthlyCustomSection'); if(cs && cs.style.display !== (mode==='custom'?'block':'none')) cs.style.display = mode==='custom' ? 'block' : 'none';
         }
 
+
+        let _configScoreMethod = 'static';
+
+        function setScoreMethod(method) {
+            _configScoreMethod = method;
+            window._configScoreMethod = method;
+            ['additive','subtractive','static'].forEach(m => {
+                const btn = document.getElementById('scoreBtn' + (m === 'additive' ? 'Additive' : m === 'subtractive' ? 'Subtractive' : 'Static'));
+                if (btn) {
+                    if (m === method) { if (!btn.classList.contains('active')) btn.classList.add('active'); }
+                    else { btn.classList.remove('active'); }
+                }
+            });
+            const desc = document.getElementById('scoreMethodDesc');
+            if (!desc) return;
+            if (method === 'additive') {
+                desc.innerHTML = 'מתחילים את החודש ב-0 ועולים מעלה עם כל <span style="color:#16a34a;font-weight:700;">הצלחה</span>';
+            } else if (method === 'subtractive') {
+                desc.innerHTML = 'מתחילים את החודש עם 100 ויורדים עם כל <span style="color:#dc2626;font-weight:700;">פספוס</span>';
+            } else {
+                desc.innerHTML = 'מצב נתון של <span style="color:#16a34a;font-weight:700;">הצלחה</span> מול <span style="color:#dc2626;font-weight:700;">פספוס</span>';
+            }
+        }
+
         function readDayTargetsFromUI() {
             const targets = [1,1,1,1,1,1,1];
             if (xTimesMode === 'uniform') {
