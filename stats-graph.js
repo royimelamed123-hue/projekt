@@ -250,14 +250,36 @@
                 if (compModeW === 'weeks') {
                     const today = new Date(); today.setHours(0,0,0,0);
                     let sunday = getSundayOfWeek(today);
-                    for (let i = 0; i < 12; i++) {
-                        const { doneScore, activeDays, remainingActive, weeklyFreq, anyActionTaken } = getWeeklyStatsForWeekByDate(habit, sunday);
-                        if (activeDays > 0 && anyActionTaken) {
-                            let pctVal = (doneScore + remainingActive) >= weeklyFreq ? 100 : Math.round(((doneScore + remainingActive) / weeklyFreq) * 100);
-                            const weekEnd = addDays(sunday, 6);
-                            rows.push({ label: `${formatHebrewShort(sunday)} — ${formatHebrewShort(weekEnd)}`, pct: pctVal });
+                    const method = habit.scoreMethod || 'static';
+                    for (let i = 0; i < 52; i++) {
+                        const weekEnd = addDays(sunday, 6);
+                        // חשב ציון שבועי לפי שיטה
+                        let done = 0, fail = 0, effective = 0, hasAction = false;
+                        for (let dow = 0; dow < 7; dow++) {
+                            const dG = addDays(sunday, dow);
+                            if (dG > today) continue; // ימים עתידיים
+                            const status = getHabitStatusForGregorianDate(habit, dG);
+                            if (status === 'א' || status === 'N_auto') continue;
+                            if (status === '' || status === undefined) continue;
+                            const dayTarget = (habit.weeklyDayTargets && habit.weeklyDayTargets[dow]) || 1;
+                            effective++;
+                            hasAction = true;
+                            if (status === 'W') { done += 1; }
+                            else if (typeof status === 'number') {
+                                const frac = Math.min(status / dayTarget, 1);
+                                done += frac; fail += (1 - frac);
+                            } else if (status === 'N') { fail += 1; }
+                        }
+                        if (!hasAction) { sunday = addDays(sunday, -7); continue; }
+                        let pct;
+                        if (method === 'additive') pct = Math.round((done / (effective || 1)) * 100);
+                        else if (method === 'subtractive') pct = Math.round((1 - (fail / (effective || 1))) * 100);
+                        else { const t = done + fail; pct = t > 0 ? Math.round((done / t) * 100) : null; }
+                        if (pct !== null) {
+                            rows.push({ label: `${formatHebrewShort(sunday)} — ${formatHebrewShort(weekEnd)}`, pct });
                         }
                         sunday = addDays(sunday, -7);
+                        if (rows.length >= 12) break;
                     }
                 } else {
                     const sortedMonths = Object.keys(habit.history || {}).reverse().slice(0, 12);
