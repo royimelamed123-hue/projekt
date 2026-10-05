@@ -454,34 +454,30 @@
             
             if (habit.type === 'weekly') {
                 const wTarget = (habit.weeklyDayTargets && habit.weeklyDayTargets[cellDayOfWeek]) || 1;
+                const isActiveDay = habit.workdays && habit.workdays[cellDayOfWeek];
                 let nextStatus = "";
-                if (currentStatus === "" || currentStatus === undefined) {
-                    nextStatus = "N";
-                } else if (currentStatus === "N") {
+
+                // סדר מחזור:
+                // יום פעיל:   ריק → הצלחה → אונס → פספוס → ריק
+                // יום לא פעיל: ריק → הצלחה → אונס → ריק
+                if (currentStatus === "" || currentStatus === undefined || currentStatus === null) {
+                    // ריק → הצלחה
                     nextStatus = wTarget > 1 ? 1 : "W";
                 } else if (typeof currentStatus === 'number') {
                     nextStatus = (currentStatus + 1 < wTarget) ? currentStatus + 1 : "W";
                 } else if (currentStatus === "W") {
-                    nextStatus = "";
-                }
-                monthHistory[dayIndex] = nextStatus;
-                invalidateStatsCache(selectedHabitIdForView);
-                saveToStorage();
-                return;
-            }
-
-            if (habit.type === 'monthly') {
-                const mTarget = (habit.monthlyDayTargets && habit.monthlyDayTargets[cellDayOfWeek]) || 1;
-                let nextStatus = "";
-                if (currentStatus === "" || currentStatus === undefined) {
-                    nextStatus = "N";
+                    // הצלחה → אונס
+                    nextStatus = "א";
+                } else if (currentStatus === "א" || currentStatus === "N_auto") {
+                    // אונס → פספוס (רק ביום פעיל) או ריק (יום לא פעיל)
+                    nextStatus = isActiveDay ? "N" : "";
                 } else if (currentStatus === "N") {
-                    nextStatus = mTarget > 1 ? 1 : "W";
-                } else if (typeof currentStatus === 'number') {
-                    nextStatus = (currentStatus + 1 < mTarget) ? currentStatus + 1 : "W";
-                } else if (currentStatus === "W") {
+                    // פספוס → ריק
+                    nextStatus = "";
+                } else {
                     nextStatus = "";
                 }
+
                 monthHistory[dayIndex] = nextStatus;
                 invalidateStatsCache(selectedHabitIdForView);
                 saveToStorage();
