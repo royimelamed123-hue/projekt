@@ -367,6 +367,8 @@
                     }
 
                     isNActive = (todayStatus === 'N');
+                    const isForceActiveCard = (todayStatus === 'א' || todayStatus === 'N_auto');
+                    const isActiveDayCard = habit.workdays && habit.workdays[currentDayOfWeek];
                     if (isPeriodic) {
                         const firstDayDate = getFirstHebrewDayDate(mainScreenDatePointer);
                         isNHarmful = isWeeklyNHarmful(habit, actualCurrentMonthKey, currentHebrewDayIndex, firstDayDate.getDay(), firstDayDate, calculateDaysInBrowsingMonth(mainScreenDatePointer));
@@ -392,8 +394,11 @@
                         </div>
                         <div class="controls-row">
                             <div class="status-buttons-group">
-                                <div class="action-toggle btn-w-skip ${isNActive ? 'active' : ''} ${isNHarmful ? 'harmful' : ''}" onclick="setStatus('${esc(habit.id)}', 'N', event)">
+                                <div class="action-toggle btn-w-skip ${isActiveDayCard ? '' : 'hidden'} ${isNActive ? 'active' : ''} ${isNHarmful ? 'harmful' : ''}" onclick="setStatus('${esc(habit.id)}', 'N', event)">
                                     <span>פספוס</span>
+                                </div>
+                                <div class="action-toggle btn-w-force ${isForceActiveCard ? 'active' : ''}" onclick="setStatus('${esc(habit.id)}', 'א', event)">
+                                    <span>אונס</span>
                                 </div>
                                 <div class="action-toggle btn-w-done ${isWActive ? 'active' : ''}" style="${wStyle}" onclick="setStatus('${esc(habit.id)}', 'W', event)">
                                     <span>${esc(wText)}</span>
