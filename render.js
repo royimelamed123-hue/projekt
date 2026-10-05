@@ -120,6 +120,8 @@
             const isNHarmfulM = isMonthlyNHarmful(habit, actualCurrentMonthKey, currentHebrewDayIndex);
             const isNActiveM = (todayStatus === 'N');
             const isNAutoM = (todayStatus === 'N_auto');
+            const isForceActiveM = (todayStatus === 'א' || todayStatus === 'N_auto');
+            const isActiveDayM = habit.workdays && habit.workdays[currentDayOfWeek];
 
             let wTextM = mTarget === 1 ? "הצלחה" : `${mTarget}`;
             let wStyleM = "";
@@ -141,8 +143,11 @@
                 createCardHeaderHTML(habit, mStats) +
                 `<div class="controls-row">
                     <div class="status-buttons-group">
-                        <div class="action-toggle btn-w-skip ${isNActiveM ? 'active' : ''} ${isNHarmfulM ? 'harmful' : ''} ${isNAutoM ? 'n-auto' : ''}" onclick="setStatus('${esc(habit.id)}', 'N', event)">
+                        ${isActiveDayM ? `<div class="action-toggle btn-w-skip ${isNActiveM ? 'active' : ''} ${isNHarmfulM ? 'harmful' : ''}" onclick="setStatus('${esc(habit.id)}', 'N', event)">
                             <span>פספוס</span>
+                        </div>` : ''}
+                        <div class="action-toggle btn-w-force ${isForceActiveM ? 'active' : ''}" onclick="setStatus('${esc(habit.id)}', 'א', event)">
+                            <span>אונס</span>
                         </div>
                         <div class="action-toggle btn-w-done ${isWActiveM ? 'active' : ''}" style="${wStyleM}" onclick="setStatus('${esc(habit.id)}', 'W', event)">
                             <span>${esc(wTextM)}</span>
@@ -180,7 +185,8 @@
             }
 
             const isNActive = (todayStatus === 'N');
-            const isNAuto = (todayStatus === 'N_auto');
+            const isForceActive = (todayStatus === 'א' || todayStatus === 'N_auto');
+            const isActiveDay = habit.workdays && habit.workdays[currentDayOfWeek];
             const isNHarmful = isWeeklyNHarmful(habit, actualCurrentMonthKey, currentHebrewDayIndex, firstDayDate.getDay(), firstDayGregorian, totalDaysInMonth);
 
             const card = createBaseCard(habit);
@@ -189,8 +195,11 @@
                 createCardHeaderHTML(habit, mStats) +
                 `<div class="controls-row">
                     <div class="status-buttons-group">
-                        <div class="action-toggle btn-w-skip ${isNActive ? 'active' : ''} ${isNHarmful ? 'harmful' : ''} ${isNAuto ? 'n-auto' : ''}" onclick="setStatus('${esc(habit.id)}', 'N', event)">
+                        ${isActiveDay ? `<div class="action-toggle btn-w-skip ${isNActive ? 'active' : ''} ${isNHarmful ? 'harmful' : ''}" onclick="setStatus('${esc(habit.id)}', 'N', event)">
                             <span>פספוס</span>
+                        </div>` : ''}
+                        <div class="action-toggle btn-w-force ${isForceActive ? 'active' : ''}" onclick="setStatus('${esc(habit.id)}', 'א', event)">
+                            <span>אונס</span>
                         </div>
                         <div class="action-toggle btn-w-done ${isWActive ? 'active' : ''}" style="${wStyle}" onclick="setStatus('${esc(habit.id)}', 'W', event)">
                             <span>${esc(wText)}</span>
@@ -277,7 +286,6 @@
                 const isNHarmfulM = isMonthlyNHarmful(habit, actualCurrentMonthKey, currentHebrewDayIndex);
                 const isNActiveM = (todayStatus === 'N');
                 const isNAutoM = (todayStatus === 'N_auto');
-            const isNAutoM = (todayStatus === 'N_auto');
                 let wTextM = mTarget === 1 ? 'הצלחה' : `${mTarget}`;
                 let wStyleM = '';
                 let isWActiveM = false;
@@ -297,7 +305,8 @@
                 const firstDayDate = getFirstHebrewDayDate(mainScreenDatePointer);
                 const isNHarmful = isWeeklyNHarmful(habit, actualCurrentMonthKey, currentHebrewDayIndex, firstDayDate.getDay(), firstDayDate, calculateDaysInBrowsingMonth(mainScreenDatePointer));
                 const isNActive = (todayStatus === 'N');
-                const isNAuto = (todayStatus === 'N_auto');
+                const isForceActiveW = (todayStatus === 'א' || todayStatus === 'N_auto');
+            const isActiveDayW = habit.workdays && habit.workdays[cellDayOfWeek];
             const isNAuto = (todayStatus === 'N_auto');
                 let wText = wTarget === 1 ? 'הצלחה' : `${wTarget}`;
                 let wStyle = '';
@@ -312,7 +321,13 @@
                 } else { isWActive = (todayStatus === 'W'); }
                 const btnSkip = card.querySelector('.btn-w-skip');
                 const btnDone = card.querySelector('.btn-w-done');
-                if (btnSkip) { btnSkip.classList.toggle('active', isNActive); btnSkip.classList.toggle('harmful', isNHarmful); btnSkip.classList.toggle('n-auto', isNAuto); }
+                if (btnSkip) {
+                    btnSkip.classList.toggle('active', isNActive);
+                    btnSkip.classList.toggle('harmful', isNHarmful);
+                    btnSkip.classList.toggle('hidden', !isActiveDayW);
+                }
+                const btnForce = card.querySelector('.btn-w-force');
+                if (btnForce) { btnForce.classList.toggle('active', isForceActiveW); }
                 if (btnDone) { btnDone.classList.toggle('active', isWActive); btnDone.style.cssText = wStyle; btnDone.querySelector('span').textContent = wText; }
 
             } else {
@@ -606,7 +621,7 @@
                         statusLabel = "פספוס";
                     } else if (status === 'N_auto') {
                         cell.classList.add('m-status-א');
-                        statusLabel = "לא פעיל";
+                        statusLabel = "אונס";
                     }
                 } else if (habit.type === 'monthly') {
                     const mTarget = (habit.monthlyDayTargets && habit.monthlyDayTargets[cellDayOfWeek]) || 1;
@@ -624,7 +639,7 @@
                         statusLabel = "פספוס";
                     } else if (status === 'N_auto') {
                         cell.classList.add('m-status-א');
-                        statusLabel = "לא פעיל";
+                        statusLabel = "אונס";
                     }
                 } else {
                     if (typeof status === 'number') {
