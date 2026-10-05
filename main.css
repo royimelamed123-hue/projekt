@@ -1421,3 +1421,38 @@ html, body {
             text-align: right;
         }
 
+
+        /* כפתור אונס (א) - שבועי */
+        .action-toggle.btn-w-force {
+            color: #64748b;
+            border-color: #e2e8f0;
+        }
+        .action-toggle.btn-w-force.active {
+            background-color: #f1f5f9;
+            border-color: #94a3b8;
+            color: #475569;
+        }
+        body.dark-mode .action-toggle.btn-w-force {
+            color: #94a3b8;
+            border-color: #334155;
+        }
+        body.dark-mode .action-toggle.btn-w-force.active {
+            background-color: #1e293b;
+            border-color: #64748b;
+            color: #cbd5e1;
+        }
+        /* פספוס — אדום מייד כשפעיל */
+        .action-toggle.btn-w-skip.active {
+            background-color: #fee2e2 !important;
+            border-color: #ef4444 !important;
+            color: #dc2626 !important;
+        }
+        body.dark-mode .action-toggle.btn-w-skip.active {
+            background-color: #450a0a !important;
+            border-color: #ef4444 !important;
+            color: #fca5a5 !important;
+        }
+        /* כפתור מוסתר */
+        .action-toggle.hidden {
+            display: none !important;
+        }
