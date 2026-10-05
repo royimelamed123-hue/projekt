@@ -121,11 +121,13 @@
             }
 
             if (habit.type === 'weekly') {
+                const isActiveDay = habit.workdays && habit.workdays[currentDayOfWeek];
+                const wTarget = (habit.weeklyDayTargets && habit.weeklyDayTargets[currentDayOfWeek]) || 1;
+
                 if (statusType === 'W') {
                     if (currentStatus === 'W') {
-                        monthHistory[currentHebrewDayIndex] = "";
+                        monthHistory[currentHebrewDayIndex] = '';
                     } else {
-                        const wTarget = (habit.weeklyDayTargets && habit.weeklyDayTargets[currentDayOfWeek]) || 1;
                         if (wTarget > 1) {
                             const cur = (typeof currentStatus === 'number') ? currentStatus : 0;
                             const next = cur + 1;
@@ -135,13 +137,10 @@
                         }
                     }
                 } else if (statusType === 'N') {
-                    const isActiveDay = habit.workdays && habit.workdays[currentDayOfWeek];
-                    if (!isActiveDay) {
-                        // יום לא פעיל — המשתמש לחץ N, שמור N_auto (אל תשנה)
-                        monthHistory[currentHebrewDayIndex] = 'N_auto';
-                    } else {
-                        monthHistory[currentHebrewDayIndex] = (currentStatus === 'N') ? "" : 'N';
-                    }
+                    if (!isActiveDay) return;
+                    monthHistory[currentHebrewDayIndex] = (currentStatus === 'N') ? '' : 'N';
+                } else if (statusType === 'א') {
+                    monthHistory[currentHebrewDayIndex] = (currentStatus === 'א') ? '' : 'א';
                 }
                 invalidateStatsCache(habitId);
                 saveToStorageForHabit(habitId);
