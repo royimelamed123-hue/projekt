@@ -44,6 +44,7 @@
                 document.getElementById('passingScoreInput').value = habit.passingScore !== null && habit.passingScore !== undefined ? habit.passingScore : '';
                 document.getElementById('minScoreInput').value = habit.minScore !== null && habit.minScore !== undefined ? habit.minScore : '';
                 selectedHabitTheme = habit.theme || BOOKMARK_COLORS[0];
+                setScoreMethod(habit.scoreMethod || 'static');
             } else {
                 // (כותרת הוסרה מה-UI)
                 configSelectedType = 'x_times';
@@ -62,6 +63,7 @@
                     document.getElementById(`monthlyTargetDay-${i}`).value = "1";
                 }
                 selectedHabitTheme = BOOKMARK_COLORS[0];
+                setScoreMethod('static');
                 document.getElementById('passingScoreInput').value = '';
                 document.getElementById('minScoreInput').value = '';
                 // טען ברירות מחדל שנשמרו ("שמור להרגלים הבאים") ומלא את השדות
