@@ -63,7 +63,7 @@
                     document.getElementById(`monthlyTargetDay-${i}`).value = "1";
                 }
                 selectedHabitTheme = BOOKMARK_COLORS[0];
-                setScoreMethod('static');
+                setScoreMethod(getDefaultScoreMethod());
                 document.getElementById('passingScoreInput').value = '';
                 document.getElementById('minScoreInput').value = '';
                 // טען ברירות מחדל שנשמרו ("שמור להרגלים הבאים") ומלא את השדות
@@ -331,6 +331,21 @@
 
         let _configScoreMethod = 'static';
 
+        function getDefaultScoreMethod() {
+            try { return localStorage.getItem('defaultScoreMethod') || 'static'; } catch(e) { return 'static'; }
+        }
+
+        function setDefaultScoreMethod(method) {
+            try { localStorage.setItem('defaultScoreMethod', method); } catch(e) {}
+        }
+
+        function handleScoreMethodDefaultChange() {
+            const cb = document.getElementById('scoreMethodSetDefault');
+            if (cb && cb.checked) {
+                setDefaultScoreMethod(window._configScoreMethod || 'static');
+            }
+        }
+
         function setScoreMethod(method) {
             _configScoreMethod = method;
             window._configScoreMethod = method;
@@ -342,14 +357,18 @@
                 }
             });
             const desc = document.getElementById('scoreMethodDesc');
-            if (!desc) return;
-            if (method === 'additive') {
-                desc.innerHTML = 'מתחילים את החודש ב-0 ועולים מעלה עם כל <span style="color:#16a34a;font-weight:700;">הצלחה</span>';
-            } else if (method === 'subtractive') {
-                desc.innerHTML = 'מתחילים את החודש עם 100 ויורדים עם כל <span style="color:#dc2626;font-weight:700;">פספוס</span>';
-            } else {
-                desc.innerHTML = 'מצב נתון של <span style="color:#16a34a;font-weight:700;">הצלחה</span> מול <span style="color:#dc2626;font-weight:700;">פספוס</span>';
+            if (desc) {
+                if (method === 'additive') {
+                    desc.innerHTML = 'מתחילים את החודש ב-0 ועולים מעלה עם כל <span style="color:#16a34a;font-weight:700;">הצלחה</span>';
+                } else if (method === 'subtractive') {
+                    desc.innerHTML = 'מתחילים את החודש עם 100 ויורדים עם כל <span style="color:#dc2626;font-weight:700;">פספוס</span>';
+                } else {
+                    desc.innerHTML = 'מצב נתון של <span style="color:#16a34a;font-weight:700;">הצלחה</span> מול <span style="color:#dc2626;font-weight:700;">פספוס</span>';
+                }
             }
+            // עדכן צ'קבוקס ברירת מחדל
+            const cb = document.getElementById('scoreMethodSetDefault');
+            if (cb) cb.checked = (method === getDefaultScoreMethod());
         }
 
         function readDayTargetsFromUI() {
