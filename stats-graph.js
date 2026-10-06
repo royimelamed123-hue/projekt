@@ -316,7 +316,8 @@
             } else {
                 let cursor = new Date();
                 const rows = [];
-                for (let i = 0; i < 12; i++) {
+                let maxLookback = 60; // מקסימום 60 חודשים אחורה למניעת לולאה אינסופית
+                while (rows.length < 12 && maxLookback > 0) {
                     const comps = getHebrewDateComponents(cursor);
                     const stats = calculateStatsForMonth(habit, comps.key);
                     if (stats.text !== '-') {
@@ -324,6 +325,7 @@
                     }
                     const firstDay = getGregorianStartForMonthKey(comps.key);
                     cursor = addDays(firstDay, -1);
+                    maxLookback--;
                 }
                 if (rows.length === 0) { emptyMsg('אין עדיין נתונים להשוואה'); return; }
                 const pcts = rows.map(r => r.pct);
