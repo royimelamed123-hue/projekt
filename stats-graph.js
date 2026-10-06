@@ -251,7 +251,8 @@
                     const today = new Date(); today.setHours(0,0,0,0);
                     let sunday = getSundayOfWeek(today);
                     const method = habit.scoreMethod || 'static';
-                    for (let i = 0; i < 52; i++) {
+                    let maxLookback = 200; // מקסימום 200 שבועות אחורה
+                    while (rows.length < 12 && maxLookback > 0) {
                         const weekEnd = addDays(sunday, 6);
                         // חשב ציון שבועי לפי שיטה
                         let done = 0, fail = 0, effective = 0, hasAction = false;
@@ -270,16 +271,17 @@
                                 done += frac; fail += (1 - frac);
                             } else if (status === 'N') { fail += 1; }
                         }
-                        if (!hasAction) { sunday = addDays(sunday, -7); continue; }
-                        let pct;
-                        if (method === 'additive') pct = Math.round((done / (effective || 1)) * 100);
-                        else if (method === 'subtractive') pct = Math.round((1 - (fail / (effective || 1))) * 100);
-                        else { const t = done + fail; pct = t > 0 ? Math.round((done / t) * 100) : null; }
-                        if (pct !== null) {
-                            rows.push({ label: `${formatHebrewShort(sunday)} — ${formatHebrewShort(weekEnd)}`, pct });
+                        if (hasAction) {
+                            let pct;
+                            if (method === 'additive') pct = Math.round((done / (effective || 1)) * 100);
+                            else if (method === 'subtractive') pct = Math.round((1 - (fail / (effective || 1))) * 100);
+                            else { const t = done + fail; pct = t > 0 ? Math.round((done / t) * 100) : null; }
+                            if (pct !== null) {
+                                rows.push({ label: `${formatHebrewShort(sunday)} — ${formatHebrewShort(weekEnd)}`, pct });
+                            }
                         }
                         sunday = addDays(sunday, -7);
-                        if (rows.length >= 12) break;
+                        maxLookback--;
                     }
                 } else {
                     const sortedMonths = Object.keys(habit.history || {}).reverse().slice(0, 12);
