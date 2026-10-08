@@ -30,21 +30,20 @@
                 const monthEnd = addDays(firstDayDate, totalDaysInMonth - 1);
                 const today = new Date(); today.setHours(0,0,0,0);
 
+                // מצא את השבוע הראשון שחופף את החודש (גם אם מתחיל לפניו)
                 let sunday = getSundayOfWeek(monthStart);
                 let weekScores = [];
                 let weekCount = 0;
 
+                // עבור על כל השבועות שחופפים את החודש (גם אם רק יום אחד)
                 while (sunday <= monthEnd) {
                     const weekEnd = addDays(sunday, 6);
                     weekCount++;
 
-                    // האם השבוע הגיע? (לפחות יום אחד בשבוע עבר)
-                    const weekStartedInMonth = sunday <= today;
-                    const weekHasAnyDayInMonth = weekEnd >= monthStart;
+                    // האם השבוע כבר התחיל (לפחות יום אחד עבר)?
+                    const weekHasStarted = sunday <= today;
 
-                    if (!weekHasAnyDayInMonth) { sunday = addDays(sunday, 7); continue; }
-
-                    if (!weekStartedInMonth) {
+                    if (!weekHasStarted) {
                         // שבוע עתידי — לפי שיטה
                         if (method === 'additive') weekScores.push(0);
                         else if (method === 'subtractive') weekScores.push(100);
@@ -53,10 +52,11 @@
                         continue;
                     }
 
-                    // חישוב ציון השבוע
+                    // חישוב ציון השבוע המלא (כל 7 הימים, גם אם חלקם מחוץ לחודש)
                     let done = 0, fail = 0, effective = 0;
                     for (let dow = 0; dow < 7; dow++) {
                         const dG = addDays(sunday, dow);
+                        if (dG > today) continue; // ימים עתידיים
                         const status = getHabitStatusForGregorianDate(habit, dG);
                         const isAuto = (status === 'N_auto' || status === 'א');
                         if (isAuto) continue; // אונס — לא נספר
@@ -67,8 +67,6 @@
                         else if (typeof status === 'number') {
                             const frac = Math.min(status / dayTarget, 1);
                             done += frac; fail += (1 - frac);
-                            effective--; // כבר ספרנו, נתאים
-                            effective += 1; // נשאיר 1 ליום
                         }
                         else if (status === 'N') { fail += 1; }
                     }
