@@ -80,13 +80,16 @@
         // ---- יוצר את חלק ה-header של כרטיס ----
         // שורה 1: ציון (ימין) | ידית (מרכז) | שלוש נקודות (שמאל)
         // שורה 2: שם ההרגל
-        function createCardHeaderHTML(habit, mStats) {
+        function createCardHeaderHTML(habit, mStats, wStats) {
+            const scoreHtml = wStats
+                ? `שבועי: <span style="color:${getScoreColor(wStats.pct, habit, wStats.text)}; font-weight:700;">${esc(wStats.text)}</span> | חודשי: <span style="color:${getScoreColor(mStats.pct, habit, mStats.text)}; font-weight:700;">${esc(mStats.text)}</span>`
+                : `חודשי: <span style="color: ${getScoreColor(mStats.pct, habit, mStats.text)}; padding: 1px 6px; border-radius: 4px; font-weight: 700;">${esc(mStats.text)}</span>`;
             return `
                 <div class="habit-header">
                     <div style="display:flex; align-items:center; justify-content:space-between; width:100%;">
                         <button class="btn-card-menu" onclick="toggleCardMenu('${esc(habit.id)}', event)" style="position:static; margin:0;">⋮</button>
                         <span class="btn-drag-handle" title="גרור לסידור מחדש" style="flex:1; text-align:center;">⠿⠿</span>
-                        <span class="habit-stats-summary" style="margin:0;">חודשי: <span style="color: ${getScoreColor(mStats.pct, habit, mStats.text)}; padding: 1px 6px; border-radius: 4px; font-weight: 700;">${esc(mStats.text)}</span></span>
+                        <span class="habit-stats-summary" style="margin:0;">${scoreHtml}</span>
                     </div>
                     <div style="width:100%; margin-top:4px;">
                         <span class="habit-title" data-habit-title style="display:block; width:100%;"></span>
@@ -275,10 +278,38 @@
             const mStats = calculateStatsForMonth(habit, actualCurrentMonthKey);
 
             // עדכון ציון חודשי
-            const scoreEl = card.querySelector('.habit-stats-summary span');
-            if (scoreEl) {
-                scoreEl.textContent = mStats.text;
-                scoreEl.style.color = getScoreColor(mStats.pct, habit, mStats.text);
+            const summaryEl = card.querySelector('.habit-stats-summary');
+            if (summaryEl && habit.type === 'weekly') {
+                // חשב ציון שבועי
+                const today = new Date(); today.setHours(0,0,0,0);
+                const currentSunday = getSundayOfWeek(today);
+                const method = habit.scoreMethod || 'static';
+                let wDone = 0, wFail = 0, wEffective = 0, wHasAction = false;
+                for (let dow = 0; dow < 7; dow++) {
+                    const dG = addDays(currentSunday, dow);
+                    if (dG > today) continue;
+                    const st = getHabitStatusForGregorianDate(habit, dG);
+                    if (st === 'א' || st === 'N_auto' || st === '' || st === undefined) continue;
+                    const dayTarget = (habit.weeklyDayTargets && habit.weeklyDayTargets[dow]) || 1;
+                    wEffective++; wHasAction = true;
+                    if (st === 'W') { wDone += 1; }
+                    else if (typeof st === 'number') { const f = Math.min(st/dayTarget,1); wDone+=f; wFail+=(1-f); }
+                    else if (st === 'N') { wFail += 1; }
+                }
+                let wPct = null;
+                if (wHasAction && wEffective > 0) {
+                    if (method === 'additive') wPct = Math.round((wDone/wEffective)*100);
+                    else if (method === 'subtractive') wPct = Math.round((1-(wFail/wEffective))*100);
+                    else { const t=wDone+wFail; wPct = t>0 ? Math.round((wDone/t)*100) : null; }
+                }
+                const wText = wPct !== null ? wPct+'%' : '-';
+                summaryEl.innerHTML = `שבועי: <span style="color:${getScoreColor(wPct||0, habit, wText)}; font-weight:700;">${wText}</span> | חודשי: <span style="color:${getScoreColor(mStats.pct, habit, mStats.text)}; font-weight:700;">${mStats.text}</span>`;
+            } else {
+                const scoreEl = card.querySelector('.habit-stats-summary span');
+                if (scoreEl) {
+                    scoreEl.textContent = mStats.text;
+                    scoreEl.style.color = getScoreColor(mStats.pct, habit, mStats.text);
+                }
             }
 
             if (habit.type === 'monthly') {
