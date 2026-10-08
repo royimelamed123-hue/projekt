@@ -735,56 +735,33 @@
                     <button class="btn-jump-today" onclick="comparisonMonthOffset = 0; renderComparisonModalTable();" ${isCurrentMonth ? 'style="opacity:0.5; pointer-events:none;"' : ''}>חזרה לחודש הנוכחי</button>
                 </div>
 
-                <table style="width:100%; border-collapse:collapse; margin-top:12px; font-size:13px;">
-                    <thead>
-                        <tr style="background:${bgHeader}; border-bottom:2px solid ${borderColor};">
-                            <th style="padding:10px 14px; text-align:right; font-weight:600; color:${textColor};">שם הרגל</th>
-                            <th style="padding:10px 14px; text-align:center; font-weight:600; color:${textColor};">ציון ${comparisonMonthDisplay}</th>
-                            <th style="padding:10px 14px; text-align:center; font-weight:600; color:${textColor};">ממוצע כולל</th>
-                            <th style="padding:10px 14px; text-align:center; font-weight:600; color:${textColor};">סטטוס</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-            `;
-
-            // חישוב מינימום/מקסימום לספקטרום יחסי
-            const monthPcts = selectedHabitsArray.map(h => calculateStatsForMonth(h, comparisonMonthKey).pct).filter(p => p !== null && !isNaN(p));
-            const totalPcts = selectedHabitsArray.map(h => { const v = parseInt(calculateTotalHabitAvg(h)); return isNaN(v) ? null : v; }).filter(p => p !== null);
-            const minMonthPct = monthPcts.length ? Math.min(...monthPcts) : 0;
-            const maxMonthPct = monthPcts.length ? Math.max(...monthPcts) : 100;
-            const minTotalPct = totalPcts.length ? Math.min(...totalPcts) : 0;
-            const maxTotalPct = totalPcts.length ? Math.max(...totalPcts) : 100;
+                `
+                <div style="display: flex; flex-direction: column; gap: 8px; margin-top: 12px;">`;
 
             selectedHabitsArray.forEach(habit => {
                 const mStats = calculateStatsForMonth(habit, comparisonMonthKey);
                 const totalAvg = calculateTotalHabitAvg(habit);
                 const totalAvgPct = parseInt(totalAvg);
                 const themeColor = getThemeColor(habit.theme);
-                const isArchived = habit.archived;
-                const rowBg = isArchived ? bgArchived : bgActive;
                 const monthColor = mStats.text !== '-' ? getRelativeSpectrumColor(mStats.pct, minMonthPct, maxMonthPct) : textColor;
                 const totalColor = !isNaN(totalAvgPct) ? getRelativeSpectrumColor(totalAvgPct, minTotalPct, maxTotalPct) : textColor;
-                
+
                 html += `
-                    <tr style="background:${rowBg}; border-right:4px solid ${themeColor}; border-bottom:1px solid ${borderColor};">
-                        <td style="padding:12px 14px;">
-                            <div style="display:flex; align-items:center; gap:8px;">
-                                <span style="width:10px; height:10px; border-radius:50%; background:${themeColor}; flex-shrink:0;"></span>
-                                <span style="font-weight:600; color:${dark ? '#e2e8f0' : '#0f172a'};">${esc(habit.title)}</span>
-                            </div>
-                        </td>
-                        <td style="padding:12px 14px; text-align:center; font-weight:700; color:${monthColor};">${esc(mStats.text)}</td>
-                        <td style="padding:12px 14px; text-align:center; font-weight:700; color:${totalColor};">${esc(totalAvg)}</td>
-                        <td style="padding:12px 14px; text-align:center;">
-                            <span style="display:inline-block; padding:3px 10px; background:${isArchived ? (dark ? '#475569' : '#cbd5e1') : '#3b82f6'}; color:${isArchived ? (dark ? '#e2e8f0' : '#475569') : 'white'}; border-radius:12px; font-size:11px; font-weight:600;">${isArchived ? 'ארכיון' : 'פעיל'}</span>
-                        </td>
-                    </tr>
+                    <div style="display:flex; justify-content:space-between; align-items:center; padding:11px 16px; border-radius:8px; border:1px solid ${borderColor}; background:${habit.archived ? bgArchived : bgActive}; border-right:4px solid ${themeColor};">
+                        <div style="display:flex; align-items:center; gap:8px; flex:1; min-width:0;">
+                            <span style="width:10px; height:10px; border-radius:50%; background:${themeColor}; flex-shrink:0;"></span>
+                            <span style="font-size:13px; font-weight:600; color:${dark ? '#e2e8f0' : '#0f172a'}; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">${esc(habit.title)}</span>
+                        </div>
+                        <div style="display:flex; gap:16px; align-items:center; flex-shrink:0;">
+                            <span style="font-size:14px; font-weight:700; color:${monthColor};">${mStats.text !== '-' ? mStats.pct + '%' : '-'}</span>
+                            <span style="font-size:12px; color:${totalColor};">${!isNaN(totalAvgPct) ? totalAvgPct + '%' : '-'}</span>
+                        </div>
+                    </div>
                 `;
             });
 
             html += `
-                    </tbody>
-                </table>
+                </div>
                 <div style="margin-top:12px; padding:10px 12px; background:${dark ? '#1e3a5f' : '#eff6ff'}; border-right:3px solid #3b82f6; border-radius:6px; font-size:12px; color:${textColor}; line-height:1.5;">
                     הסבר: הרגלים פעילים מודגשים ברקע כחול. השתמש בכפתורי הניווט כדי להשוות בין חודשים שונים.
                 </div>
