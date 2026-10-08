@@ -142,7 +142,10 @@
                         _tooltip.textContent = `יום ${closest.day}: ${Math.round(closest.level * 10) / 10}`;
                         _tooltip.style.display = 'block';
                         _tooltip.style.left = (e.clientX + 12) + 'px';
-                        _tooltip.style.top = (e.clientY - 28) + 'px';
+                        const tipTop = e.clientY - 40;
+                        const minTop = 8;
+                        const maxTop = window.innerHeight - 80;
+                        _tooltip.style.top = Math.max(minTop, Math.min(tipTop, maxTop)) + 'px';
                     } else {
                         _tooltip.style.display = 'none';
                     }
