@@ -461,18 +461,18 @@
                 // יום פעיל:   ריק → הצלחה → אונס → פספוס → ריק
                 // יום לא פעיל: ריק → הצלחה → אונס → ריק
                 if (currentStatus === "" || currentStatus === undefined || currentStatus === null) {
-                    // ריק → הצלחה
-                    nextStatus = wTarget > 1 ? 1 : "W";
-                } else if (typeof currentStatus === 'number') {
-                    nextStatus = (currentStatus + 1 < wTarget) ? currentStatus + 1 : "W";
-                } else if (currentStatus === "W") {
-                    // הצלחה → אונס
+                    // ריק → אונס
                     nextStatus = "א";
                 } else if (currentStatus === "א" || currentStatus === "N_auto") {
                     // אונס → פספוס (רק ביום פעיל) או ריק (יום לא פעיל)
                     nextStatus = isActiveDay ? "N" : "";
                 } else if (currentStatus === "N") {
-                    // פספוס → ריק
+                    // פספוס → הצלחה
+                    nextStatus = wTarget > 1 ? 1 : "W";
+                } else if (typeof currentStatus === 'number') {
+                    nextStatus = (currentStatus + 1 < wTarget) ? currentStatus + 1 : "W";
+                } else if (currentStatus === "W") {
+                    // הצלחה → ריק
                     nextStatus = "";
                 } else {
                     nextStatus = "";
@@ -558,7 +558,6 @@
 
         // כמות הפעמים שמותר לדלג בתקופה (המודל החדש). מוחזר null אם לא הוגדר.
         function getAllowedSkips(habit, periodType) {
-            const val = (periodType === 'weekly' ? habit.weeklyAllowedSkips : habit.monthlyAllowedSkips);
             return (val === null || val === undefined) ? null : val;
         }
 
