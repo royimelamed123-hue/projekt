@@ -63,20 +63,15 @@
 
             // המודל החדש: הקלט מייצג כמה פעמים מותר לדלג (לא לעשות) בתקופה.
             let weeklyDayTargets = [1, 1, 1, 1, 1, 1, 1];
-            let weeklyAllowedSkips = 0;
             if (configSelectedType === 'weekly') {
                 weeklyDayTargets = readWeeklyDayTargetsFromUI();
-                weeklyAllowedSkips = parseInt(document.getElementById('weeklyFreqInput').value, 10);
-                if (isNaN(weeklyAllowedSkips) || weeklyAllowedSkips < 0) weeklyAllowedSkips = 0;
-                if (weeklyAllowedSkips > 7) weeklyAllowedSkips = 7;
             }
 
             let monthlyDayTargets = [1, 1, 1, 1, 1, 1, 1];
-            let monthlyAllowedSkips = 0;
+            let
             if (configSelectedType === 'monthly') {
                 monthlyDayTargets = readMonthlyDayTargetsFromUI();
-                monthlyAllowedSkips = parseInt(document.getElementById('monthlyFreqInput').value, 10);
-                if (isNaN(monthlyAllowedSkips) || monthlyAllowedSkips < 0) monthlyAllowedSkips = 0;
+                if (isNaN(
             }
             
             const passingRaw = document.getElementById('passingScoreInput').value.trim();
@@ -114,12 +109,11 @@
                 habit.dayTargets = dayTargets;
                 if (configSelectedType === 'weekly') {
                     habit.weeklyDayTargets = weeklyDayTargets;
-                    habit.weeklyAllowedSkips = weeklyAllowedSkips;
                     delete habit.weeklyFreq;
                 }
                 if (configSelectedType === 'monthly') {
                     habit.monthlyDayTargets = monthlyDayTargets;
-                    habit.monthlyAllowedSkips = monthlyAllowedSkips;
+                    habit.
                     delete habit.monthlyFreq;
                 }
 
@@ -190,11 +184,8 @@
                     workdays: [...configSelectedWeekdays],
                     dayTargets: dayTargets,
                     weeklyDayTargets: configSelectedType === 'weekly' ? weeklyDayTargets : undefined,
-                    weeklyAllowedSkips: configSelectedType === 'weekly' ? weeklyAllowedSkips : undefined,
-                    monthlyDayTargets: configSelectedType === 'monthly' ? monthlyDayTargets : undefined,
                     scoreMethod: window._configScoreMethod || 'static',
-                    monthlyAllowedSkips: configSelectedType === 'monthly' ? monthlyAllowedSkips : undefined,
-                    passingScore: passingScore,
+                                        passingScore: passingScore,
                     minScore: minScore,
                     theme: selectedHabitTheme,
                     schemaVersion: HABIT_SCHEMA_VERSION,
