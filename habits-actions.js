@@ -67,12 +67,7 @@
                 weeklyDayTargets = readWeeklyDayTargetsFromUI();
             }
 
-            let monthlyDayTargets = [1, 1, 1, 1, 1, 1, 1];
-            let
-            if (configSelectedType === 'monthly') {
-                monthlyDayTargets = readMonthlyDayTargetsFromUI();
-                if (isNaN(
-            }
+
             
             const passingRaw = document.getElementById('passingScoreInput').value.trim();
             const minRaw = document.getElementById('minScoreInput').value.trim();
