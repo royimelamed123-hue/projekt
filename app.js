@@ -111,23 +111,18 @@
         function migrateHabitToV3(habit) {
             if (!habit || typeof habit !== 'object') return;
 
-            // מיגרציה גרסה 2: weeklyAllowedSkips
             if ((habit.schemaVersion || 0) < 2) {
-                if (habit.type === 'weekly' && (habit.weeklyAllowedSkips === undefined || habit.weeklyAllowedSkips === null)) {
                     const oldTarget = (typeof habit.weeklyFreq === 'number' && habit.weeklyFreq > 0) ? habit.weeklyFreq : 1;
                     let skips = 7 - oldTarget;
                     if (skips < 0) skips = 0;
                     if (skips > 7) skips = 7;
-                    habit.weeklyAllowedSkips = skips;
                 }
                 delete habit.weeklyFreq;
-                if (habit.type === 'monthly' && (habit.monthlyAllowedSkips === undefined || habit.monthlyAllowedSkips === null)) {
                     const oldTarget = (typeof habit.monthlyFreq === 'number' && habit.monthlyFreq > 0) ? habit.monthlyFreq : 1;
                     let daysInMonth = 30;
                     try { daysInMonth = calculateDaysInBrowsingMonth(new Date()); } catch(e) { daysInMonth = 30; }
                     let skips = daysInMonth - oldTarget;
                     if (skips < 0) skips = 0;
-                    habit.monthlyAllowedSkips = skips;
                 }
                 delete habit.monthlyFreq;
             }
