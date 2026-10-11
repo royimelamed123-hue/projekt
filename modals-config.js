@@ -53,8 +53,6 @@
                 document.getElementById('uniformTargetInput').value = "1";
                 document.getElementById('weeklyUniformTargetInput').value = "1";
                 document.getElementById('monthlyUniformTargetInput').value = "1";
-                document.getElementById('weeklyFreqInput').value = "0";
-                document.getElementById('monthlyFreqInput').value = "0";
                 for (let i = 0; i < 7; i++) {
                     document.getElementById(`targetDay-${i}`).value = "1";
                     document.getElementById(`weeklyTargetDay-${i}`).value = "1";
