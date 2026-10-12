@@ -10,42 +10,7 @@
 
 
 
-        function updateConfigModalUI() {
-            const safeEl = (id) => document.getElementById(id);
-            const safeToggle = (id, cls, val) => { const el = safeEl(id); if(el) { if(val) { if(!el.classList.contains(cls)) el.classList.add(cls); } else { el.classList.remove(cls); } } };
-            const safeDisplay = (id, val) => { const el = safeEl(id); if(el && el.style.display !== val) el.style.display = val; };
-                
-            safeToggle('typeBtnXTimes', 'active', configSelectedType === 'x_times' || configSelectedType === 'regular');
-            safeToggle('typeBtnWeekly', 'active', configSelectedType === 'weekly');
-            safeToggle('typeBtnMonthly', 'active', configSelectedType === 'monthly');
-            safeDisplay('xTimesConfigSection', (configSelectedType === 'x_times' || configSelectedType === 'regular') ? 'block' : 'none');
-            safeDisplay('weeklyConfigSection', configSelectedType === 'weekly' ? 'block' : 'none');
-            safeDisplay('monthlyConfigSection', configSelectedType === 'monthly' ? 'block' : 'none');
 
-            setXTimesMode(xTimesMode);
-            setWeeklyMode(weeklyDayMode);
-            setMonthlyMode(monthlyDayMode);
-            
-            for (let i = 0; i < 7; i++) {
-                const btn = safeEl(`weekday-${i}`);
-                const targetBox = safeEl(`targetBox-${i}`);
-                const weeklyTargetBox = safeEl(`weeklyTargetBox-${i}`);
-                const monthlyTargetBox = safeEl(`monthlyTargetBox-${i}`);
-                
-                if (!btn) continue;
-                if (configSelectedWeekdays[i]) {
-                    btn.classList.add('active');
-                    if (targetBox) { targetBox.style.opacity = '1'; targetBox.style.pointerEvents = 'auto'; }
-                    if (weeklyTargetBox) { weeklyTargetBox.style.opacity = '1'; weeklyTargetBox.style.pointerEvents = 'auto'; }
-                    if (monthlyTargetBox) { monthlyTargetBox.style.opacity = '1'; monthlyTargetBox.style.pointerEvents = 'auto'; }
-                } else {
-                    btn.classList.remove('active');
-                    if (targetBox) { targetBox.style.opacity = '0.4'; targetBox.style.pointerEvents = 'none'; }
-                    if (weeklyTargetBox) { weeklyTargetBox.style.opacity = '0.4'; weeklyTargetBox.style.pointerEvents = 'none'; }
-                    if (monthlyTargetBox) { monthlyTargetBox.style.opacity = '0.4'; monthlyTargetBox.style.pointerEvents = 'none'; }
-                }
-            }
-        }
 
         function saveHabitConfig() {
             const title = document.getElementById('configHabitTitle').value.trim();
