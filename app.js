@@ -111,33 +111,20 @@
         function migrateHabitToV3(habit) {
             if (!habit || typeof habit !== 'object') return;
 
+            // מיגרציה גרסה 2: הסרת שדות ישנים
             if ((habit.schemaVersion || 0) < 2) {
-                    const oldTarget = (typeof habit.weeklyFreq === 'number' && habit.weeklyFreq > 0) ? habit.weeklyFreq : 1;
-                    let skips = 7 - oldTarget;
-                    if (skips < 0) skips = 0;
-                    if (skips > 7) skips = 7;
-                }
                 delete habit.weeklyFreq;
-                    const oldTarget = (typeof habit.monthlyFreq === 'number' && habit.monthlyFreq > 0) ? habit.monthlyFreq : 1;
-                    let daysInMonth = 30;
-                    try { daysInMonth = calculateDaysInBrowsingMonth(new Date()); } catch(e) { daysInMonth = 30; }
-                    let skips = daysInMonth - oldTarget;
-                    if (skips < 0) skips = 0;
-                }
                 delete habit.monthlyFreq;
             }
 
             // מיגרציה גרסה 3: שיטת חישוב + המרת חודשי ליומי
             if ((habit.schemaVersion || 0) < 3) {
-                // ברירת מחדל: מצב סטטי (הכי קרוב לשיטה הישנה)
                 if (!habit.scoreMethod) {
                     habit.scoreMethod = 'static';
                 }
-                // המרת הרגל חודשי ליומי
                 if (habit.type === 'monthly') {
                     habit.type = 'regular';
                 }
-                // N_auto ישן → א (אונס)
                 migrateNAutoForHabit(habit);
             }
 
