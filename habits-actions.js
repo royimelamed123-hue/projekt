@@ -71,11 +71,7 @@
                     habit.weeklyDayTargets = weeklyDayTargets;
                     delete habit.weeklyFreq;
                 }
-                if (configSelectedType === 'monthly') {
-                    habit.monthlyDayTargets = monthlyDayTargets;
-                    habit.
-                    delete habit.monthlyFreq;
-                }
+
 
                 if (habit.type === 'x_times' && habit.history) {
                     for (let monthKey in habit.history) {
