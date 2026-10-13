@@ -192,10 +192,34 @@
             const isActiveDay = habit.workdays && habit.workdays[currentDayOfWeek];
             const isNHarmful = isWeeklyNHarmful(habit, actualCurrentMonthKey, currentHebrewDayIndex, firstDayDate.getDay(), firstDayGregorian, totalDaysInMonth);
 
+            // ציון שבועי נוכחי
+            const _today = new Date(); _today.setHours(0,0,0,0);
+            const _currentSunday = getSundayOfWeek(_today);
+            const _method = habit.scoreMethod || 'static';
+            let _wDone = 0, _wFail = 0, _wEffective = 0, _wHasAction = false;
+            for (let _dow = 0; _dow < 7; _dow++) {
+                const _dG = addDays(_currentSunday, _dow);
+                if (_dG > _today) continue;
+                const _st = getHabitStatusForGregorianDate(habit, _dG);
+                if (_st === 'א' || _st === 'N_auto' || _st === '' || _st === undefined) continue;
+                const _dayTarget = (habit.weeklyDayTargets && habit.weeklyDayTargets[_dow]) || 1;
+                _wEffective++; _wHasAction = true;
+                if (_st === 'W') { _wDone += 1; }
+                else if (typeof _st === 'number') { const _f = Math.min(_st/_dayTarget,1); _wDone+=_f; _wFail+=(1-_f); }
+                else if (_st === 'N') { _wFail += 1; }
+            }
+            let _wPct = null;
+            if (_wHasAction && _wEffective > 0) {
+                if (_method === 'additive') _wPct = Math.round((_wDone/_wEffective)*100);
+                else if (_method === 'subtractive') _wPct = Math.round((1-(_wFail/_wEffective))*100);
+                else { const _t=_wDone+_wFail; _wPct = _t>0 ? Math.round((_wDone/_t)*100) : null; }
+            }
+            const wStats = _wPct !== null ? { pct: _wPct, text: _wPct+'%' } : { pct: 0, text: '-' };
+
             const card = createBaseCard(habit);
             card.innerHTML =
                 createCardMenuHTML(habit.id) +
-                createCardHeaderHTML(habit, mStats) +
+                createCardHeaderHTML(habit, mStats, wStats) +
                 `<div class="controls-row">
                     <div class="status-buttons-group">
                         ${isActiveDay ? `<div class="action-toggle btn-w-skip ${isNActive ? 'active' : ''} ${isNHarmful ? 'harmful' : ''}" onclick="setStatus('${esc(habit.id)}', 'N', event)">
