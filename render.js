@@ -538,17 +538,17 @@
                 let card;
 
                 if (habit.type === 'monthly') {
-                    const { card: mCard, mTarget, isNHarmfulM } = createMonthlyHabitCard(habit, todayStatus, mStats, currentDayTextVal);
-                    card = mCard;
-                    if (typeof todayStatus === 'number') { todayV += todayStatus / mTarget; todayActive += 1; }
-                    else if (todayStatus === 'W') { todayV += 1; todayActive += 1; }
-                    else if (todayStatus === 'N' && isNHarmfulM) { todayActive += 1; }
+                    // הרגל חודשי הומר ליומי במיגרציה — מטפלים בו כיומי
+                    card = createDailyHabitCard(habit, todayStatus, target, mStats, currentDayTextVal);
+                    if (typeof todayStatus === 'number') { todayV += todayStatus; todayActive += target; }
+                    else if (todayStatus === 'V') { todayV += target; todayActive += target; }
+                    else if (todayStatus === 'X') { todayActive += target; }
                 } else if (habit.type === 'weekly') {
-                    const { card: wCard, wTarget, isNHarmful } = createWeeklyHabitCard(habit, todayStatus, mStats, currentDayTextVal);
-                    card = wCard;
+                    card = createWeeklyHabitCard(habit, todayStatus, mStats, currentDayTextVal);
+                    const wTarget = (habit.weeklyDayTargets && habit.weeklyDayTargets[currentDayOfWeek]) || 1;
                     if (typeof todayStatus === 'number') { todayV += todayStatus / wTarget; todayActive += 1; }
                     else if (todayStatus === 'W') { todayV += 1; todayActive += 1; }
-                    else if (todayStatus === 'N' && isNHarmful) { todayActive += 1; }
+                    else if (todayStatus === 'N') { todayActive += 1; }
                 } else {
                     card = createDailyHabitCard(habit, todayStatus, target, mStats, currentDayTextVal);
                     if (typeof todayStatus === 'number') { todayV += todayStatus; todayActive += target; }
