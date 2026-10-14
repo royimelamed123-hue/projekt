@@ -537,8 +537,7 @@
 
                 let card;
 
-                if (habit.type === 'monthly') {
-                    // הרגל חודשי הומר ליומי במיגרציה — מטפלים בו כיומי
+                if (habit.type === 'monthly' || habit.type === 'regular' || habit.type === 'x_times') {
                     card = createDailyHabitCard(habit, todayStatus, target, mStats, currentDayTextVal);
                     if (typeof todayStatus === 'number') { todayV += todayStatus; todayActive += target; }
                     else if (todayStatus === 'V') { todayV += target; todayActive += target; }
