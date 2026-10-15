@@ -69,6 +69,7 @@
                 for (let i = 0; i < 7; i++) {
                     document.getElementById(`weeklyTargetDay-${i}`).value = (habit.weeklyDayTargets && habit.weeklyDayTargets[i]) || 1;
                 }
+                document.getElementById('weeklyFreqInput').value = (habit.weeklyAllowedSkips !== null && habit.weeklyAllowedSkips !== undefined) ? habit.weeklyAllowedSkips : 0;
                 const activeMonthlyTargets = (habit.monthlyDayTargets || []).filter((_, i) => configSelectedWeekdays[i]);
                 const allSameMonthly = activeMonthlyTargets.length === 0 || activeMonthlyTargets.every(v => v === activeMonthlyTargets[0]);
                 monthlyDayMode = allSameMonthly ? 'uniform' : 'custom';
@@ -76,6 +77,7 @@
                 for (let i = 0; i < 7; i++) {
                     document.getElementById(`monthlyTargetDay-${i}`).value = (habit.monthlyDayTargets && habit.monthlyDayTargets[i]) || 1;
                 }
+                document.getElementById('monthlyFreqInput').value = (habit.monthlyAllowedSkips !== null && habit.monthlyAllowedSkips !== undefined) ? habit.monthlyAllowedSkips : 0;
                 document.getElementById('passingScoreInput').value = habit.passingScore !== null && habit.passingScore !== undefined ? habit.passingScore : '';
                 document.getElementById('minScoreInput').value = habit.minScore !== null && habit.minScore !== undefined ? habit.minScore : '';
                 selectedHabitTheme = habit.theme || BOOKMARK_COLORS[0];
@@ -90,6 +92,8 @@
                 document.getElementById('uniformTargetInput').value = "1";
                 document.getElementById('weeklyUniformTargetInput').value = "1";
                 document.getElementById('monthlyUniformTargetInput').value = "1";
+                document.getElementById('weeklyFreqInput').value = "0";
+                document.getElementById('monthlyFreqInput').value = "0";
                 for (let i = 0; i < 7; i++) {
                     document.getElementById(`targetDay-${i}`).value = "1";
                     document.getElementById(`weeklyTargetDay-${i}`).value = "1";
