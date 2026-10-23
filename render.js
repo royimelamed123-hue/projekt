@@ -277,7 +277,6 @@
                 const isNHarmfulM = isMonthlyNHarmful(habit, actualCurrentMonthKey, currentHebrewDayIndex);
                 const isNActiveM = (todayStatus === 'N');
                 const isNAutoM = (todayStatus === 'N_auto');
-            const isNAutoM = (todayStatus === 'N_auto');
                 let wTextM = mTarget === 1 ? 'בוצע' : `${mTarget}`;
                 let wStyleM = '';
                 let isWActiveM = false;
@@ -298,7 +297,6 @@
                 const isNHarmful = isWeeklyNHarmful(habit, actualCurrentMonthKey, currentHebrewDayIndex, firstDayDate.getDay(), firstDayDate, calculateDaysInBrowsingMonth(mainScreenDatePointer));
                 const isNActive = (todayStatus === 'N');
                 const isNAuto = (todayStatus === 'N_auto');
-            const isNAuto = (todayStatus === 'N_auto');
                 let wText = wTarget === 1 ? 'בוצע' : `${wTarget}`;
                 let wStyle = '';
                 let isWActive = false;
