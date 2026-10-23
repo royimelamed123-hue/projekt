@@ -86,72 +86,41 @@
         }
         // ---- סיום ערכת נושא אוצריא ----
 
-        // ---- מיגרציה: גרסה 3 — שיטות חישוב חדשות + סטטוסים חדשים ----
-        const HABIT_SCHEMA_VERSION = 3;
+        // ---- מיגרציה: מעבר מ"כמות פעמים שצריך לעשות" ל"כמות פעמים שמותר לדלג" ----
+        // גרסת הסכמה הנוכחית של אובייקט ההרגל. מיגרציה רצה פעם אחת בלבד לכל הרגל.
+        const HABIT_SCHEMA_VERSION = 2;
 
-        function migrateNAutoForHabit(habit) {
-            if (!habit.workdays || !habit.history) return;
-            if ((habit.type !== 'weekly' && habit.type !== 'monthly')) return;
-            for (const monthKey in habit.history) {
-                const history = habit.history[monthKey];
-                const firstDate = getGregorianStartForMonthKey(monthKey);
-                const startDayOfWeek = firstDate.getDay();
-                for (let i = 0; i < 30; i++) {
-                    if (history[i] === 'N') {
-                        const dayOfWeek = (startDayOfWeek + i) % 7;
-                        const isActive = habit.workdays[dayOfWeek];
-                        if (!isActive) {
-                            history[i] = 'N_auto';
-                        }
-                    }
-                }
-            }
-        }
-
-        function migrateHabitToV3(habit) {
+        function migrateHabitToAllowedSkips(habit) {
             if (!habit || typeof habit !== 'object') return;
+            if (habit.schemaVersion >= HABIT_SCHEMA_VERSION) return;
 
-            // מיגרציה גרסה 2: weeklyAllowedSkips
-            if ((habit.schemaVersion || 0) < 2) {
-                if (habit.type === 'weekly' && (habit.weeklyAllowedSkips === undefined || habit.weeklyAllowedSkips === null)) {
-                    const oldTarget = (typeof habit.weeklyFreq === 'number' && habit.weeklyFreq > 0) ? habit.weeklyFreq : 1;
-                    let skips = 7 - oldTarget;
-                    if (skips < 0) skips = 0;
-                    if (skips > 7) skips = 7;
-                    habit.weeklyAllowedSkips = skips;
-                }
-                delete habit.weeklyFreq;
-                if (habit.type === 'monthly' && (habit.monthlyAllowedSkips === undefined || habit.monthlyAllowedSkips === null)) {
-                    const oldTarget = (typeof habit.monthlyFreq === 'number' && habit.monthlyFreq > 0) ? habit.monthlyFreq : 1;
-                    let daysInMonth = 30;
-                    try { daysInMonth = calculateDaysInBrowsingMonth(new Date()); } catch(e) { daysInMonth = 30; }
-                    let skips = daysInMonth - oldTarget;
-                    if (skips < 0) skips = 0;
-                    habit.monthlyAllowedSkips = skips;
-                }
-                delete habit.monthlyFreq;
+            // שבועי: מותר לדלג = 7 פחות היעד הישן (חסום ל-0 עד 7)
+            if (habit.type === 'weekly' && (habit.weeklyAllowedSkips === undefined || habit.weeklyAllowedSkips === null)) {
+                const oldTarget = (typeof habit.weeklyFreq === 'number' && habit.weeklyFreq > 0) ? habit.weeklyFreq : 1;
+                let skips = 7 - oldTarget;
+                if (skips < 0) skips = 0;
+                if (skips > 7) skips = 7;
+                habit.weeklyAllowedSkips = skips;
             }
+            delete habit.weeklyFreq;
 
-            // מיגרציה גרסה 3: שיטת חישוב + המרת חודשי ליומי
-            if ((habit.schemaVersion || 0) < 3) {
-                // ברירת מחדל: מצב סטטי (הכי קרוב לשיטה הישנה)
-                if (!habit.scoreMethod) {
-                    habit.scoreMethod = 'static';
-                }
-                // המרת הרגל חודשי ליומי
-                if (habit.type === 'monthly') {
-                    habit.type = 'regular';
-                }
-                // N_auto ישן → א (אונס)
-                migrateNAutoForHabit(habit);
+            // חודשי: מותר לדלג = מספר ימי החודש הנוכחי פחות היעד הישן (חסום ל-0 לפחות)
+            if (habit.type === 'monthly' && (habit.monthlyAllowedSkips === undefined || habit.monthlyAllowedSkips === null)) {
+                const oldTarget = (typeof habit.monthlyFreq === 'number' && habit.monthlyFreq > 0) ? habit.monthlyFreq : 1;
+                let daysInMonth = 30;
+                try { daysInMonth = calculateDaysInBrowsingMonth(new Date()); } catch(e) { daysInMonth = 30; }
+                let skips = daysInMonth - oldTarget;
+                if (skips < 0) skips = 0;
+                habit.monthlyAllowedSkips = skips;
             }
+            delete habit.monthlyFreq;
 
             habit.schemaVersion = HABIT_SCHEMA_VERSION;
         }
 
         function migrateAllHabits(list) {
             if (!Array.isArray(list)) return;
-            list.forEach(migrateHabitToV3);
+            list.forEach(migrateHabitToAllowedSkips);
         }
         // ---- סיום מיגרציה ----
 
@@ -193,4 +162,3 @@
                 initializeApp();
             }
         }
-

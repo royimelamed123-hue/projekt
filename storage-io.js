@@ -35,12 +35,8 @@
         function saveToStorageForHabit(habitId) {
             invalidateStatsCache(habitId);
             _debouncedSave();
-            // אם פילטר "לא סומן" פעיל — רנדר מחדש כדי להסיר הרגלים שסומנו
-            if (showUnsignedOnly) {
-                renderHabits();
-            } else {
-                updateCardInPlace(habitId);
-            }
+            // עדכן רק את הכרטיס שהשתנה במקום כל הכרטיסים
+            updateCardInPlace(habitId);
             if(selectedHabitIdForView) {
                 renderFullMonthGrid();
                 renderMonthNotesList();
@@ -275,4 +271,3 @@
             window._pendingImportHabits = null;
             window._pendingImportEvent = null;
         }
-
