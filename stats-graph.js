@@ -59,7 +59,7 @@
             const maxLevel = Math.max(actualMax + padding, actualMin + 2);
             const range = maxLevel - minLevel || 1;
 
-            const padL = 44, padR = 16, padT = 20, padB = 30;
+            const padL = 44, padR = 28, padT = 20, padB = 30;
             const gW = W - padL - padR;
             const gH = H - padT - padB;
 
