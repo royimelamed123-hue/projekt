@@ -59,7 +59,7 @@
             const maxLevel = Math.max(actualMax + padding, actualMin + 2);
             const range = maxLevel - minLevel || 1;
 
-            const padL = 44, padR = 28, padT = 20, padB = 30;
+            const padL = 44, padR = 44, padT = 20, padB = 30;
             const gW = W - padL - padR;
             const gH = H - padT - padB;
 
@@ -141,7 +141,9 @@
                     if (closest) {
                         _tooltip.textContent = `יום ${closest.day}: ${Math.round(closest.level * 10) / 10}`;
                         _tooltip.style.display = 'block';
-                        _tooltip.style.left = (e.clientX + 12) + 'px';
+                        const tipW = _tooltip.offsetWidth || 80;
+                        const leftPos = (e.clientX + 12 + tipW > window.innerWidth) ? (e.clientX - tipW - 12) : (e.clientX + 12);
+                        _tooltip.style.left = leftPos + 'px';
                         _tooltip.style.top = (e.clientY - 28) + 'px';
                     } else {
                         _tooltip.style.display = 'none';
