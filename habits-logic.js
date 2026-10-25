@@ -419,7 +419,7 @@
             const habit = habits.find(h => h.id === selectedHabitIdForView);
             if (!habit) return;
 
-            showConfirm(`האם אתה בטוח שברצונך למחוק לחלוטין את כל היסטוריית הסימונים וההערות של ההרגל "${habit.title}" מכל החודשים?`, () => {
+            showConfirm(`האם אתה בטוח שברצונך לאפס לחלוטין את כל היסטוריית הסימונים וההערות של ההרגל "${habit.title}" מכל החודשים?`, () => {
                 habit.history = {};
                 const currentMonthComps = getHebrewDateComponents(new Date());
                 habit.history[currentMonthComps.key] = Array(30).fill("");
