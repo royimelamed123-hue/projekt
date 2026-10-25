@@ -90,25 +90,20 @@
 
         <div id="monthViewScreen" class="month-view-container">
         <div class="month-view-header">
-            <div class="month-header-top">
-                <div class="month-title-area">
-                    <div style="display: flex; align-items: center; gap: 8px;">
-                        <span style="font-size: 20px; font-weight: 700; color: var(--text-color, #0f172a); white-space: nowrap;">מציג הרגל:</span>
-                        <select id="habitSelectDropdown" class="month-select-dropdown" style="font-size: 20px; font-weight: 700; min-width: 200px;" onchange="onHabitSelectChange()"></select>
-                        <button class="btn-edit-habit-trigger" onclick="openHabitConfigModal(true)">ערוך הרגל זה</button>
-                    </div>
-                    
-                    <div class="navigation-wrapper">
-                        <div class="day-navigation-container" style="margin-bottom: 0;">
-                            <button class="btn-day-nav" onclick="adjustBrowsingMonth(-1)" title="חודש קודם">→</button>
-                            <div id="monthDisplayBadge" class="date-badge">טוען חודש...</div>
-                            <button class="btn-day-nav" onclick="adjustBrowsingMonth(1)" title="חודש הבא">←</button>
-                        </div>
-                        <button id="btnMonthJumpToday" class="btn-jump-today" onclick="jumpToCurrentMonth()">חזרה לחודש הנוכחי</button>
-                    </div>
-                </div>
+            <div style="display: flex; align-items: center; gap: 8px; justify-content: center; margin-bottom: 10px;">
+                <span style="font-size: 20px; font-weight: 700; color: var(--text-color, #0f172a); white-space: nowrap;">מציג הרגל:</span>
+                <select id="habitSelectDropdown" class="month-select-dropdown" style="font-size: 20px; font-weight: 700; min-width: 200px;" onchange="onHabitSelectChange()"></select>
             </div>
-            <div style="display: flex; gap: 5px; align-items: center; flex-wrap: wrap; justify-content: center; margin-top: 10px;">
+            <div style="display: flex; gap: 5px; align-items: center; flex-wrap: wrap; justify-content: center; margin-bottom: 10px;">
+                <div class="day-navigation-container" style="margin-bottom: 0;">
+                    <button class="btn-day-nav" onclick="adjustBrowsingMonth(-1)" title="חודש קודם">→</button>
+                    <div id="monthDisplayBadge" class="date-badge">טוען חודש...</div>
+                    <button class="btn-day-nav" onclick="adjustBrowsingMonth(1)" title="חודש הבא">←</button>
+                </div>
+                <button id="btnMonthJumpToday" class="btn-jump-today" onclick="jumpToCurrentMonth()">חזרה לחודש הנוכחי</button>
+            </div>
+            <div style="display: flex; gap: 5px; align-items: center; flex-wrap: wrap; justify-content: center; margin-bottom: 10px;">
+                <button class="btn-edit-habit-trigger" onclick="openHabitConfigModal(true)">ערוך הרגל זה</button>
                 <button class="btn-month-action-archive" onclick="archiveCurrentHabitFromMonthView()">הוסף לארכיון</button>
                 <button class="btn-reset-action" onclick="resetCurrentMonthData()">אפס חודש</button>
                 <button class="btn-reset-action" onclick="resetTotalHabitData()">אפס הרגל</button>
