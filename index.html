@@ -398,6 +398,17 @@
     <script src="js/reminders.js"></script>
     <script src="js/app.js"></script>
 
+    <!-- Modal: אישור פעולה -->
+    <div id="confirmModal" class="modal-overlay" style="display:none;">
+        <div class="modal-card" style="max-width:420px; text-align:center;">
+            <p id="confirmModalMessage" style="margin-bottom:18px; font-size:15px;"></p>
+            <div class="modal-actions" style="justify-content:center;">
+                <button class="btn-modal-save" id="confirmModalOk">אישור</button>
+                <button class="btn-modal-cancel" id="confirmModalCancel">ביטול</button>
+            </div>
+        </div>
+    </div>
+
     <!-- Modal: ממוצע הרגלים ספציפיים -->
     <div id="avgHabitsModal" class="modal-overlay" style="display: none;">
         <div class="modal-box" style="max-width: 560px; width: 95%; max-height: 80vh; overflow-y: auto;">

@@ -1,3 +1,14 @@
+        function showConfirm(message, onConfirm) {
+            const modal = document.getElementById('confirmModal');
+            document.getElementById('confirmModalMessage').textContent = message;
+            modal.style.display = 'flex';
+            const okBtn = document.getElementById('confirmModalOk');
+            const cancelBtn = document.getElementById('confirmModalCancel');
+            const close = () => { modal.style.display = 'none'; okBtn.onclick = null; cancelBtn.onclick = null; };
+            okBtn.onclick = () => { close(); onConfirm(); };
+            cancelBtn.onclick = () => close();
+        }
+
         // ---- תיקון 4: calculateStatsForMonth עם מטמון ----
         function calculateStatsForMonth(habit, monthKey) {
             // בדיקה אם התוצאה כבר מחושבת במטמון

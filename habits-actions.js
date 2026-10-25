@@ -94,93 +94,95 @@
             if (isModalEditMode) {
                 const habit = habits.find(h => h.id === selectedHabitIdForView);
                 if (!habit) return;
-                const habitSnapshot = JSON.parse(JSON.stringify(habit)); // snapshot לפני עריכה
-                
-                const isTypeChanged = habit.type !== configSelectedType;
-                
-                if (isTypeChanged) {
-                    if (!confirm(`שינוי סוג ההרגל יאפס לחלוטין את כל היסטוריית הסימונים של הרגל זה. האם להמשיך?`)) {
-                        return;
-                    }
-                    habit.history = {};
-                }
-                
+                const habitSnapshot = JSON.parse(JSON.stringify(habit));
                 const oldWorkdays = habit.workdays ? [...habit.workdays] : null;
+                const isTypeChanged = habit.type !== configSelectedType;
 
-                habit.title = title;
-                habit.description = desc;
-                habit.type = configSelectedType;
-                habit.workdays = [...configSelectedWeekdays];
-                habit.dayTargets = dayTargets;
-                if (configSelectedType === 'weekly') {
-                    habit.weeklyDayTargets = weeklyDayTargets;
-                    habit.weeklyAllowedSkips = weeklyAllowedSkips;
-                    delete habit.weeklyFreq;
-                }
-                if (configSelectedType === 'monthly') {
-                    habit.monthlyDayTargets = monthlyDayTargets;
-                    habit.monthlyAllowedSkips = monthlyAllowedSkips;
-                    delete habit.monthlyFreq;
-                }
-
-                if (habit.type === 'x_times' && habit.history) {
-                    for (let monthKey in habit.history) {
-                        if (!Array.isArray(habit.history[monthKey])) continue;
-                        let startDayOfWeek = 0;
-                        try {
-                            const monthStartDate = getGregorianStartForMonthKey(monthKey);
-                            startDayOfWeek = monthStartDate.getDay();
-                        } catch(e) {
-                            startDayOfWeek = new Date().getDay(); 
-                        }
-                        for (let i = 0; i < habit.history[monthKey].length; i++) {
-                            let currentStatus = habit.history[monthKey][i];
-                            let cellDayOfWeek = (startDayOfWeek + i) % 7;
-                            let newTarget = dayTargets[cellDayOfWeek];
-                            if (typeof currentStatus === 'number') {
-                                if (currentStatus >= newTarget) {
-                                    habit.history[monthKey][i] = newTarget;
-                                }
-                            } else if (currentStatus === 'V') {
-                                // יום שסומן כ"בוצע" (כמות 1) — כאשר מעלים את הכמות הופך לספירה חלקית 1/X
-                                if (newTarget > 1) {
-                                    habit.history[monthKey][i] = 1;
-                                }
-                            }
-                        }
+                const applyEdit = () => {
+                    habit.title = title;
+                    habit.description = desc;
+                    habit.type = configSelectedType;
+                    habit.workdays = [...configSelectedWeekdays];
+                    habit.dayTargets = dayTargets;
+                    if (configSelectedType === 'weekly') {
+                        habit.weeklyDayTargets = weeklyDayTargets;
+                        habit.weeklyAllowedSkips = weeklyAllowedSkips;
+                        delete habit.weeklyFreq;
                     }
-                }
-                if (habit.type === 'weekly' && habit.history) {
-                    for (let monthKey in habit.history) {
-                        if (!Array.isArray(habit.history[monthKey])) continue;
-                        let startDayOfWeek = 0;
-                        try {
-                            startDayOfWeek = getGregorianStartForMonthKey(monthKey).getDay();
-                        } catch(e) { startDayOfWeek = new Date().getDay(); }
-                        for (let i = 0; i < habit.history[monthKey].length; i++) {
-                            let currentStatus = habit.history[monthKey][i];
-                            if (typeof currentStatus === 'number') {
+                    if (configSelectedType === 'monthly') {
+                        habit.monthlyDayTargets = monthlyDayTargets;
+                        habit.monthlyAllowedSkips = monthlyAllowedSkips;
+                        delete habit.monthlyFreq;
+                    }
+                    if (habit.type === 'x_times' && habit.history) {
+                        for (let monthKey in habit.history) {
+                            if (!Array.isArray(habit.history[monthKey])) continue;
+                            let startDayOfWeek = 0;
+                            try {
+                                const monthStartDate = getGregorianStartForMonthKey(monthKey);
+                                startDayOfWeek = monthStartDate.getDay();
+                            } catch(e) {
+                                startDayOfWeek = new Date().getDay();
+                            }
+                            for (let i = 0; i < habit.history[monthKey].length; i++) {
+                                let currentStatus = habit.history[monthKey][i];
                                 let cellDayOfWeek = (startDayOfWeek + i) % 7;
-                                let newTarget = weeklyDayTargets[cellDayOfWeek];
-                                if (currentStatus >= newTarget) {
-                                    habit.history[monthKey][i] = 'W';
+                                let newTarget = dayTargets[cellDayOfWeek];
+                                if (typeof currentStatus === 'number') {
+                                    if (currentStatus >= newTarget) {
+                                        habit.history[monthKey][i] = newTarget;
+                                    }
+                                } else if (currentStatus === 'V') {
+                                    if (newTarget > 1) {
+                                        habit.history[monthKey][i] = 1;
+                                    }
                                 }
                             }
                         }
                     }
-                }
-                
-                for (let monthKey in habit.history) {
-                    applyAutomaticOffDaysForMonth(habit, monthKey, isTypeChanged ? null : oldWorkdays);
-                }
-                habit.passingScore = passingScore;
-                habit.minScore = minScore;
-                habit.theme = selectedHabitTheme;
-                habit.schemaVersion = HABIT_SCHEMA_VERSION;
+                    if (habit.type === 'weekly' && habit.history) {
+                        for (let monthKey in habit.history) {
+                            if (!Array.isArray(habit.history[monthKey])) continue;
+                            let startDayOfWeek = 0;
+                            try {
+                                startDayOfWeek = getGregorianStartForMonthKey(monthKey).getDay();
+                            } catch(e) { startDayOfWeek = new Date().getDay(); }
+                            for (let i = 0; i < habit.history[monthKey].length; i++) {
+                                let currentStatus = habit.history[monthKey][i];
+                                if (typeof currentStatus === 'number') {
+                                    let cellDayOfWeek = (startDayOfWeek + i) % 7;
+                                    let newTarget = weeklyDayTargets[cellDayOfWeek];
+                                    if (currentStatus >= newTarget) {
+                                        habit.history[monthKey][i] = 'W';
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    for (let monthKey in habit.history) {
+                        applyAutomaticOffDaysForMonth(habit, monthKey, isTypeChanged ? null : oldWorkdays);
+                    }
+                    habit.passingScore = passingScore;
+                    habit.minScore = minScore;
+                    habit.theme = selectedHabitTheme;
+                    habit.schemaVersion = HABIT_SCHEMA_VERSION;
+                    pushUndoAction({ type: 'edit', habitId: habit.id, previousHabit: JSON.parse(JSON.stringify(habitSnapshot)) });
+                    invalidateStatsCache(habit.id);
+                    updateHabitDropdownDisplay();
+                };
 
-                pushUndoAction({ type: 'edit', habitId: habit.id, previousHabit: JSON.parse(JSON.stringify(habitSnapshot)) });
-                invalidateStatsCache(habit.id);
-                updateHabitDropdownDisplay();
+                if (isTypeChanged) {
+                    showConfirm(`שינוי סוג ההרגל יאפס לחלוטין את כל היסטוריית הסימונים של הרגל זה. האם להמשיך?`, () => {
+                        habit.history = {};
+                        applyEdit();
+                        closeHabitConfigModal();
+                        saveToStorage();
+                        executeScoreExtras(passingScore, minScore);
+                    });
+                    return;
+                }
+
+                applyEdit();
             } else {
                 const newHabit = {
                     id: Date.now().toString(),
@@ -225,12 +227,12 @@
             const habit = habits.find(h => h.id === id);
             if(!habit) return;
 
-            if(confirm(`האם אתה בטוח שברצונך למחוק לחלוטין את ההרגל "${habit.title}" יחד עם כל ההיסטוריה וההערות שלו?`)) {
+            showConfirm(`האם אתה בטוח שברצונך למחוק לחלוטין את ההרגל "${habit.title}" יחד עם כל ההיסטוריה וההערות שלו?`, () => {
                 if(selectedHabitIdForView === id) closeMonthView();
                 invalidateStatsCache(id);
                 habits = habits.filter(h => h.id !== id);
                 saveToStorage();
-            }
+            });
         }
 
         function duplicateHabit(id, event) {
@@ -265,10 +267,10 @@
             const habit = habits.find(h => h.id === selectedHabitIdForView);
             if(!habit) return;
 
-            if(confirm(`האם אתה בטוח שברצונך למחוק לחלוטין את ההרגל "${habit.title}" יחד עם כל ההיסטוריה וההערות שלו?`)) {
+            showConfirm(`האם אתה בטוח שברצונך למחוק לחלוטין את ההרגל "${habit.title}" יחד עם כל ההיסטוריה וההערות שלו?`, () => {
                 invalidateStatsCache(selectedHabitIdForView);
                 habits = habits.filter(h => h.id !== selectedHabitIdForView);
                 closeMonthView();
                 saveToStorage();
-            }
+            });
         }
