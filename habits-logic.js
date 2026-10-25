@@ -399,7 +399,7 @@
             if (!habit) return;
             const targetMonthComps = getHebrewDateComponents(browsingDatePointer);
             
-            if (confirm(`האם אתה בטוח שברצונך לאפס לחלוטין את נתוני הסימונים וההערות של ההרגל "${habit.title}" לחודש ${targetMonthComps.key}?`)) {
+            showConfirm(`האם אתה בטוח שברצונך לאפס לחלוטין את נתוני הסימונים וההערות של ההרגל "${habit.title}" לחודש ${targetMonthComps.key}?`, () => {
                 if (habit.history && habit.history[targetMonthComps.key]) {
                     habit.history[targetMonthComps.key] = Array(30).fill("");
                     applyAutomaticOffDaysForMonth(habit, targetMonthComps.key);
@@ -412,24 +412,23 @@
                 }
                 invalidateStatsCache(habit.id);
                 saveToStorage();
-            }
+            });
         }
 
         function resetTotalHabitData() {
             const habit = habits.find(h => h.id === selectedHabitIdForView);
             if (!habit) return;
 
-            if (confirm(`האם אתה בטוח שברצונך למחוק לחלוטין את כל היסטוריית הסימונים וההערות של ההרגל "${habit.title}" מכל החודשים?`)) {
+            showConfirm(`האם אתה בטוח שברצונך למחוק לחלוטין את כל היסטוריית הסימונים וההערות של ההרגל "${habit.title}" מכל החודשים?`, () => {
                 habit.history = {};
                 const currentMonthComps = getHebrewDateComponents(new Date());
                 habit.history[currentMonthComps.key] = Array(30).fill("");
                 applyAutomaticOffDaysForMonth(habit, currentMonthComps.key);
-                
                 habit.notesLog = [];
                 habit.lastTextareaVal = "";
                 invalidateStatsCache(habit.id);
                 saveToStorage();
-            }
+            });
         }
 
         function toggleDayInFullView(dayIndex) {
