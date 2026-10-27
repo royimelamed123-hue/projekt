@@ -350,6 +350,38 @@
                         <span><span style="color:#d97706;">■</span> כתום = גבול המלחמה</span>
                     </div>
                 </div>
+                <!-- בחירת שיטת חישוב -->
+                <div style="margin-top: 10px; margin-bottom: 6px;">
+                    <div class="modal-section-title" style="margin-bottom: 6px;">שיטת חישוב ציון:</div>
+                    <div style="display: flex; flex-direction: column; gap: 6px;">
+                        <label id="scoreMethodLabel-additive" onclick="setScoreMethod('additive')" style="display:flex; align-items:flex-start; gap:8px; cursor:pointer; padding:8px 10px; border-radius:8px; border:1.5px solid #e2e8f0; background:#f8fafc;">
+                            <input type="radio" name="scoreMethod" id="scoreMethodRadio-additive" value="additive" style="margin-top:2px; flex-shrink:0;">
+                            <div>
+                                <div style="font-size:13px; font-weight:700; color:#0f172a;">הולך ומוסיף</div>
+                                <div style="font-size:11px; color:#64748b; margin-top:2px;">מתחילים את החודש ב-0 ועולים מעלה עם כל <span style="color:#22a84a; font-weight:600;">הצלחה</span></div>
+                            </div>
+                        </label>
+                        <label id="scoreMethodLabel-subtractive" onclick="setScoreMethod('subtractive')" style="display:flex; align-items:flex-start; gap:8px; cursor:pointer; padding:8px 10px; border-radius:8px; border:1.5px solid #e2e8f0; background:#f8fafc;">
+                            <input type="radio" name="scoreMethod" id="scoreMethodRadio-subtractive" value="subtractive" style="margin-top:2px; flex-shrink:0;">
+                            <div>
+                                <div style="font-size:13px; font-weight:700; color:#0f172a;">הולך ופוחת</div>
+                                <div style="font-size:11px; color:#64748b; margin-top:2px;">מתחילים את החודש ב-100 ויורדים עם כל <span style="color:#e74c3c; font-weight:600;">פספוס</span></div>
+                            </div>
+                        </label>
+                        <label id="scoreMethodLabel-static" onclick="setScoreMethod('static')" style="display:flex; align-items:flex-start; gap:8px; cursor:pointer; padding:8px 10px; border-radius:8px; border:1.5px solid #e2e8f0; background:#f8fafc;">
+                            <input type="radio" name="scoreMethod" id="scoreMethodRadio-static" value="static" style="margin-top:2px; flex-shrink:0;">
+                            <div>
+                                <div style="font-size:13px; font-weight:700; color:#0f172a;">סטטי</div>
+                                <div style="font-size:11px; color:#64748b; margin-top:2px;">מצב נתון של <span style="color:#22a84a; font-weight:600;">הצלחה</span> מול <span style="color:#e74c3c; font-weight:600;">פספוס</span></div>
+                            </div>
+                        </label>
+                    </div>
+                    <div style="display: flex; gap: 8px; margin-top: 7px; flex-wrap: wrap;">
+                        <button type="button" id="btnScoreMethodDefaultToggle" onclick="toggleScoreMethodDefaultMark()" style="flex:1; min-width:0; font-family:inherit; font-size:11px; font-weight:700; padding:5px 8px; border-radius:7px; border:1.5px solid #2563eb; background:#eff6ff; color:#1d4ed8; cursor:pointer; white-space:nowrap; transition: all 0.18s;">שמור להרגלים הבאים</button>
+                        <button type="button" id="btnScoreMethodApplyAllToggle" onclick="toggleScoreMethodApplyAllMark()" style="flex:1; min-width:0; font-family:inherit; font-size:11px; font-weight:700; padding:5px 8px; border-radius:7px; border:1.5px solid #7c3aed; background:#f5f3ff; color:#6d28d9; cursor:pointer; white-space:nowrap; transition: all 0.18s;">עדכן הרגלים קיימים</button>
+                    </div>
+                </div>
+
                 <div style="display: flex; gap: 10px; margin-top: 6px;">
                     <div style="flex: 1;">
                         <label style="font-size: 11px; font-weight: 600; color: #475569; display: block; margin-bottom: 2px;">ציון קניין — <span style="color:#22a84a;">השטח שלנו</span> (%)</label>

@@ -44,6 +44,7 @@
                 document.getElementById('passingScoreInput').value = habit.passingScore !== null && habit.passingScore !== undefined ? habit.passingScore : '';
                 document.getElementById('minScoreInput').value = habit.minScore !== null && habit.minScore !== undefined ? habit.minScore : '';
                 selectedHabitTheme = habit.theme || BOOKMARK_COLORS[0];
+                setScoreMethod(habit.scoreMethod || 'static');
             } else {
                 // (כותרת הוסרה מה-UI)
                 configSelectedType = 'x_times';
@@ -64,7 +65,9 @@
                 selectedHabitTheme = BOOKMARK_COLORS[0];
                 document.getElementById('passingScoreInput').value = '';
                 document.getElementById('minScoreInput').value = '';
+                setScoreMethod('static');
                 // טען ברירות מחדל שנשמרו ("שמור להרגלים הבאים") ומלא את השדות
+                storageGet(SCORE_METHOD_DEFAULTS_KEY).then(d => { if (d && d.scoreMethod) setScoreMethod(d.scoreMethod); }).catch(()=>{});
                 loadScoreDefaults().then(defaults => {
                     if (!defaults) return;
                     // מלא רק אם המשתמש עדיין לא שינה ידנית את השדות
@@ -103,8 +106,51 @@
         }
 
         const SCORE_DEFAULTS_KEY = 'otzarya_score_defaults';
+        const SCORE_METHOD_DEFAULTS_KEY = 'otzarya_score_method_default';
         let scoreDefaultMarked = false;
         let scoreApplyAllMarked = false;
+        let scoreMethodDefaultMarked = false;
+        let scoreMethodApplyAllMarked = false;
+        let configSelectedScoreMethod = 'static';
+
+        function setScoreMethod(method) {
+            configSelectedScoreMethod = method;
+            ['additive', 'subtractive', 'static'].forEach(m => {
+                const radio = document.getElementById(`scoreMethodRadio-${m}`);
+                const label = document.getElementById(`scoreMethodLabel-${m}`);
+                if (!radio || !label) return;
+                const active = m === method;
+                radio.checked = active;
+                label.style.borderColor = active ? '#2563eb' : '#e2e8f0';
+                label.style.background = active ? '#eff6ff' : '#f8fafc';
+            });
+        }
+
+        function toggleScoreMethodDefaultMark() {
+            scoreMethodDefaultMarked = !scoreMethodDefaultMarked;
+            _renderScoreToggleBtn('btnScoreMethodDefaultToggle', scoreMethodDefaultMarked, '#2563eb', '#eff6ff', '#1d4ed8');
+        }
+
+        function toggleScoreMethodApplyAllMark() {
+            scoreMethodApplyAllMarked = !scoreMethodApplyAllMarked;
+            _renderScoreToggleBtn('btnScoreMethodApplyAllToggle', scoreMethodApplyAllMarked, '#7c3aed', '#f5f3ff', '#6d28d9');
+        }
+
+        function executeScoreMethodExtras(scoreMethod) {
+            if (scoreMethodDefaultMarked) {
+                storageSaveAsync(SCORE_METHOD_DEFAULTS_KEY, { scoreMethod });
+            }
+            if (scoreMethodApplyAllMarked) {
+                habits.forEach(h => { h.scoreMethod = scoreMethod; });
+                invalidateAllStatsCache();
+                saveToStorage();
+                otzShowMessage('שיטת החישוב עודכנה לכל ההרגלים.', 'success');
+            }
+            scoreMethodDefaultMarked = false;
+            scoreMethodApplyAllMarked = false;
+            _renderScoreToggleBtn('btnScoreMethodDefaultToggle', false, '#2563eb', '#eff6ff', '#1d4ed8');
+            _renderScoreToggleBtn('btnScoreMethodApplyAllToggle', false, '#7c3aed', '#f5f3ff', '#6d28d9');
+        }
 
         async function loadScoreDefaults() {
             try {
@@ -129,8 +175,12 @@
         function resetScoreToggleButtons() {
             scoreDefaultMarked = false;
             scoreApplyAllMarked = false;
+            scoreMethodDefaultMarked = false;
+            scoreMethodApplyAllMarked = false;
             _renderScoreToggleBtn('btnScoreDefaultToggle', false, '#2563eb', '#eff6ff', '#1d4ed8');
             _renderScoreToggleBtn('btnScoreApplyAllToggle', false, '#7c3aed', '#f5f3ff', '#6d28d9');
+            _renderScoreToggleBtn('btnScoreMethodDefaultToggle', false, '#2563eb', '#eff6ff', '#1d4ed8');
+            _renderScoreToggleBtn('btnScoreMethodApplyAllToggle', false, '#7c3aed', '#f5f3ff', '#6d28d9');
         }
 
         function _renderScoreToggleBtn(id, active, borderColor, bgOff, colorOff) {

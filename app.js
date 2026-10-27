@@ -118,9 +118,17 @@
             habit.schemaVersion = HABIT_SCHEMA_VERSION;
         }
 
+        function migrateHabitScoreMethod(habit) {
+            if (!habit || typeof habit !== 'object') return;
+            if (!habit.scoreMethod) {
+                habit.scoreMethod = 'static';
+            }
+        }
+
         function migrateAllHabits(list) {
             if (!Array.isArray(list)) return;
             list.forEach(migrateHabitToAllowedSkips);
+            list.forEach(migrateHabitScoreMethod);
         }
         // ---- סיום מיגרציה ----
 

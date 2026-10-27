@@ -121,16 +121,16 @@
             const isNActiveM = (todayStatus === 'N');
             const isNAutoM = (todayStatus === 'N_auto');
 
-            let wTextM = mTarget === 1 ? "בוצע" : `${mTarget}`;
+            let wTextM = mTarget === 1 ? "הצלחה" : `${mTarget}`;
             let wStyleM = "";
             let isWActiveM = false;
             if (todayStatus === 'W') {
-                wTextM = "בוצע";
+                wTextM = "הצלחה";
                 wStyleM = getStatusProgressStyle(100);
                 isWActiveM = true;
             } else if (mTarget > 1 && typeof todayStatus === 'number') {
                 const rem = mTarget - todayStatus;
-                wTextM = rem > 0 ? `${rem}` : "בוצע";
+                wTextM = rem > 0 ? `${rem}` : "הצלחה";
                 const pct = Math.round((todayStatus / mTarget) * 100);
                 wStyleM = getStatusProgressStyle(pct);
             }
@@ -142,7 +142,7 @@
                 `<div class="controls-row">
                     <div class="status-buttons-group">
                         <div class="action-toggle btn-w-skip ${isNActiveM ? 'active' : ''} ${isNHarmfulM ? 'harmful' : ''} ${isNAutoM ? 'n-auto' : ''}" onclick="setStatus('${esc(habit.id)}', 'N', event)">
-                            <span>לא בוצע</span>
+                            <span>לא הצליח</span>
                         </div>
                         <div class="action-toggle btn-w-done ${isWActiveM ? 'active' : ''}" style="${wStyleM}" onclick="setStatus('${esc(habit.id)}', 'W', event)">
                             <span>${esc(wTextM)}</span>
@@ -163,16 +163,16 @@
             const totalDaysInMonth = calculateDaysInBrowsingMonth(mainScreenDatePointer);
             const wTarget = (habit.weeklyDayTargets && habit.weeklyDayTargets[currentDayOfWeek]) || 1;
 
-            let wText = wTarget === 1 ? "בוצע" : `${wTarget}`;
+            let wText = wTarget === 1 ? "הצלחה" : `${wTarget}`;
             let wStyle = "";
             let isWActive = false;
 
             if (wTarget > 1) {
                 if (todayStatus === 'W') {
-                    wText = "בוצע"; wStyle = getStatusProgressStyle(100); isWActive = true;
+                    wText = "הצלחה"; wStyle = getStatusProgressStyle(100); isWActive = true;
                 } else if (typeof todayStatus === 'number') {
                     const rem = wTarget - todayStatus;
-                    wText = rem > 0 ? `${rem}` : `בוצע`;
+                    wText = rem > 0 ? `${rem}` : `הצלחה`;
                     wStyle = getStatusProgressStyle(Math.round((todayStatus / wTarget) * 100));
                 }
             } else {
@@ -190,7 +190,7 @@
                 `<div class="controls-row">
                     <div class="status-buttons-group">
                         <div class="action-toggle btn-w-skip ${isNActive ? 'active' : ''} ${isNHarmful ? 'harmful' : ''} ${isNAuto ? 'n-auto' : ''}" onclick="setStatus('${esc(habit.id)}', 'N', event)">
-                            <span>לא בוצע</span>
+                            <span>לא הצליח</span>
                         </div>
                         <div class="action-toggle btn-w-done ${isWActive ? 'active' : ''}" style="${wStyle}" onclick="setStatus('${esc(habit.id)}', 'W', event)">
                             <span>${esc(wText)}</span>
@@ -206,22 +206,22 @@
 
         // ---- כרטיס להרגל יומי (x_times / regular) ----
         function createDailyHabitCard(habit, todayStatus, target, mStats, currentDayTextVal) {
-            let vText = "בוצע";
+            let vText = "הצלחה";
             let vStyle = "";
             let isVActive = false;
 
             if (habit.type === 'x_times' || habit.type === 'regular') {
                 if (typeof todayStatus === 'number') {
                     const rem = target - todayStatus;
-                    vText = rem > 0 ? `${rem}` : `בוצע`;
+                    vText = rem > 0 ? `${rem}` : `הצלחה`;
                     vStyle = getStatusProgressStyle(Math.round((todayStatus / target) * 100));
                     isVActive = (todayStatus >= target);
                 } else if (todayStatus === 'V') {
-                    vText = `בוצע`;
+                    vText = `הצלחה`;
                     vStyle = getStatusProgressStyle(100);
                     isVActive = true;
                 } else {
-                    vText = target === 1 ? `בוצע` : `${target}`;
+                    vText = target === 1 ? `הצלחה` : `${target}`;
                 }
             } else {
                 isVActive = (todayStatus === 'V');
@@ -593,15 +593,15 @@
                     if (typeof status === 'number') {
                         const pct = Math.round((status / wTarget) * 100);
                         cellStyle = getStatusProgressStyle(pct);
-                        statusLabel = status >= wTarget ? "בוצע" : `${status}/${wTarget}`;
+                        statusLabel = status >= wTarget ? "הצלחה" : `${status}/${wTarget}`;
                     } else if (status === 'W') {
                         cell.classList.add('m-status-V');
-                        statusLabel = "בוצע";
+                        statusLabel = "הצלחה";
                     } else if (status === 'N') {
                         const dayGregorian = addDays(firstDayGregorian, i);
                         const harmful = isWeeklyNHarmfulByDate(habit, dayGregorian);
                         cell.classList.add(harmful ? 'm-status-X' : 'm-status-א');
-                        statusLabel = "לא בוצע";
+                        statusLabel = "לא הצליח";
                     } else if (status === 'N_auto') {
                         cell.classList.add('m-status-א');
                         statusLabel = "לא פעיל";
@@ -612,14 +612,14 @@
                     if (typeof status === 'number') {
                         const pct = Math.round((status / mTarget) * 100);
                         cellStyle = getStatusProgressStyle(pct);
-                        statusLabel = status >= mTarget ? "בוצע" : `${status}/${mTarget}`;
+                        statusLabel = status >= mTarget ? "הצלחה" : `${status}/${mTarget}`;
                     } else if (status === 'W') {
                         cell.classList.add('m-status-V');
-                        statusLabel = "בוצע";
+                        statusLabel = "הצלחה";
                     } else if (status === 'N') {
                         const harmful = isMonthlyNHarmful(habit, targetMonthComps.key, i);
                         cell.classList.add(harmful ? 'm-status-X' : 'm-status-א');
-                        statusLabel = "לא בוצע";
+                        statusLabel = "לא הצליח";
                     } else if (status === 'N_auto') {
                         cell.classList.add('m-status-א');
                         statusLabel = "לא פעיל";
@@ -627,7 +627,7 @@
                 } else {
                     if (typeof status === 'number') {
                         if (status >= target) {
-                            statusLabel = "בוצע";
+                            statusLabel = "הצלחה";
                             cell.classList.add('m-status-V');
                         } else {
                             statusLabel = `${status}/${target}`;
@@ -636,7 +636,7 @@
                         }
                     } else {
                         if(status) cell.classList.add(`m-status-${status}`);
-                        if(status === "V") statusLabel = "בוצע";
+                        if(status === "V") statusLabel = "הצלחה";
                         if(status === "X") statusLabel = "פספוס";
                         if(status === "א") statusLabel = "אונס";
                     }

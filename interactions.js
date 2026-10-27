@@ -94,40 +94,63 @@
 
             if(!habit.history || !habit.history[monthKey]) return { pct: 0, text: "-" };
             const history = habit.history[monthKey];
+            const scoreMethod = habit.scoreMethod || 'static';
 
-            let totalActive = 0;
-            let totalV = 0;
-            let hasAnyAction = false;
-            
-            for(let i = 0; i < 30; i++) {
+            const totalDaysInMonth = calculateDaysInBrowsingMonth(firstDayDate);
+
+            let totalDone = 0;   // סכום בוצע (כולל חלקי)
+            let totalMiss = 0;   // סכום פספוס (כולל חלקי)
+            let totalForce = 0;  // סכום אונס (ימי A)
+            let hasUserAction = false; // האם המשתמש הזין משהו (לא רק אוטו-אונס)
+
+            for(let i = 0; i < totalDaysInMonth; i++) {
                 const status = history[i];
                 const cellDayOfWeek = (startDayOfWeek + i) % 7;
+                const isActiveDay = habit.workdays ? habit.workdays[cellDayOfWeek] : true;
                 const target = getTargetForDay(habit, cellDayOfWeek);
-                
-                if (typeof status === 'number') {
-                    // ביצוע חלקי
-                    totalV += status;
-                    totalActive += target;
-                    hasAnyAction = true;
-                } else if(status === "V") { 
-                    // בוצע
-                    totalV += target; 
-                    totalActive += target;
-                    hasAnyAction = true;
-                } else if(status === "X") { 
-                    // פספוס — לא מוסיף לV, כן מוסיף לactive
-                    totalActive += target;
-                    hasAnyAction = true;
-                } else if(status === undefined || status === "" || status === null) {
-                    // ריק — נחשב כבוצע אבל רק אם יש פעולה אחרת בחודש
-                    totalV += target;
-                    totalActive += target;
+
+                if (status === 'A' || status === 'N' || status === 'N_auto') {
+                    // אונס (אוטומטי או ידני)
+                    totalForce += 1;
+                    // אונס אוטומטי (יום לא פעיל) לא נחשב פעולת משתמש
+                    if (status === 'A') hasUserAction = true;
+                } else if (status === 'V') {
+                    // הצלחה מלאה
+                    totalDone += 1;
+                    hasUserAction = true;
+                } else if (typeof status === 'number') {
+                    // הצלחה/פספוס חלקי
+                    totalDone += status / target;
+                    totalMiss += (target - status) / target;
+                    hasUserAction = true;
+                } else if (status === 'X') {
+                    // פספוס מלא
+                    totalMiss += 1;
+                    hasUserAction = true;
                 }
-                // א — לא נספר בכלל
+                // ריק — לא נכנס לחישוב
             }
-            if(!hasAnyAction) return { pct: 0, text: "-" };
-            const pct = Math.round((totalV / totalActive) * 100);
-            return { pct: pct, text: `${pct}%` };
+
+            // אם אין שום פעולת משתמש — ציון ריק
+            if (!hasUserAction) return { pct: 0, text: "-" };
+
+            const daysMinusForce = totalDaysInMonth - totalForce;
+            if (daysMinusForce <= 0) return { pct: 0, text: "-" };
+
+            let pct;
+            if (scoreMethod === 'additive') {
+                pct = Math.round((totalDone / daysMinusForce) * 100);
+            } else if (scoreMethod === 'subtractive') {
+                pct = Math.round((1 - (totalMiss / daysMinusForce)) * 100);
+            } else {
+                // static
+                const total = totalDone + totalMiss;
+                if (total === 0) return { pct: 0, text: "-" };
+                pct = Math.round((totalDone / total) * 100);
+            }
+
+            pct = Math.max(0, Math.min(100, pct));
+            return { pct, text: `${pct}%` };
         }
         // ---- סיום תיקון 4 ----
 
@@ -321,7 +344,7 @@
                         ? (habit.weeklyDayTargets && habit.weeklyDayTargets[currentDayOfWeek]) || 1
                         : (habit.monthlyDayTargets && habit.monthlyDayTargets[currentDayOfWeek]) || 1;
                     
-                    let wText = dayTarget === 1 ? "בוצע" : `${dayTarget}`;
+                    let wText = dayTarget === 1 ? "הצלחה" : `${dayTarget}`;
                     let wStyle = "";
                     let isWActive = false;
                     let isNActive = false;
@@ -329,12 +352,12 @@
 
                     if (dayTarget > 1) {
                         if (todayStatus === 'W') {
-                            wText = "בוצע";
+                            wText = "הצלחה";
                             wStyle = getStatusProgressStyle(100);
                             isWActive = true;
                         } else if (typeof todayStatus === 'number') {
                             const rem = dayTarget - todayStatus;
-                            wText = rem > 0 ? `${rem}` : "בוצע";
+                            wText = rem > 0 ? `${rem}` : "הצלחה";
                             const pct = Math.round((todayStatus / dayTarget) * 100);
                             wStyle = getStatusProgressStyle(pct);
                         }
@@ -369,7 +392,7 @@
                         <div class="controls-row">
                             <div class="status-buttons-group">
                                 <div class="action-toggle btn-w-skip ${isNActive ? 'active' : ''} ${isNHarmful ? 'harmful' : ''}" onclick="setStatus('${esc(habit.id)}', 'N', event)">
-                                    <span>לא בוצע</span>
+                                    <span>לא הצליח</span>
                                 </div>
                                 <div class="action-toggle btn-w-done ${isWActive ? 'active' : ''}" style="${wStyle}" onclick="setStatus('${esc(habit.id)}', 'W', event)">
                                     <span>${esc(wText)}</span>
@@ -383,22 +406,22 @@
                     `;
                 } else {
                     // יומי (x_times / regular)
-                    let vText = "בוצע";
+                    let vText = "הצלחה";
                     let vStyle = "";
                     let isVActive = false;
 
                     if (typeof todayStatus === 'number') {
                         const rem = target - todayStatus;
-                        vText = rem > 0 ? `${rem}` : `בוצע`;
+                        vText = rem > 0 ? `${rem}` : `הצלחה`;
                         const pct = Math.round((todayStatus / target) * 100);
                         vStyle = getStatusProgressStyle(pct);
                         isVActive = (todayStatus >= target);
                     } else if (todayStatus === 'V') {
-                        vText = `בוצע`;
+                        vText = `הצלחה`;
                         vStyle = getStatusProgressStyle(100);
                         isVActive = true;
                     } else {
-                        vText = target === 1 ? `בוצע` : `${target}`;
+                        vText = target === 1 ? `הצלחה` : `${target}`;
                     }
 
                     card.innerHTML = `

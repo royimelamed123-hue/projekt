@@ -165,6 +165,7 @@
                     habit.passingScore = passingScore;
                     habit.minScore = minScore;
                     habit.theme = selectedHabitTheme;
+                    habit.scoreMethod = configSelectedScoreMethod;
                     habit.schemaVersion = HABIT_SCHEMA_VERSION;
                     pushUndoAction({ type: 'edit', habitId: habit.id, previousHabit: JSON.parse(JSON.stringify(habitSnapshot)) });
                     invalidateStatsCache(habit.id);
@@ -198,6 +199,7 @@
                     passingScore: passingScore,
                     minScore: minScore,
                     theme: selectedHabitTheme,
+                    scoreMethod: configSelectedScoreMethod,
                     schemaVersion: HABIT_SCHEMA_VERSION,
                     history: {},
                     notesLog: [],
@@ -214,6 +216,7 @@
             closeHabitConfigModal();
             saveToStorage();
             executeScoreExtras(passingScore, minScore);
+            executeScoreMethodExtras(configSelectedScoreMethod);
         }
 
         function editHabitFromHome(id, event) {
