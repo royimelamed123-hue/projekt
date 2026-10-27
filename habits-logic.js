@@ -240,6 +240,7 @@
                 ta.className = 'note-edit-textarea';
                 ta.value = note.text;
                 container.appendChild(ta);
+                initAutoResize(ta);
 
                 btn.classList.add('save-active');
                 btn.title = "שמור שינויים";

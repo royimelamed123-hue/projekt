@@ -1,3 +1,15 @@
+        function autoResize(ta) {
+            ta.style.height = 'auto';
+            ta.style.height = ta.scrollHeight + 'px';
+        }
+
+        function initAutoResize(ta) {
+            if (!ta) return;
+            ta.style.overflowY = 'hidden';
+            ta.addEventListener('input', () => autoResize(ta));
+            autoResize(ta);
+        }
+
         function showConfirm(message, onConfirm) {
             const modal = document.getElementById('confirmModal');
             document.getElementById('confirmModalMessage').textContent = message;

@@ -152,7 +152,9 @@
                 createCardNotesHTML(habit.id);
 
             card.querySelector('[data-habit-title]').textContent = habit.title;
-            card.querySelector(`#noteText-${CSS.escape(habit.id)}`).value = currentDayTextVal;
+            const taMonthly = card.querySelector(`#noteText-${CSS.escape(habit.id)}`);
+            taMonthly.value = currentDayTextVal;
+            initAutoResize(taMonthly);
             return { card, mTarget, isNHarmfulM, todayStatus };
         }
 
@@ -200,7 +202,9 @@
                 createCardNotesHTML(habit.id);
 
             card.querySelector('[data-habit-title]').textContent = habit.title;
-            card.querySelector(`#noteText-${CSS.escape(habit.id)}`).value = currentDayTextVal;
+            const taWeekly = card.querySelector(`#noteText-${CSS.escape(habit.id)}`);
+            taWeekly.value = currentDayTextVal;
+            initAutoResize(taWeekly);
             return { card, wTarget, isNHarmful, todayStatus };
         }
 
@@ -247,7 +251,9 @@
                 createCardNotesHTML(habit.id);
 
             card.querySelector('[data-habit-title]').textContent = habit.title;
-            card.querySelector(`#noteText-${CSS.escape(habit.id)}`).value = currentDayTextVal;
+            const taDaily = card.querySelector(`#noteText-${CSS.escape(habit.id)}`);
+            taDaily.value = currentDayTextVal;
+            initAutoResize(taDaily);
             return card;
         }
 
