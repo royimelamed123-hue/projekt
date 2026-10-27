@@ -1180,6 +1180,15 @@ html, body {
             overflow-y: auto;
         }
 
+        .modal-card-inner {
+            overflow-y: auto;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 7px;
+            padding-bottom: 4px;
+        }
+
         .modal-card h4 {
             margin: 0 0 2px 0;
             font-size: 16px;
