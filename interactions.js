@@ -121,11 +121,13 @@
                 const isActiveDay = habit.workdays ? habit.workdays[cellDayOfWeek] : true;
                 const target = getTargetForDay(habit, cellDayOfWeek);
 
-                if (status === 'A' || status === 'N' || status === 'N_auto') {
-                    // אונס (אוטומטי או ידני)
+                if (status === 'א') {
+                    // אונס ידני — מוריד מימי החודש
                     totalForce += 1;
-                    // אונס אוטומטי (יום לא פעיל) לא נחשב פעולת משתמש
-                    if (status === 'A') hasUserAction = true;
+                    hasUserAction = true;
+                } else if (status === 'N' || status === 'N_auto') {
+                    // יום לא פעיל אוטומטי — נספר כאונס (ימי שבת/מנוחה שהוגדרו)
+                    totalForce += 1;
                 } else if (status === 'V') {
                     // הצלחה מלאה
                     totalDone += 1;
