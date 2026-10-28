@@ -1165,6 +1165,7 @@ html, body {
             box-sizing: border-box;
             font-size: 14px !important;
             overflow-y: auto;
+            direction: rtl;
         }
 
         .modal-card {
