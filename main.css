@@ -1178,8 +1178,13 @@ html, body {
             display: flex;
             flex-direction: column;
             gap: 7px;
-
+            max-height: 90dvh;
+            overflow-y: auto;
         }
+
+        .modal-card::-webkit-scrollbar { width: 4px; }
+        .modal-card::-webkit-scrollbar-track { background: transparent; }
+        .modal-card::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 99px; }
 
         .modal-card-inner {
             display: flex;
