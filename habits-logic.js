@@ -209,6 +209,15 @@
             saveToStorage();
         }
 
+        function cancelEditNote(noteId) {
+            const habit = habits.find(h => h.id === selectedHabitIdForView);
+            if (!habit || !habit.notesLog) return;
+            const note = habit.notesLog.find(n => n.id === noteId);
+            if (!note) return;
+            note.isEditing = false;
+            saveToStorage();
+        }
+
         function toggleEditNote(noteId) {
             const habit = habits.find(h => h.id === selectedHabitIdForView);
             if (!habit || !habit.notesLog) return;
@@ -223,17 +232,14 @@
                 const textarea = document.getElementById(`editInput-${noteId}`);
                 const newVal = textarea.value.trim();
                 pushUndoAction({ type: 'note', habitId: habit.id, previousNotesLog: JSON.parse(JSON.stringify(habit.notesLog)), previousLastTextareaVal: habit.lastTextareaVal });
-            note.text = newVal;
+                note.text = newVal;
                 note.isEditing = false;
-                    
                 if (note.dateStr === currentLetterDayOnly && note.monthKey === actualCurrentMonthKey) {
                     habit.lastTextareaVal = newVal;
                 }
-
                 saveToStorage();
             } else {
                 note.isEditing = true;
-                // בניית textarea בצורה בטוחה (ללא innerHTML עם note.text)
                 container.innerHTML = '';
                 const ta = document.createElement('textarea');
                 ta.id = `editInput-${noteId}`;
@@ -244,11 +250,18 @@
 
                 btn.classList.add('save-active');
                 btn.title = "שמור שינויים";
-                btn.innerHTML = `
-                    <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                        <polyline points="20 6 9 17 4 12"></polyline>
-                    </svg>
-                `;
+                btn.innerHTML = `<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>`;
+
+                // הוסף כפתור X אם לא קיים
+                const actionsWrapper = btn.closest('.note-actions-wrapper');
+                if (actionsWrapper && !actionsWrapper.querySelector('.btn-cancel-edit-note')) {
+                    const cancelBtn = document.createElement('button');
+                    cancelBtn.className = 'btn-cancel-edit-note';
+                    cancelBtn.title = 'בטל עריכה';
+                    cancelBtn.innerHTML = `<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>`;
+                    cancelBtn.onclick = () => cancelEditNote(noteId);
+                    actionsWrapper.appendChild(cancelBtn);
+                }
 
                 ta.focus();
                 ta.setSelectionRange(ta.value.length, ta.value.length);

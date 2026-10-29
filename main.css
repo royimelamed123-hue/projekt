@@ -1097,6 +1097,22 @@ html, body {
             color: #166534;
             background-color: #bbf7d0;
         }
+        .btn-cancel-edit-note {
+            background: none;
+            border: none;
+            color: #94a3b8;
+            cursor: pointer;
+            padding: 4px;
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: color 0.15s, background-color 0.15s;
+        }
+        .btn-cancel-edit-note:hover {
+            color: #ef4444;
+            background-color: #fee2e2;
+        }
 
         .calendar-wrapper {
             display: grid;
