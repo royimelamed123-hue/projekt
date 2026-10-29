@@ -252,17 +252,6 @@
                 btn.title = "שמור שינויים";
                 btn.innerHTML = `<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>`;
 
-                // הוסף כפתור X אם לא קיים
-                const actionsWrapper = btn.closest('.note-actions-wrapper');
-                if (actionsWrapper && !actionsWrapper.querySelector('.btn-cancel-edit-note')) {
-                    const cancelBtn = document.createElement('button');
-                    cancelBtn.className = 'btn-cancel-edit-note';
-                    cancelBtn.title = 'בטל עריכה';
-                    cancelBtn.innerHTML = `<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>`;
-                    cancelBtn.onclick = () => cancelEditNote(noteId);
-                    actionsWrapper.appendChild(cancelBtn);
-                }
-
                 ta.focus();
                 ta.setSelectionRange(ta.value.length, ta.value.length);
             }

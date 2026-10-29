@@ -1098,9 +1098,9 @@ html, body {
             background-color: #bbf7d0;
         }
         .btn-cancel-edit-note {
-            background: none;
+            background-color: #fee2e2;
             border: none;
-            color: #94a3b8;
+            color: #dc2626;
             cursor: pointer;
             padding: 4px;
             border-radius: 4px;
@@ -1110,8 +1110,7 @@ html, body {
             transition: color 0.15s, background-color 0.15s;
         }
         .btn-cancel-edit-note:hover {
-            color: #ef4444;
-            background-color: #fee2e2;
+            background-color: #fecaca;
         }
 
         .calendar-wrapper {
