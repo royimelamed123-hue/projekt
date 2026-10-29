@@ -99,8 +99,9 @@
             modalEl.style.opacity = '1';
             const card = modalEl.querySelector('.modal-card');
             if (card) {
-                const availableHeight = window.innerHeight || document.documentElement.clientHeight || 600;
-                card.style.maxHeight = Math.floor(availableHeight * 0.88) + 'px';
+                const overlayRect = modalEl.getBoundingClientRect();
+                const availableHeight = overlayRect.height > 0 ? overlayRect.height : document.documentElement.clientHeight;
+                card.style.maxHeight = Math.min(Math.floor(availableHeight * 0.88), 650) + 'px';
             }
             document.getElementById('configHabitTitle').focus();
             } catch(e) { alert('Error: ' + e.message + '\nStack: ' + (e.stack||'').substring(0,200)); }
