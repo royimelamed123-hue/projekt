@@ -97,6 +97,11 @@
             modalEl.style.display = 'flex';
             modalEl.style.visibility = 'visible';
             modalEl.style.opacity = '1';
+            const card = modalEl.querySelector('.modal-card');
+            if (card) {
+                const availableHeight = window.innerHeight || document.documentElement.clientHeight || 600;
+                card.style.maxHeight = Math.floor(availableHeight * 0.88) + 'px';
+            }
             document.getElementById('configHabitTitle').focus();
             } catch(e) { alert('Error: ' + e.message + '\nStack: ' + (e.stack||'').substring(0,200)); }
         }
