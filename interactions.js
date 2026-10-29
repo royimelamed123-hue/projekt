@@ -1029,7 +1029,16 @@
         function openAvgHabitsModal() {
             avgHabitsSelectedHabits.clear();
             showAvgHabitsSelectionScreen();
-            document.getElementById('avgHabitsModal').style.display = 'flex';
+            const avgModalEl = document.getElementById('avgHabitsModal');
+            avgModalEl.style.display = 'flex';
+            const avgCard = avgModalEl.querySelector('.modal-card');
+            const avgInner = avgModalEl.querySelector('.modal-card-inner');
+            if (avgCard) {
+                const availableHeight = document.documentElement.clientHeight || window.innerHeight || 700;
+                const maxH = Math.floor(availableHeight * 0.82);
+                avgCard.style.setProperty('max-height', maxH + 'px', 'important');
+                avgCard.style.setProperty('overflow-y', 'auto', 'important');
+            }
         }
 
         function closeAvgHabitsModal() {
