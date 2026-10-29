@@ -189,7 +189,8 @@
                             <div style="font-size:13px; font-weight:700; color:var(--text-color,#0f172a); margin-bottom:4px;">ייבוא מקובץ גיבוי</div>
                             <div style="font-size:12px; color:#64748b; margin-bottom:10px;">מוסיף הרגלים מקובץ JSON שמורד בעבר.</div>
                             <button class="btn-modal-save" style="width:100%; background:#475569;" onclick="document.getElementById('importFileInputModal').click();">בחר קובץ לייבוא</button>
-                            <input type="file" id="importFileInputModal" accept="application/json" style="display:none;" onchange="importHabitsData(event)">
+                            <input type="file" id="importFileInputModal" accept="application/json" style="display:none;" onchange="document.getElementById('importFileNameLabel').textContent = this.files[0] ? 'נבחר: ' + this.files[0].name : ''; importHabitsData(event)">
+                            <div id="importFileNameLabel" style="font-size:11px; color:#2563eb; margin-top:6px; font-weight:600;"></div>
                         </div>
 
                         <div style="padding:12px 14px; background:var(--input-background-color,#f8fafc); border:1px solid var(--divider-color,#e2e8f0); border-radius:10px;">
