@@ -310,7 +310,19 @@
                 }
             }
 
-            document.getElementById('addNoteModal').style.display = 'flex';
+            const addNoteModalEl = document.getElementById('addNoteModal');
+            addNoteModalEl.style.display = 'flex';
+            const addNoteCard = addNoteModalEl.querySelector('.modal-card');
+            const addNoteInner = addNoteModalEl.querySelector('.modal-card-inner');
+            if (addNoteCard && addNoteInner) {
+                const availableHeight = document.documentElement.clientHeight || window.innerHeight || 700;
+                const maxH = Math.floor(availableHeight * 0.82);
+                addNoteCard.style.setProperty('max-height', maxH + 'px', 'important');
+                addNoteCard.style.setProperty('overflow', 'hidden', 'important');
+                addNoteInner.style.setProperty('overflow-y', 'auto', 'important');
+                addNoteInner.style.setProperty('overflow-x', 'hidden', 'important');
+                addNoteInner.style.setProperty('max-height', (maxH - 60) + 'px', 'important');
+            }
             document.getElementById('modalNoteText').focus();
         }
 
