@@ -184,6 +184,7 @@
                 }
 
                 applyEdit();
+                invalidateStatsCache(habit.id);
             } else {
                 const newHabit = {
                     id: Date.now().toString(),

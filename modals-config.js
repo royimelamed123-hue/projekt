@@ -152,8 +152,7 @@
                 storageSaveAsync(SCORE_METHOD_DEFAULTS_KEY, { scoreMethod });
             }
             if (scoreMethodApplyAllMarked) {
-                habits.forEach(h => { h.scoreMethod = scoreMethod; });
-                invalidateAllStatsCache();
+                habits.forEach(h => { h.scoreMethod = scoreMethod; invalidateStatsCache(h.id); });
                 saveToStorage();
                 otzShowMessage('שיטת החישוב עודכנה לכל ההרגלים.', 'success');
             }
