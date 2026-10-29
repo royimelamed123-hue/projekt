@@ -101,8 +101,9 @@
             if (card) {
                 const availableHeight = document.documentElement.clientHeight || window.innerHeight || 700;
                 const maxH = Math.floor(availableHeight * 0.82);
-                card.setAttribute('style', card.getAttribute('style') || '');
-                card.style.cssText += `max-height: ${maxH}px !important; overflow-y: auto !important;`;
+                card.style.setProperty('max-height', maxH + 'px', 'important');
+                card.style.setProperty('overflow-y', 'auto', 'important');
+                card.style.setProperty('overflow-x', 'hidden', 'important');
             }
             document.getElementById('configHabitTitle').focus();
             } catch(e) { alert('Error: ' + e.message + '\nStack: ' + (e.stack||'').substring(0,200)); }
