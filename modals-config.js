@@ -98,12 +98,15 @@
             modalEl.style.visibility = 'visible';
             modalEl.style.opacity = '1';
             const card = modalEl.querySelector('.modal-card');
-            if (card) {
+            const inner = modalEl.querySelector('.modal-card-inner');
+            if (card && inner) {
                 const availableHeight = document.documentElement.clientHeight || window.innerHeight || 700;
                 const maxH = Math.floor(availableHeight * 0.82);
                 card.style.setProperty('max-height', maxH + 'px', 'important');
-                card.style.setProperty('overflow-y', 'auto', 'important');
-                card.style.setProperty('overflow-x', 'hidden', 'important');
+                card.style.setProperty('overflow', 'hidden', 'important');
+                inner.style.setProperty('overflow-y', 'auto', 'important');
+                inner.style.setProperty('overflow-x', 'hidden', 'important');
+                inner.style.setProperty('max-height', (maxH - 60) + 'px', 'important');
             }
             document.getElementById('configHabitTitle').focus();
             } catch(e) { alert('Error: ' + e.message + '\nStack: ' + (e.stack||'').substring(0,200)); }
