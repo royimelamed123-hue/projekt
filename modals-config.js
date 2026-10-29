@@ -99,11 +99,10 @@
             modalEl.style.opacity = '1';
             const card = modalEl.querySelector('.modal-card');
             if (card) {
-                const overlayRect = modalEl.getBoundingClientRect();
-                const cardRect = card.getBoundingClientRect();
-                alert(`overlay h: ${overlayRect.height}, card h: ${cardRect.height}, clientH: ${document.documentElement.clientHeight}, innerH: ${window.innerHeight}`);
-                const availableHeight = overlayRect.height > 0 ? overlayRect.height : document.documentElement.clientHeight;
-                card.style.maxHeight = Math.min(Math.floor(availableHeight * 0.88), 650) + 'px';
+                const availableHeight = document.documentElement.clientHeight || window.innerHeight || 700;
+                const maxH = Math.floor(availableHeight * 0.82);
+                card.setAttribute('style', card.getAttribute('style') || '');
+                card.style.cssText += `max-height: ${maxH}px !important; overflow-y: auto !important;`;
             }
             document.getElementById('configHabitTitle').focus();
             } catch(e) { alert('Error: ' + e.message + '\nStack: ' + (e.stack||'').substring(0,200)); }
