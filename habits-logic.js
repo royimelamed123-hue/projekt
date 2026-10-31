@@ -215,7 +215,7 @@
             const note = habit.notesLog.find(n => n.id === noteId);
             if (!note) return;
             note.isEditing = false;
-            saveToStorage();
+            renderMonthNotesList();
         }
 
         function toggleEditNote(noteId) {

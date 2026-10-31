@@ -216,6 +216,9 @@
             
             closeHabitConfigModal();
             saveToStorage();
+            if (selectedHabitIdForView) {
+                renderFullMonthGrid();
+            }
             executeScoreExtras(passingScore, minScore);
             executeScoreMethodExtras(configSelectedScoreMethod);
         }

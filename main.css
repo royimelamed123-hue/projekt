@@ -1054,12 +1054,15 @@ html, body {
             padding: 6px;
             font-family: inherit;
             font-size: 13px;
-            border: 1px solid #2563eb;
-            border-radius: 6px;
+            border: none;
+            border-bottom: 1px solid #cbd5e1;
+            border-radius: 0;
             box-sizing: border-box;
             resize: none;
             overflow: hidden;
             text-align: right;
+            background: transparent;
+            outline: none;
         }
 
         .logged-note-date {
