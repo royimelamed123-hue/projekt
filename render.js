@@ -695,7 +695,7 @@
                 const svgCancel = `<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>`;
 
                 item.innerHTML = `
-                    <div class="note-item-header" style="position: sticky; top: 0; background: var(--card-background-color, #fff); z-index: 1; padding-bottom: 4px;">
+                    <div class="note-item-header" style="position: sticky; top: 0; background: var(--card-color, #ffffff); z-index: 1; padding-bottom: 4px;">
                         <span class="logged-note-date" data-note-date></span>
                         <div class="note-actions-wrapper">
                             <button id="btnEditNote-${esc(note.id)}" class="btn-edit-note ${note.isEditing ? 'save-active' : ''}" title="${note.isEditing ? 'שמור' : 'ערוך הערה'}" onclick="toggleEditNote('${esc(note.id)}')">
