@@ -171,7 +171,8 @@
         function calculateTotalHabitAvg(habit) {
             if(!habit.history) return "-";
             // מטמון: מחזיר ערך שמור אם קיים
-            if (totalAvgCache.has(habit.id)) return totalAvgCache.get(habit.id);
+            if (totalAvgCache.has(habit.id)) { console.log('[DEBUG totalAvgCache HIT]', habit.id, totalAvgCache.get(habit.id)); return totalAvgCache.get(habit.id); }
+            console.log('[DEBUG totalAvgCache MISS - calculating]', habit.id, 'scoreMethod:', habit.scoreMethod);
             let sumPct = 0;
             let countMonths = 0;
             for(let monthKey in habit.history) {
