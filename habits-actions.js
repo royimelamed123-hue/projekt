@@ -215,6 +215,9 @@
             }
             
             closeHabitConfigModal();
+            if (isModalEditMode && selectedHabitIdForView) {
+                invalidateStatsCache(selectedHabitIdForView);
+            }
             saveToStorage();
             if (selectedHabitIdForView) {
                 renderFullMonthGrid();
