@@ -217,11 +217,11 @@
             
             const _editedHabitId = isModalEditMode ? selectedHabitIdForView : null;
             closeHabitConfigModal();
-            if (_editedHabitId) invalidateStatsCache(_editedHabitId);
-            saveToStorage();
-            if (_editedHabitId) invalidateStatsCache(_editedHabitId);
-            if (selectedHabitIdForView) {
-                renderFullMonthGrid();
+            if (_editedHabitId) {
+                invalidateStatsCache(_editedHabitId);
+                saveToStorageForHabit(_editedHabitId);
+            } else {
+                saveToStorage();
             }
             executeScoreExtras(passingScore, minScore);
             executeScoreMethodExtras(configSelectedScoreMethod);
