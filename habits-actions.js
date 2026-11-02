@@ -94,6 +94,7 @@
             if (isModalEditMode) {
                 const habit = habits.find(h => h.id === selectedHabitIdForView);
                 if (!habit) return;
+                const editedHabitId = habit.id;
                 const habitSnapshot = JSON.parse(JSON.stringify(habit));
                 const oldWorkdays = habit.workdays ? [...habit.workdays] : null;
                 const isTypeChanged = habit.type !== configSelectedType;
@@ -214,10 +215,9 @@
                 habits.push(newHabit);
             }
             
+            const _editedId = isModalEditMode ? (typeof editedHabitId !== 'undefined' ? editedHabitId : selectedHabitIdForView) : null;
             closeHabitConfigModal();
-            if (isModalEditMode && selectedHabitIdForView) {
-                invalidateStatsCache(selectedHabitIdForView);
-            }
+            if (_editedId) invalidateStatsCache(_editedId);
             saveToStorage();
             if (selectedHabitIdForView) {
                 renderFullMonthGrid();
