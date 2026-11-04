@@ -37,6 +37,7 @@
             _debouncedSave();
             // עדכן רק את הכרטיס שהשתנה במקום כל הכרטיסים
             updateCardInPlace(habitId);
+            invalidateStatsCache(habitId);
             if(selectedHabitIdForView) {
                 renderFullMonthGrid();
                 renderMonthNotesList();
