@@ -81,12 +81,27 @@
         // שורה 1: ציון (ימין) | ידית (מרכז) | שלוש נקודות (שמאל)
         // שורה 2: שם ההרגל
         function createCardHeaderHTML(habit, mStats) {
+            let weeklyScoreHTML = '';
+            if (habit.type === 'weekly') {
+                const firstDayDate = getFirstHebrewDayDate(mainScreenDatePointer);
+                const totalDaysInMonth = calculateDaysInBrowsingMonth(mainScreenDatePointer);
+                const weekText = calculateWeeklyPctForCurrentWeek(
+                    habit,
+                    actualCurrentMonthKey,
+                    currentHebrewDayIndex,
+                    firstDayDate.getDay(),
+                    firstDayDate,
+                    totalDaysInMonth
+                );
+                const weekPct = parseInt(weekText, 10);
+                weeklyScoreHTML = `שבועי: <span style="color: ${getScoreColor(weekPct, habit, weekText)}; padding: 1px 6px; border-radius: 4px; font-weight: 700;">${esc(weekText)}</span> | `;
+            }
             return `
                 <div class="habit-header">
                     <div style="display:flex; align-items:center; justify-content:space-between; width:100%;">
                         <button class="btn-card-menu" onclick="toggleCardMenu('${esc(habit.id)}', event)" style="position:static; margin:0;">⋮</button>
                         <span class="btn-drag-handle" title="גרור לסידור מחדש" style="flex:1; text-align:center;">⠿⠿</span>
-                        <span class="habit-stats-summary" style="margin:0;">חודשי: <span style="color: ${getScoreColor(mStats.pct, habit, mStats.text)}; padding: 1px 6px; border-radius: 4px; font-weight: 700;">${esc(mStats.text)}</span></span>
+                        <span class="habit-stats-summary" style="margin:0;">${weeklyScoreHTML}חודשי: <span style="color: ${getScoreColor(mStats.pct, habit, mStats.text)}; padding: 1px 6px; border-radius: 4px; font-weight: 700;">${esc(mStats.text)}</span></span>
                     </div>
                     <div style="width:100%; margin-top:4px;">
                         <span class="habit-title" data-habit-title style="display:block; width:100%;"></span>
@@ -271,11 +286,25 @@
             const target = getTargetForDay(habit, currentDayOfWeek);
             const mStats = calculateStatsForMonth(habit, actualCurrentMonthKey);
 
-            // עדכון ציון חודשי
-            const scoreEl = card.querySelector('.habit-stats-summary span');
-            if (scoreEl) {
-                scoreEl.textContent = mStats.text;
-                scoreEl.style.color = getScoreColor(mStats.pct, habit, mStats.text);
+            // עדכון ציון חודשי (ושבועי אם רלוונטי)
+            const summaryEl = card.querySelector('.habit-stats-summary');
+            if (summaryEl) {
+                let weeklyScoreHTML = '';
+                if (habit.type === 'weekly') {
+                    const firstDayDate = getFirstHebrewDayDate(mainScreenDatePointer);
+                    const totalDaysInMonth = calculateDaysInBrowsingMonth(mainScreenDatePointer);
+                    const weekText = calculateWeeklyPctForCurrentWeek(
+                        habit,
+                        actualCurrentMonthKey,
+                        currentHebrewDayIndex,
+                        firstDayDate.getDay(),
+                        firstDayDate,
+                        totalDaysInMonth
+                    );
+                    const weekPct = parseInt(weekText, 10);
+                    weeklyScoreHTML = `שבועי: <span style="color: ${getScoreColor(weekPct, habit, weekText)}; padding: 1px 6px; border-radius: 4px; font-weight: 700;">${esc(weekText)}</span> | `;
+                }
+                summaryEl.innerHTML = `${weeklyScoreHTML}חודשי: <span style="color: ${getScoreColor(mStats.pct, habit, mStats.text)}; padding: 1px 6px; border-radius: 4px; font-weight: 700;">${esc(mStats.text)}</span>`;
             }
 
             if (habit.type === 'monthly') {
@@ -545,6 +574,32 @@
             const mStats = calculateStatsForMonth(habit, targetMonthComps.key);
             const totalAvgText = calculateTotalHabitAvg(habit);
             const totalAvgPct = parseInt(totalAvgText, 10);
+
+            // ציון שבועי — מוצג רק להרגלים שבועיים
+            const weeklyScoreCard = document.getElementById('weeklyScoreCard');
+            const browsingWeekEl = document.getElementById('browsingWeekAvg');
+            if (habit.type === 'weekly') {
+                weeklyScoreCard.style.display = '';
+                const firstDayDate = getFirstHebrewDayDate(browsingDatePointer);
+                const totalDaysInMonth = calculateDaysInBrowsingMonth(browsingDatePointer);
+                const weekText = calculateWeeklyPctForCurrentWeek(
+                    habit,
+                    targetMonthComps.key,
+                    currentHebrewDayIndex,
+                    firstDayDate.getDay(),
+                    firstDayDate,
+                    totalDaysInMonth
+                );
+                const weekPct = parseInt(weekText, 10);
+                browsingWeekEl.innerText = weekText;
+                browsingWeekEl.style.color = getScoreColor(weekPct, habit, weekText);
+                browsingWeekEl.style.background = '';
+                browsingWeekEl.style.borderRadius = '';
+                browsingWeekEl.style.padding = '';
+            } else {
+                weeklyScoreCard.style.display = 'none';
+                browsingWeekEl.innerText = '-';
+            }
 
             const browsingMonthEl = document.getElementById('browsingMonthAvg');
             browsingMonthEl.innerText = mStats.text;
