@@ -129,11 +129,9 @@
                         }
                     }
                 } else if (statusType === 'N') {
-                    if (currentStatus === 'N') {
-                        monthHistory[currentHebrewDayIndex] = "";
-                    } else {
-                        monthHistory[currentHebrewDayIndex] = 'N';
-                    }
+                    monthHistory[currentHebrewDayIndex] = (currentStatus === 'N') ? "" : 'N';
+                } else if (statusType === 'א_w') {
+                    monthHistory[currentHebrewDayIndex] = (currentStatus === 'א_w') ? "" : 'א_w';
                 }
                 invalidateStatsCache(habitId);
                 saveToStorageForHabit(habitId);
