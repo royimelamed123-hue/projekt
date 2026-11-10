@@ -722,13 +722,80 @@
             return getWeeklyStatsForWeekByDate(habit, sundayGregorian);
         }
 
+        // מחשב ציון שבועי לשבוע נתון לפי שיטת החישוב של ההרגל.
+        // מחזיר { pct: מספר, text: מחרוזת } או { pct: null, text: "-" } אם אין נתונים.
+        function calcWeekScore(habit, sundayGregorian) {
+            const scoreMethod = habit.scoreMethod || 'static';
+            const dayTargets = habit.weeklyDayTargets;
+            const days = Array.from({ length: 7 }, (_, i) => addDays(sundayGregorian, i));
+
+            let totalDone = 0;   // סכום הצלחה (כולל חלקי)
+            let totalMiss = 0;   // סכום פספוס (כולל חלקי)
+            let totalForce = 0;  // ימי אונס (N ידני, N_auto, ריק ביום לא פעיל)
+            let hasUserAction = false;
+
+            for (const day of days) {
+                const dow = day.getDay();
+                const isActive = habit.workdays && habit.workdays[dow];
+                const status = getHabitStatusForGregorianDate(habit, day);
+                const target = (dayTargets && dayTargets[dow]) || 1;
+                const isEmpty = (status === "" || status === undefined);
+
+                if (!isActive) {
+                    // יום לא פעיל — אונס אוטומטי, לא מתחיל חישוב
+                    totalForce += 1;
+                    continue;
+                }
+
+                // יום פעיל
+                if (isEmpty) {
+                    // ריק — לא נכנס לחישוב כלל
+                    continue;
+                }
+
+                if (status === 'N' || status === 'N_auto') {
+                    // אונס ידני ביום פעיל
+                    totalForce += 1;
+                    hasUserAction = true;
+                } else if (status === 'W') {
+                    totalDone += 1;
+                    hasUserAction = true;
+                } else if (typeof status === 'number') {
+                    totalDone += status / target;
+                    totalMiss += (target - status) / target;
+                    hasUserAction = true;
+                } else if (status === 'X') {
+                    totalMiss += 1;
+                    hasUserAction = true;
+                }
+            }
+
+            if (!hasUserAction) return { pct: null, text: "-" };
+
+            const activeDays = 7 - totalForce;
+            if (activeDays <= 0) return { pct: null, text: "-" };
+
+            let pct;
+            if (scoreMethod === 'additive') {
+                pct = Math.round((totalDone / activeDays) * 100);
+            } else if (scoreMethod === 'subtractive') {
+                pct = Math.round((1 - (totalMiss / activeDays)) * 100);
+            } else {
+                // static
+                const total = totalDone + totalMiss;
+                if (total === 0) return { pct: null, text: "-" };
+                pct = Math.round((totalDone / total) * 100);
+            }
+
+            pct = Math.max(0, Math.min(100, pct));
+            return { pct, text: `${pct}%` };
+        }
+
         function calculateWeeklyPctForCurrentWeek(habit, monthKey, currentDayIndex, startDayOfWeek, firstDayOfMonthGregorian, totalDaysInMonth) {
             const viewedDate = addDays(firstDayOfMonthGregorian, currentDayIndex);
             const sunday = getSundayOfWeek(viewedDate);
-            const { doneScore, activeDays, remainingActive, weeklyFreq } = getWeeklyStatsForWeekByDate(habit, sunday);
-            if (activeDays === 0 && doneScore === 0) return "-";
-            if (doneScore + remainingActive >= weeklyFreq) return "100%";
-            return `${Math.round(((doneScore + remainingActive) / weeklyFreq) * 100)}%`;
+            const result = calcWeekScore(habit, sunday);
+            return result.text;
         }
 
         function getScoreColor(pct, habit, text) {

@@ -43,51 +43,53 @@
             const startDayOfWeek = firstDayDate.getDay();
 
             if (habit.type === 'weekly') {
+                const scoreMethod = habit.scoreMethod || 'static';
                 const totalDaysInMonth = calculateDaysInBrowsingMonth(firstDayDate);
-                const weeklyFreq = getEffectiveWeeklyTargetNow(habit);
-                const firstDayGregorian = firstDayDate;
-                const monthStart = firstDayGregorian;
-                const monthEnd = addDays(firstDayGregorian, totalDaysInMonth - 1);
+                const monthStart = firstDayDate;
+                const monthEnd = addDays(firstDayDate, totalDaysInMonth - 1);
 
                 let sunday = getSundayOfWeek(monthStart);
-                let totalWeekScore = 0;
-                let countedWeeks = 0;
+                let weekScores = []; // ציוני השבועות שיש להם נתונים
 
                 while (true) {
-                    const weekEnd = addDays(sunday, 6);
                     if (sunday > monthEnd) break;
+                    const weekEnd = addDays(sunday, 6);
                     if (weekEnd < monthStart) { sunday = addDays(sunday, 7); continue; }
 
-                    let activeDaysInThisMonth = 0;
-                    let activeDaysTotal = 0;
+                    // בדוק שיש לפחות יום פעיל בחודש זה עבור השבוע הזה
+                    let hasActiveDayInMonth = false;
                     for (let dow = 0; dow < 7; dow++) {
                         if (!(habit.workdays && habit.workdays[dow])) continue;
                         const dG = addDays(sunday, dow);
-                        activeDaysTotal++;
-                        if (dG >= monthStart && dG <= monthEnd) activeDaysInThisMonth++;
+                        if (dG >= monthStart && dG <= monthEnd) { hasActiveDayInMonth = true; break; }
                     }
 
-                    const hasAnyDayInThisMonth = activeDaysTotal > 0 && activeDaysInThisMonth > 0;
-
-                    if (hasAnyDayInThisMonth) {
-                        const { doneScore, activeDays, remainingActive, anyActionTaken } = getWeeklyStatsForWeekByDate(habit, sunday);
-                        if (activeDays > 0 && anyActionTaken) {
-                            let weekPct;
-                            if ((doneScore + remainingActive) >= weeklyFreq) {
-                                weekPct = 1;
-                            } else {
-                                weekPct = Math.min((doneScore + remainingActive) / weeklyFreq, 1);
-                            }
-                            totalWeekScore += weekPct;
-                            countedWeeks++;
+                    if (hasActiveDayInMonth) {
+                        const result = calcWeekScore(habit, sunday);
+                        if (result.pct !== null) {
+                            weekScores.push(result.pct);
                         }
                     }
 
                     sunday = addDays(sunday, 7);
                 }
 
-                if (countedWeeks === 0) return { pct: 0, text: "-" };
-                const pct = Math.round((totalWeekScore / countedWeeks) * 100);
+                if (weekScores.length === 0) return { pct: 0, text: "-" };
+
+                const n = weekScores.length;
+                let pct;
+
+                if (scoreMethod === 'additive') {
+                    pct = Math.round(weekScores.reduce((s, w) => s + w, 0) / n);
+                } else if (scoreMethod === 'subtractive') {
+                    const sumDeficit = weekScores.reduce((s, w) => s + (100 - w), 0);
+                    pct = Math.round((100 * n - sumDeficit) / n);
+                } else {
+                    // static — ממוצע שבועות שהגיעו
+                    pct = Math.round(weekScores.reduce((s, w) => s + w, 0) / n);
+                }
+
+                pct = Math.max(0, Math.min(100, pct));
                 return { pct, text: `${pct}%` };
             }
 
