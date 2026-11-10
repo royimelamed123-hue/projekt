@@ -408,7 +408,7 @@
                         <div class="controls-row">
                             <div class="status-buttons-group">
                                 <div class="action-toggle btn-w-skip ${isNActive ? 'active' : ''} ${isNHarmful ? 'harmful' : ''}" onclick="setStatus('${esc(habit.id)}', 'N', event)">
-                                    <span>לא הצליח</span>
+                                    <span>פספוס</span>
                                 </div>
                                 <div class="action-toggle btn-w-done ${isWActive ? 'active' : ''}" style="${wStyle}" onclick="setStatus('${esc(habit.id)}', 'W', event)">
                                     <span>${esc(wText)}</span>
