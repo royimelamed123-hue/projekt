@@ -492,7 +492,7 @@
             if (status === '' || status === undefined || status === null) return false;
 
             if (habit.type === 'weekly') {
-                return status === 'W' || status === 'N' || typeof status === 'number';
+                return status === 'W' || status === 'N' || status === 'א_w' || typeof status === 'number';
             }
             if (habit.type === 'monthly') {
                 return status === 'W' || status === 'N' || typeof status === 'number';
@@ -509,7 +509,10 @@
         function isHabitSignedToday(habit) {
             const currentMonthHistory = peekMonthHistory(habit, actualCurrentMonthKey);
             const todayStatus = currentMonthHistory[currentHebrewDayIndex];
-            if (habit.type === 'weekly' || habit.type === 'monthly') {
+            if (habit.type === 'weekly') {
+                return todayStatus === 'W' || todayStatus === 'N' || todayStatus === 'א_w' || typeof todayStatus === 'number';
+            }
+            if (habit.type === 'monthly') {
                 return todayStatus === 'W' || todayStatus === 'N' || typeof todayStatus === 'number';
             }
             return todayStatus === 'V' || todayStatus === 'X' || todayStatus === 'א' || typeof todayStatus === 'number';

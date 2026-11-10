@@ -474,13 +474,15 @@
                 const wTarget = (habit.weeklyDayTargets && habit.weeklyDayTargets[cellDayOfWeek]) || 1;
                 let nextStatus = "";
                 if (currentStatus === "" || currentStatus === undefined) {
-                    nextStatus = "N";
+                    nextStatus = "א_w";           // אונס
+                } else if (currentStatus === "א_w") {
+                    nextStatus = "N";             // פספוס
                 } else if (currentStatus === "N") {
-                    nextStatus = wTarget > 1 ? 1 : "W";
+                    nextStatus = wTarget > 1 ? 1 : "W";  // הצלחה (חלקית או מלאה)
                 } else if (typeof currentStatus === 'number') {
                     nextStatus = (currentStatus + 1 < wTarget) ? currentStatus + 1 : "W";
                 } else if (currentStatus === "W") {
-                    nextStatus = "";
+                    nextStatus = "";              // ריק
                 }
                 monthHistory[dayIndex] = nextStatus;
                 invalidateStatsCache(selectedHabitIdForView);
@@ -753,8 +755,12 @@
                     continue;
                 }
 
-                if (status === 'N' || status === 'N_auto') {
-                    // אונס ידני ביום פעיל
+                if (status === 'א_w') {
+                    // אונס ידני ביום פעיל שבועי
+                    totalForce += 1;
+                    hasUserAction = true;
+                } else if (status === 'N' || status === 'N_auto') {
+                    // אונס אוטומטי (יום לא פעיל)
                     totalForce += 1;
                     hasUserAction = true;
                 } else if (status === 'W') {

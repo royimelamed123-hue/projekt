@@ -206,6 +206,9 @@
                 createCardHeaderHTML(habit, mStats) +
                 `<div class="controls-row">
                     <div class="status-buttons-group">
+                        <div class="action-toggle btn-a ${todayStatus === 'א_w' ? 'active' : ''}" onclick="setStatus('${esc(habit.id)}', 'א_w', event)">
+                            <span>אונס</span>
+                        </div>
                         <div class="action-toggle btn-w-skip ${isNActive ? 'active' : ''} ${isNHarmful ? 'harmful' : ''} ${isNAuto ? 'n-auto' : ''}" onclick="setStatus('${esc(habit.id)}', 'N', event)">
                             <span>פספוס</span>
                         </div>
@@ -649,6 +652,9 @@
                     } else if (status === 'W') {
                         cell.classList.add('m-status-V');
                         statusLabel = "הצלחה";
+                    } else if (status === 'א_w') {
+                        cell.classList.add('m-status-א');
+                        statusLabel = "אונס";
                     } else if (status === 'N') {
                         const dayGregorian = addDays(firstDayGregorian, i);
                         const harmful = isWeeklyNHarmfulByDate(habit, dayGregorian);
