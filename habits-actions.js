@@ -22,20 +22,7 @@
             safeDisplay('weeklyConfigSection', configSelectedType === 'weekly' ? 'block' : 'none');
             safeDisplay('monthlyConfigSection', configSelectedType === 'monthly' ? 'block' : 'none');
 
-            // עדכון תיאורי שיטות החישוב לפי סוג ההרגל
-            const isWeekly = configSelectedType === 'weekly';
-            const descAdditive = safeEl('scoreMethodDesc-additive');
-            const descSubtractive = safeEl('scoreMethodDesc-subtractive');
-            const descStatic = safeEl('scoreMethodDesc-static');
-            if (descAdditive) descAdditive.innerHTML = isWeekly
-                ? 'ציון שבועי: <b>הצלחה / (7 − אונס) × 100</b>. ציון חודשי: ממוצע השבועות'
-                : 'מתחילים את החודש ב-0 ועולים מעלה עם כל <span style="color:#22a84a;font-weight:600;">הצלחה</span>';
-            if (descSubtractive) descSubtractive.innerHTML = isWeekly
-                ? 'ציון שבועי: <b>(1 − פספוס / (7 − אונס)) × 100</b>. ציון חודשי: ממוצע השבועות'
-                : 'מתחילים את החודש ב-100 ויורדים עם כל <span style="color:#e74c3c;font-weight:600;">פספוס</span>';
-            if (descStatic) descStatic.innerHTML = isWeekly
-                ? 'ציון שבועי: <b>הצלחה / (הצלחה + פספוס) × 100</b>. ציון חודשי: ממוצע השבועות'
-                : 'מצב נתון של <span style="color:#22a84a;font-weight:600;">הצלחה</span> מול <span style="color:#e74c3c;font-weight:600;">פספוס</span>';
+
 
             setXTimesMode(xTimesMode);
             setWeeklyMode(weeklyDayMode);
