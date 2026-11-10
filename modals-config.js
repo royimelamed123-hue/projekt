@@ -32,7 +32,7 @@
                 for (let i = 0; i < 7; i++) {
                     document.getElementById(`weeklyTargetDay-${i}`).value = (habit.weeklyDayTargets && habit.weeklyDayTargets[i]) || 1;
                 }
-                document.getElementById('weeklyFreqInput').value = (habit.weeklyAllowedSkips !== null && habit.weeklyAllowedSkips !== undefined) ? habit.weeklyAllowedSkips : 0;
+
                 const activeMonthlyTargets = (habit.monthlyDayTargets || []).filter((_, i) => configSelectedWeekdays[i]);
                 const allSameMonthly = activeMonthlyTargets.length === 0 || activeMonthlyTargets.every(v => v === activeMonthlyTargets[0]);
                 monthlyDayMode = allSameMonthly ? 'uniform' : 'custom';
@@ -55,7 +55,7 @@
                 document.getElementById('uniformTargetInput').value = "1";
                 document.getElementById('weeklyUniformTargetInput').value = "1";
                 document.getElementById('monthlyUniformTargetInput').value = "1";
-                document.getElementById('weeklyFreqInput').value = "0";
+
                 document.getElementById('monthlyFreqInput').value = "0";
                 for (let i = 0; i < 7; i++) {
                     document.getElementById(`targetDay-${i}`).value = "1";

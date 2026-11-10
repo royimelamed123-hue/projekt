@@ -68,7 +68,7 @@
             let weeklyAllowedSkips = 0;
             if (configSelectedType === 'weekly') {
                 weeklyDayTargets = readWeeklyDayTargetsFromUI();
-                weeklyAllowedSkips = parseInt(document.getElementById('weeklyFreqInput').value, 10);
+                weeklyAllowedSkips = 0;
                 if (isNaN(weeklyAllowedSkips) || weeklyAllowedSkips < 0) weeklyAllowedSkips = 0;
                 if (weeklyAllowedSkips > 7) weeklyAllowedSkips = 7;
             }
