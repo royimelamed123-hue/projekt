@@ -771,7 +771,7 @@
                     continue;
                 }
 
-                if (status === 'N' || status === 'N_auto' || status === 'א_w') {
+                if (status === 'N' || status === 'N_auto') {
                     // אונס
                     totalForce += 1;
                     hasUserAction = true;
