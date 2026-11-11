@@ -794,18 +794,19 @@
 
             if (!hasUserAction) return { pct: null, text: "-" };
 
+            // אם אין הצלחות ופספוסים (רק אונס) — ציון ריק
+            if (totalDone === 0 && totalMiss === 0) return { pct: null, text: "-" };
+
             const activeDays = 7 - totalForce;
             if (activeDays <= 0) return { pct: null, text: "-" };
 
             let pct;
             if (scoreMethod === 'additive') {
-                // עשה טוב: הצלחות / (7 - אונס)
                 pct = Math.round((totalDone / activeDays) * 100);
             } else if (scoreMethod === 'subtractive') {
-                // סור מרע: (1 - פספוס / (7 - אונס))
                 pct = Math.round((1 - (totalMiss / activeDays)) * 100);
             } else {
-                // סטטי: הצלחות / (הצלחות + פספוס)
+                // static
                 const total = totalDone + totalMiss;
                 if (total === 0) return { pct: null, text: "-" };
                 pct = Math.round((totalDone / total) * 100);
