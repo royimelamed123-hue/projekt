@@ -150,6 +150,9 @@
             // אם אין שום פעולת משתמש — ציון ריק
             if (!hasUserAction) return { pct: null, text: "-" };
 
+            // אם אין הצלחות ופספוסים (רק אונס) — ציון ריק
+            if (totalDone === 0 && totalMiss === 0) return { pct: null, text: "-" };
+
             const daysMinusForce = totalDaysInMonth - totalForce;
             if (daysMinusForce <= 0) return { pct: null, text: "-" };
 
