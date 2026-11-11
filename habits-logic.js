@@ -481,12 +481,12 @@
                         nextStatus = 'W';
                     }
                 } else {
-                    // יום פעיל: ריק → אונס → פספוס → הצלחה → ריק
+                    // יום פעיל: ריק → N (אונס) → X (פספוס) → W (הצלחה) → ריק
                     if (currentStatus === "" || currentStatus === undefined) {
-                        nextStatus = "א_w";
-                    } else if (currentStatus === "א_w") {
                         nextStatus = "N";
                     } else if (currentStatus === "N") {
+                        nextStatus = "X";
+                    } else if (currentStatus === "X") {
                         nextStatus = wTarget > 1 ? 1 : "W";
                     } else if (typeof currentStatus === 'number') {
                         nextStatus = (currentStatus + 1 < wTarget) ? currentStatus + 1 : "W";
@@ -771,12 +771,8 @@
                     continue;
                 }
 
-                if (status === 'א_w') {
-                    // אונס ידני ביום פעיל שבועי
-                    totalForce += 1;
-                    hasUserAction = true;
-                } else if (status === 'N' || status === 'N_auto') {
-                    // אונס אוטומטי (יום לא פעיל)
+                if (status === 'N' || status === 'N_auto' || status === 'א_w') {
+                    // אונס
                     totalForce += 1;
                     hasUserAction = true;
                 } else if (status === 'W') {
