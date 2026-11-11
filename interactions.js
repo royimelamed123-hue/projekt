@@ -74,7 +74,7 @@
                     sunday = addDays(sunday, 7);
                 }
 
-                if (weekScores.length === 0) return { pct: 0, text: "-" };
+                if (weekScores.length === 0) return { pct: null, text: "-" };
 
                 const n = weekScores.length;
                 let pct;
@@ -95,7 +95,7 @@
 
             if (habit.type === 'monthly') {
                 const { doneScore, activeDays, remainingActive, monthlyFreq, anyActionTaken } = getMonthlyStatsForHabitMonth(habit, monthKey);
-                if (!anyActionTaken) return { pct: 0, text: "-" };
+                if (!anyActionTaken) return { pct: null, text: "-" };
                 let pctVal;
                 if ((doneScore + remainingActive) >= monthlyFreq) {
                     pctVal = 1;
@@ -106,7 +106,7 @@
                 return { pct, text: `${pct}%` };
             }
 
-            if(!habit.history || !habit.history[monthKey]) return { pct: 0, text: "-" };
+            if(!habit.history || !habit.history[monthKey]) return { pct: null, text: "-" };
             const history = habit.history[monthKey];
             const scoreMethod = habit.scoreMethod || 'static';
 
@@ -161,7 +161,7 @@
             } else {
                 // static
                 const total = totalDone + totalMiss;
-                if (total === 0) return { pct: 0, text: "-" };
+                if (total === 0) return { pct: null, text: "-" };
                 pct = Math.round((totalDone / total) * 100);
             }
 
