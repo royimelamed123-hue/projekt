@@ -666,10 +666,16 @@
                         cell.classList.add('m-status-א');
                         statusLabel = "אונס";
                     } else if (status === 'N') {
-                        const dayGregorian = addDays(firstDayGregorian, i);
-                        const harmful = isWeeklyNHarmfulByDate(habit, dayGregorian);
-                        cell.classList.add(harmful ? 'm-status-X' : 'm-status-א');
-                        statusLabel = "פספוס";
+                        const isActiveDow = habit.workdays && habit.workdays[cellDayOfWeek];
+                        if (isActiveDow) {
+                            const dayGregorian = addDays(firstDayGregorian, i);
+                            const harmful = isWeeklyNHarmfulByDate(habit, dayGregorian);
+                            cell.classList.add(harmful ? 'm-status-X' : 'm-status-א');
+                            statusLabel = "פספוס";
+                        } else {
+                            cell.classList.add('m-status-א');
+                            statusLabel = "אונס";
+                        }
                     } else if (status === 'N_auto' || (!status && !(habit.workdays && habit.workdays[cellDayOfWeek]))) {
                         cell.classList.add('m-status-א');
                         statusLabel = "אונס";
