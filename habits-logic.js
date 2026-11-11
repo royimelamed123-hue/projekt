@@ -476,7 +476,7 @@
                 if (!isActiveDow) {
                     // יום לא פעיל: אונס ↔ הצלחה
                     if (currentStatus === 'W') {
-                        nextStatus = 'N_auto';
+                        nextStatus = 'N';
                     } else {
                         nextStatus = 'W';
                     }
@@ -743,7 +743,7 @@
 
             let totalDone = 0;   // סכום הצלחה (כולל חלקי)
             let totalMiss = 0;   // סכום פספוס (כולל חלקי)
-            let totalForce = 0;  // ימי אונס (N ידני, N_auto, ריק ביום לא פעיל)
+            let totalForce = 0;  // ימי אונס (N)
             let hasUserAction = false;
 
             for (const day of days) {
@@ -771,7 +771,7 @@
                     continue;
                 }
 
-                if (status === 'N' || status === 'N_auto') {
+                if (status === 'N') {
                     // אונס
                     totalForce += 1;
                     hasUserAction = true;
