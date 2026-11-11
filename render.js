@@ -211,7 +211,7 @@
                     <div class="action-toggle btn-w-done ${isWActive ? 'active' : ''}" style="${wStyle}" onclick="setStatus('${esc(habit.id)}', 'W', event)">
                         <span>${esc(wText)}</span>
                     </div>`
-                : `<div class="action-toggle btn-a ${todayStatus === 'א_w' || isNAuto ? 'active' : ''}" onclick="setStatus('${esc(habit.id)}', 'א_w', event)">
+                : `<div class="action-toggle btn-a ${todayStatus !== 'W' ? 'active' : ''}" onclick="setStatus('${esc(habit.id)}', 'א_w', event)">
                         <span>אונס</span>
                     </div>
                     <div class="action-toggle btn-w-done ${isWActive ? 'active' : ''}" style="${wStyle}" onclick="setStatus('${esc(habit.id)}', 'W', event)">
@@ -670,9 +670,9 @@
                         const harmful = isWeeklyNHarmfulByDate(habit, dayGregorian);
                         cell.classList.add(harmful ? 'm-status-X' : 'm-status-א');
                         statusLabel = "פספוס";
-                    } else if (status === 'N_auto') {
+                    } else if (status === 'N_auto' || (!status && !(habit.workdays && habit.workdays[cellDayOfWeek]))) {
                         cell.classList.add('m-status-א');
-                        statusLabel = "לא פעיל";
+                        statusLabel = "אונס";
                     }
                 } else if (habit.type === 'monthly') {
                     const mTarget = (habit.monthlyDayTargets && habit.monthlyDayTargets[cellDayOfWeek]) || 1;
