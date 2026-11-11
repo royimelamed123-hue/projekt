@@ -734,16 +734,17 @@
             return getWeeklyStatsForWeekByDate(habit, sundayGregorian);
         }
 
-        // מחשב ציון שבועי לשבוע נתון לפי שיטת החישוב של ההרגל.
+        // מחשב ציון שבועי לשבוע נתון.
+        // הלוגיקה: כמו יומי — המכנה הוא 7 פחות ימי אונס.
+        // ריק = יום שעדיין לא מולא = נספר כהצלחה עתידית (remainingActive).
         // מחזיר { pct: מספר, text: מחרוזת } או { pct: null, text: "-" } אם אין נתונים.
         function calcWeekScore(habit, sundayGregorian) {
-            const scoreMethod = habit.scoreMethod || 'static';
             const dayTargets = habit.weeklyDayTargets;
             const days = Array.from({ length: 7 }, (_, i) => addDays(sundayGregorian, i));
 
-            let totalDone = 0;   // סכום הצלחה (כולל חלקי)
-            let totalMiss = 0;   // סכום פספוס (כולל חלקי)
-            let totalForce = 0;  // ימי אונס (N ידני, N_auto, ריק ביום לא פעיל)
+            let totalDone = 0;      // הצלחות (כולל חלקיות)
+            let totalForce = 0;     // ימי אונס — מורידים מה-7
+            let remainingActive = 0; // ימים ריקים פעילים — עדיין לא מולאו
             let hasUserAction = false;
 
             for (const day of days) {
@@ -755,11 +756,11 @@
 
                 if (!isActive) {
                     if (status === 'W') {
-                        // הצלחה ביום לא פעיל — נספור כהצלחה, לא כאונס
+                        // הצלחה ביום לא פעיל — נספור כהצלחה
                         totalDone += 1;
                         hasUserAction = true;
                     } else {
-                        // אונס (אוטומטי או ידני) — מוריד מה-7
+                        // יום לא פעיל ללא הצלחה — אונס (מוריד מה-7)
                         totalForce += 1;
                     }
                     continue;
@@ -767,52 +768,32 @@
 
                 // יום פעיל
                 if (isEmpty) {
-                    // ריק — לא נכנס לחישוב כלל
+                    // ריק — עדיין לא מולא, יכול להיות הצלחה עתידית
+                    remainingActive++;
                     continue;
                 }
 
-                if (status === 'א_w') {
-                    // אונס ידני ביום פעיל שבועי
+                hasUserAction = true;
+
+                if (status === 'א_w' || status === 'N' || status === 'N_auto') {
+                    // אונס (ידני או אוטומטי) — מוריד מה-7
                     totalForce += 1;
-                    hasUserAction = true;
-                } else if (status === 'N' || status === 'N_auto') {
-                    // אונס אוטומטי (יום לא פעיל)
-                    totalForce += 1;
-                    hasUserAction = true;
                 } else if (status === 'W') {
                     totalDone += 1;
-                    hasUserAction = true;
                 } else if (typeof status === 'number') {
-                    totalDone += status / target;
-                    totalMiss += (target - status) / target;
-                    hasUserAction = true;
+                    totalDone += Math.min(status / target, 1);
                 } else if (status === 'X') {
-                    totalMiss += 1;
-                    hasUserAction = true;
+                    // כישלון — לא מוסיף ולא מוריד מה-7
                 }
             }
 
             if (!hasUserAction) return { pct: null, text: "-" };
 
-            // אם אין הצלחות ופספוסים (רק אונס) — ציון ריק
-            if (totalDone === 0 && totalMiss === 0) return { pct: null, text: "-" };
-
             const activeDays = 7 - totalForce;
             if (activeDays <= 0) return { pct: null, text: "-" };
 
-            let pct;
-            if (scoreMethod === 'additive') {
-                pct = Math.round((totalDone / activeDays) * 100);
-            } else if (scoreMethod === 'subtractive') {
-                pct = Math.round((1 - (totalMiss / activeDays)) * 100);
-            } else {
-                // static
-                const total = totalDone + totalMiss;
-                if (total === 0) return { pct: null, text: "-" };
-                pct = Math.round((totalDone / total) * 100);
-            }
-
-            pct = Math.max(0, Math.min(100, pct));
+            // ציון = (הצלחות + ריקים) / (7 - אונסים) — כמו היומי
+            const pct = Math.max(0, Math.min(100, Math.round(((totalDone + remainingActive) / activeDays) * 100)));
             return { pct, text: `${pct}%` };
         }
 
