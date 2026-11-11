@@ -148,10 +148,10 @@
             }
 
             // אם אין שום פעולת משתמש — ציון ריק
-            if (!hasUserAction) return { pct: 0, text: "-" };
+            if (!hasUserAction) return { pct: null, text: "-" };
 
             const daysMinusForce = totalDaysInMonth - totalForce;
-            if (daysMinusForce <= 0) return { pct: 0, text: "-" };
+            if (daysMinusForce <= 0) return { pct: null, text: "-" };
 
             let pct;
             if (scoreMethod === 'additive') {
