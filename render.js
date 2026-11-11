@@ -199,6 +199,24 @@
             const isNActive = (todayStatus === 'N');
             const isNAuto = (todayStatus === 'N_auto');
             const isNHarmful = isWeeklyNHarmful(habit, actualCurrentMonthKey, currentHebrewDayIndex, firstDayDate.getDay(), firstDayGregorian, totalDaysInMonth);
+            const isTodayActive = habit.workdays && habit.workdays[currentDayOfWeek];
+
+            const buttonsHTML = isTodayActive
+                ? `<div class="action-toggle btn-a ${todayStatus === 'א_w' ? 'active' : ''}" onclick="setStatus('${esc(habit.id)}', 'א_w', event)">
+                        <span>אונס</span>
+                    </div>
+                    <div class="action-toggle btn-w-skip ${isNActive ? 'active' : ''} ${isNHarmful ? 'harmful' : ''} ${isNAuto ? 'n-auto' : ''}" onclick="setStatus('${esc(habit.id)}', 'N', event)">
+                        <span>פספוס</span>
+                    </div>
+                    <div class="action-toggle btn-w-done ${isWActive ? 'active' : ''}" style="${wStyle}" onclick="setStatus('${esc(habit.id)}', 'W', event)">
+                        <span>${esc(wText)}</span>
+                    </div>`
+                : `<div class="action-toggle btn-a ${todayStatus === 'א_w' || isNAuto ? 'active' : ''}" onclick="setStatus('${esc(habit.id)}', 'א_w', event)">
+                        <span>אונס</span>
+                    </div>
+                    <div class="action-toggle btn-w-done ${isWActive ? 'active' : ''}" style="${wStyle}" onclick="setStatus('${esc(habit.id)}', 'W', event)">
+                        <span>${esc(wText)}</span>
+                    </div>`;
 
             const card = createBaseCard(habit);
             card.innerHTML =
@@ -206,15 +224,7 @@
                 createCardHeaderHTML(habit, mStats) +
                 `<div class="controls-row">
                     <div class="status-buttons-group">
-                        <div class="action-toggle btn-a ${todayStatus === 'א_w' ? 'active' : ''}" onclick="setStatus('${esc(habit.id)}', 'א_w', event)">
-                            <span>אונס</span>
-                        </div>
-                        <div class="action-toggle btn-w-skip ${isNActive ? 'active' : ''} ${isNHarmful ? 'harmful' : ''} ${isNAuto ? 'n-auto' : ''}" onclick="setStatus('${esc(habit.id)}', 'N', event)">
-                            <span>פספוס</span>
-                        </div>
-                        <div class="action-toggle btn-w-done ${isWActive ? 'active' : ''}" style="${wStyle}" onclick="setStatus('${esc(habit.id)}', 'W', event)">
-                            <span>${esc(wText)}</span>
-                        </div>
+                        ${buttonsHTML}
                     </div>
                 </div>` +
                 createCardNotesHTML(habit.id);
