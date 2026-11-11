@@ -794,6 +794,9 @@
 
             if (!hasUserAction) return { pct: null, text: "-" };
 
+            // אם אין הצלחות ופספוסים (רק אונס) — ציון ריק
+            if (totalDone === 0 && totalMiss === 0) return { pct: null, text: "-" };
+
             const activeDays = 7 - totalForce;
             if (activeDays <= 0) return { pct: null, text: "-" };
 
