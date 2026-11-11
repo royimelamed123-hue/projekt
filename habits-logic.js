@@ -754,8 +754,14 @@
                 const isEmpty = (status === "" || status === undefined);
 
                 if (!isActive) {
-                    // יום לא פעיל — אונס אוטומטי, לא מתחיל חישוב
-                    totalForce += 1;
+                    // יום לא פעיל — אם המשתמש שינה להצלחה, נספור כהצלחה
+                    if (status === 'W') {
+                        totalDone += 1;
+                        hasUserAction = true;
+                    } else {
+                        // אונס אוטומטי — לא מתחיל חישוב
+                        totalForce += 1;
+                    }
                     continue;
                 }
 
