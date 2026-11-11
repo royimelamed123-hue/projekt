@@ -495,7 +495,7 @@
             if (status === '' || status === undefined || status === null) return false;
 
             if (habit.type === 'weekly') {
-                return status === 'W' || status === 'N' || status === 'א_w' || typeof status === 'number';
+                return status === 'W' || status === 'N' || status === 'X' || typeof status === 'number';
             }
             if (habit.type === 'monthly') {
                 return status === 'W' || status === 'N' || typeof status === 'number';
@@ -513,7 +513,7 @@
             const currentMonthHistory = peekMonthHistory(habit, actualCurrentMonthKey);
             const todayStatus = currentMonthHistory[currentHebrewDayIndex];
             if (habit.type === 'weekly') {
-                return todayStatus === 'W' || todayStatus === 'N' || todayStatus === 'א_w' || typeof todayStatus === 'number';
+                return todayStatus === 'W' || todayStatus === 'N' || todayStatus === 'X' || typeof todayStatus === 'number';
             }
             if (habit.type === 'monthly') {
                 return todayStatus === 'W' || todayStatus === 'N' || typeof todayStatus === 'number';

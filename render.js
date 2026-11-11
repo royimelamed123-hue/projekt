@@ -202,16 +202,16 @@
             const isTodayActive = habit.workdays && habit.workdays[currentDayOfWeek];
 
             const buttonsHTML = isTodayActive
-                ? `<div class="action-toggle btn-a ${todayStatus === 'א_w' ? 'active' : ''}" onclick="setStatus('${esc(habit.id)}', 'א_w', event)">
+                ? `<div class="action-toggle btn-a ${isNActive ? 'active' : ''}" onclick="setStatus('${esc(habit.id)}', 'N', event)">
                         <span>אונס</span>
                     </div>
-                    <div class="action-toggle btn-w-skip ${isNActive ? 'active' : ''} ${isNHarmful ? 'harmful' : ''} ${isNAuto ? 'n-auto' : ''}" onclick="setStatus('${esc(habit.id)}', 'N', event)">
+                    <div class="action-toggle btn-w-skip ${todayStatus === 'X' ? 'active' : ''} ${isNHarmful ? 'harmful' : ''}" onclick="setStatus('${esc(habit.id)}', 'X', event)">
                         <span>פספוס</span>
                     </div>
                     <div class="action-toggle btn-w-done ${isWActive ? 'active' : ''}" style="${wStyle}" onclick="setStatus('${esc(habit.id)}', 'W', event)">
                         <span>${esc(wText)}</span>
                     </div>`
-                : `<div class="action-toggle btn-a ${todayStatus !== 'W' ? 'active' : ''}" onclick="setStatus('${esc(habit.id)}', 'א_w', event)">
+                : `<div class="action-toggle btn-a ${todayStatus !== 'W' ? 'active' : ''}" onclick="setStatus('${esc(habit.id)}', 'N', event)">
                         <span>אונס</span>
                     </div>
                     <div class="action-toggle btn-w-done ${isWActive ? 'active' : ''}" style="${wStyle}" onclick="setStatus('${esc(habit.id)}', 'W', event)">
@@ -662,21 +662,10 @@
                     } else if (status === 'W') {
                         cell.classList.add('m-status-V');
                         statusLabel = "הצלחה";
-                    } else if (status === 'א_w') {
-                        cell.classList.add('m-status-א');
-                        statusLabel = "אונס";
+                    } else if (status === 'X') {
+                        cell.classList.add('m-status-X');
+                        statusLabel = "פספוס";
                     } else if (status === 'N') {
-                        const isActiveDow = habit.workdays && habit.workdays[cellDayOfWeek];
-                        if (isActiveDow) {
-                            const dayGregorian = addDays(firstDayGregorian, i);
-                            const harmful = isWeeklyNHarmfulByDate(habit, dayGregorian);
-                            cell.classList.add(harmful ? 'm-status-X' : 'm-status-א');
-                            statusLabel = "פספוס";
-                        } else {
-                            cell.classList.add('m-status-א');
-                            statusLabel = "אונס";
-                        }
-                    } else if (status === 'N_auto' || (!status && !(habit.workdays && habit.workdays[cellDayOfWeek]))) {
                         cell.classList.add('m-status-א');
                         statusLabel = "אונס";
                     }
