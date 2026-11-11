@@ -754,12 +754,12 @@
                 const isEmpty = (status === "" || status === undefined);
 
                 if (!isActive) {
-                    // יום לא פעיל — אם המשתמש שינה להצלחה, נספור כהצלחה
                     if (status === 'W') {
+                        // הצלחה ביום לא פעיל — נספור כהצלחה, לא כאונס
                         totalDone += 1;
                         hasUserAction = true;
                     } else {
-                        // אונס אוטומטי — לא מתחיל חישוב
+                        // אונס (אוטומטי או ידני) — מוריד מה-7
                         totalForce += 1;
                     }
                     continue;
