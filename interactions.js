@@ -83,7 +83,8 @@
                     // שבוע כולו N — לא נספר בשום שיטה
                     if (isAllForce) { sunday = addDays(sunday, 7); continue; }
 
-                    anyWeekCounted = true;
+                    // מתחילים חישוב רק כשיש לפחות הצלחה/פספוס אחד בחודש
+                    if (!isEmpty) anyWeekCounted = true;
                     const weekPct = !isEmpty ? result.pct : 0;
 
                     // עשה טוב: כולם נספרים, ריק=0
