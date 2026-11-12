@@ -34,7 +34,7 @@
                 const target = getTargetForDay(habit, dow);
                 const isActive = habit.workdays && habit.workdays[dow];
 
-                if (!isActive || status === 'א' || status === "" || status === undefined) {
+                if (!isActive || status === 'N' || status === "" || status === undefined) {
                     points.push({ day: i + 1, level, type: 'unchanged' });
                 } else if (status === 'V' || (typeof status === 'number' && status >= target)) {
                     level += 1;

@@ -35,7 +35,7 @@
                 } else {
                     if (status === 'V') { statusLabel = 'בוצע'; scoreLabel = '100%'; }
                     else if (status === 'X') { statusLabel = 'פספוס'; scoreLabel = '0%'; }
-                    else if (status === 'א') { statusLabel = 'אונס'; scoreLabel = '-'; }
+                    else if (status === 'N') { statusLabel = 'אונס'; scoreLabel = '-'; }
                     else if (typeof status === 'number') {
                         statusLabel = status >= target ? 'בוצע' : `${status}/${target}`;
                         scoreLabel = `${Math.round((status / target) * 100)}%`;
@@ -265,7 +265,7 @@
                 createCardHeaderHTML(habit, mStats) +
                 `<div class="controls-row">
                     <div class="status-buttons-group">
-                        <div class="action-toggle btn-a ${todayStatus === 'א' ? 'active' : ''}" onclick="setStatus('${esc(habit.id)}', 'א', event)">
+                        <div class="action-toggle btn-a ${todayStatus === 'N' ? 'active' : ''}" onclick="setStatus('${esc(habit.id)}', 'N', event)">
                             <span>אונס</span>
                         </div>
                         <div class="action-toggle btn-x ${todayStatus === 'X' ? 'active' : ''}" onclick="setStatus('${esc(habit.id)}', 'X', event)">
@@ -378,7 +378,7 @@
                 const btnA = card.querySelector('.btn-a');
                 const btnX = card.querySelector('.btn-x');
                 const btnV = card.querySelector('.btn-v');
-                if (btnA) btnA.classList.toggle('active', todayStatus === 'א');
+                if (btnA) btnA.classList.toggle('active', todayStatus === 'N');
                 if (btnX) btnX.classList.toggle('active', todayStatus === 'X');
                 if (btnV) { btnV.classList.toggle('active', isVActive); btnV.style.cssText = vStyle; btnV.querySelector('span').textContent = vText; }
             }
@@ -701,7 +701,7 @@
                         if(status) cell.classList.add(`m-status-${status}`);
                         if(status === "V") statusLabel = "הצלחה";
                         if(status === "X") statusLabel = "פספוס";
-                        if(status === "א") statusLabel = "אונס";
+                        if(status === "N") statusLabel = "אונס";
                     }
                 }
 

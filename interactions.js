@@ -151,11 +151,11 @@
                 const isActiveDay = habit.workdays ? habit.workdays[cellDayOfWeek] : true;
                 const target = getTargetForDay(habit, cellDayOfWeek);
 
-                if (status === 'א') {
-                    // אונס ידני — מוריד מימי החודש
+                if (status === 'N') {
+                    // אונס — מוריד מימי החודש
                     totalForce += 1;
                     hasUserAction = true;
-                } else if (status === 'N' || status === 'N_auto') {
+                } else if (status === 'N_auto') {
                     // יום לא פעיל אוטומטי — נספר כאונס (ימי שבת/מנוחה שהוגדרו)
                     totalForce += 1;
                 } else if (status === 'V') {
@@ -489,7 +489,7 @@
                         </div>
                         <div class="controls-row">
                             <div class="status-buttons-group">
-                                <div class="action-toggle btn-a ${todayStatus === 'א' ? 'active' : ''}" onclick="setStatus('${esc(habit.id)}', 'א', event)">
+                                <div class="action-toggle btn-a ${todayStatus === 'N' ? 'active' : ''}" onclick="setStatus('${esc(habit.id)}', 'N', event)">
                                     <span>אונס</span>
                                 </div>
                                 <div class="action-toggle btn-x ${todayStatus === 'X' ? 'active' : ''}" onclick="setStatus('${esc(habit.id)}', 'X', event)">
@@ -529,7 +529,7 @@
                 return status === 'W' || status === 'N' || typeof status === 'number';
             }
             // יומי
-            return status === 'V' || status === 'X' || status === 'א' || typeof status === 'number';
+            return status === 'V' || status === 'X' || status === 'N' || typeof status === 'number';
         }
 
         // ---- פילטר סימניות + לא סומן ----
@@ -546,7 +546,7 @@
             if (habit.type === 'monthly') {
                 return todayStatus === 'W' || todayStatus === 'N' || typeof todayStatus === 'number';
             }
-            return todayStatus === 'V' || todayStatus === 'X' || todayStatus === 'א' || typeof todayStatus === 'number';
+            return todayStatus === 'V' || todayStatus === 'X' || todayStatus === 'N' || typeof todayStatus === 'number';
         }
 
         let _lastBookmarkBarState = null;
