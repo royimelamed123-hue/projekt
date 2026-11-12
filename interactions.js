@@ -90,14 +90,10 @@
                     addSum += weekPct;
                     addCount++;
 
-                    // סור מרע: עבר ריק=0, נוכחי/עתידי ריק=100
-                    if (!isEmpty) {
-                        subSum += weekPct;
-                    } else if (isPast) {
-                        subSum += 0;
-                    } else {
-                        subSum += 100;
-                    }
+                    // סור מרע: (100×n − סכום(100−ציון)) ÷ n
+                    // עבר ריק=0, נוכחי/עתידי ריק=100
+                    const subWeekPct = !isEmpty ? weekPct : (isPast ? 0 : 100);
+                    subSum += (100 - subWeekPct);
                     subCount++;
 
                     // דע את מקומך: עבר ריק=0, נוכחי נספר, עתידי לא נספר
@@ -115,7 +111,7 @@
                 if (scoreMethod === 'additive') {
                     pct = addCount > 0 ? Math.round(addSum / addCount) : null;
                 } else if (scoreMethod === 'subtractive') {
-                    pct = subCount > 0 ? Math.round(subSum / subCount) : null;
+                    pct = subCount > 0 ? Math.round((100 * subCount - subSum) / subCount) : null;
                 } else {
                     pct = staticCount > 0 ? Math.round(staticSum / staticCount) : null;
                 }
