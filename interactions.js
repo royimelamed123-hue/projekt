@@ -50,7 +50,7 @@
                 const today = new Date(); today.setHours(0,0,0,0);
                 const currentSunday = getSundayOfWeek(today);
 
-                let sunday = getSundayOfWeek(monthStart);
+                let sunday = getSundayOfWeek(monthStart); // יום ראשון של השבוע שמכיל את תחילת החודש
                 let anyWeekCounted = false; // האם יש לפחות שבוע אחד שנספר
 
                 // נאסוף את הנתונים לכל שיטה בנפרד
@@ -98,6 +98,7 @@
                     sunday = addDays(sunday, 7);
                 }
 
+                console.log('weekly monthly debug:', { addCount, addSum, subCount, staticCount, anyWeekCounted });
                 if (!anyWeekCounted) return { pct: null, text: "-" };
 
                 let pct;
