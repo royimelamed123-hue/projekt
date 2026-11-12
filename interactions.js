@@ -47,9 +47,16 @@
                 const totalDaysInMonth = calculateDaysInBrowsingMonth(firstDayDate);
                 const monthStart = firstDayDate;
                 const monthEnd = addDays(firstDayDate, totalDaysInMonth - 1);
+                const today = new Date(); today.setHours(0,0,0,0);
+                const currentSunday = getSundayOfWeek(today);
 
                 let sunday = getSundayOfWeek(monthStart);
-                let weekScores = []; // ציוני השבועות שיש להם נתונים
+                let anyWeekCounted = false; // האם יש לפחות שבוע אחד שנספר
+
+                // נאסוף את הנתונים לכל שיטה בנפרד
+                let addSum = 0, addCount = 0;      // עשה טוב
+                let subSum = 0, subCount = 0;      // סור מרע
+                let staticSum = 0, staticCount = 0; // דע את מקומך
 
                 while (true) {
                     if (sunday > monthEnd) break;
@@ -64,31 +71,56 @@
                         if (dG >= monthStart && dG <= monthEnd) { hasActiveDayInMonth = true; break; }
                     }
 
-                    if (hasActiveDayInMonth) {
-                        const result = calcWeekScore(habit, sunday);
-                        if (result.pct !== null) {
-                            weekScores.push(result.pct);
-                        }
+                    if (!hasActiveDayInMonth) { sunday = addDays(sunday, 7); continue; }
+
+                    const result = calcWeekScore(habit, sunday);
+                    const isPast = weekEnd < today;
+                    const isCurrent = sunday <= today && today <= weekEnd;
+                    const isFuture = sunday > today;
+                    const isAllForce = (result.pct === null); // כולו N או ריק לחלוטין ללא פעולה
+
+                    // שבוע כולו N — לא נספר בשום שיטה
+                    if (isAllForce) { sunday = addDays(sunday, 7); continue; }
+
+                    anyWeekCounted = true;
+                    const weekPct = result.pct !== null ? result.pct : 0;
+                    const weekHasScore = result.pct !== null;
+
+                    // עשה טוב: עבר ריק=0, נוכחי ריק=0, עתידי ריק=0 — כולם נספרים
+                    addSum += weekHasScore ? weekPct : 0;
+                    addCount++;
+
+                    // סור מרע: עבר ריק=0, נוכחי ריק=100, עתידי ריק=100
+                    if (weekHasScore) {
+                        subSum += weekPct;
+                    } else if (isPast) {
+                        subSum += 0;
+                    } else {
+                        subSum += 100; // נוכחי או עתידי ריק
+                    }
+                    subCount++;
+
+                    // דע את מקומך: עבר ריק=0, נוכחי נספר, עתידי לא נספר
+                    if (!isFuture) {
+                        staticSum += weekHasScore ? weekPct : 0;
+                        staticCount++;
                     }
 
                     sunday = addDays(sunday, 7);
                 }
 
-                if (weekScores.length === 0) return { pct: null, text: "-" };
+                if (!anyWeekCounted) return { pct: null, text: "-" };
 
-                const n = weekScores.length;
                 let pct;
-
                 if (scoreMethod === 'additive') {
-                    pct = Math.round(weekScores.reduce((s, w) => s + w, 0) / n);
+                    pct = addCount > 0 ? Math.round(addSum / addCount) : null;
                 } else if (scoreMethod === 'subtractive') {
-                    const sumDeficit = weekScores.reduce((s, w) => s + (100 - w), 0);
-                    pct = Math.round((100 * n - sumDeficit) / n);
+                    pct = subCount > 0 ? Math.round(subSum / subCount) : null;
                 } else {
-                    // static — ממוצע שבועות שהגיעו
-                    pct = Math.round(weekScores.reduce((s, w) => s + w, 0) / n);
+                    pct = staticCount > 0 ? Math.round(staticSum / staticCount) : null;
                 }
 
+                if (pct === null) return { pct: null, text: "-" };
                 pct = Math.max(0, Math.min(100, pct));
                 return { pct, text: `${pct}%` };
             }
