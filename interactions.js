@@ -59,19 +59,11 @@
                 let staticSum = 0, staticCount = 0; // דע את מקומך
 
                 while (true) {
-                    if (sunday > monthEnd) break;
                     const weekEnd = addDays(sunday, 6);
+                    // שבוע שחוצה את החודש נכנס כשבוע שלם — עוצרים רק כשהשבוע מתחיל אחרי סוף החודש
+                    if (sunday > monthEnd) break;
+                    // שבוע שנגמר לפני תחילת החודש — דלג
                     if (weekEnd < monthStart) { sunday = addDays(sunday, 7); continue; }
-
-                    // בדוק שיש לפחות יום פעיל בחודש זה עבור השבוע הזה
-                    let hasActiveDayInMonth = false;
-                    for (let dow = 0; dow < 7; dow++) {
-                        if (!(habit.workdays && habit.workdays[dow])) continue;
-                        const dG = addDays(sunday, dow);
-                        if (dG >= monthStart && dG <= monthEnd) { hasActiveDayInMonth = true; break; }
-                    }
-
-                    if (!hasActiveDayInMonth) { sunday = addDays(sunday, 7); continue; }
 
                     const result = calcWeekScore(habit, sunday);
                     const isPast = weekEnd < today;
