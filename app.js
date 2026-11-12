@@ -125,10 +125,22 @@
             }
         }
 
+        function migrateAlefToN(habit) {
+            if (!habit.history) return;
+            for (const monthKey of Object.keys(habit.history)) {
+                const month = habit.history[monthKey];
+                if (!Array.isArray(month)) continue;
+                for (let i = 0; i < month.length; i++) {
+                    if (month[i] === 'א') month[i] = 'N';
+                }
+            }
+        }
+
         function migrateAllHabits(list) {
             if (!Array.isArray(list)) return;
             list.forEach(migrateHabitToAllowedSkips);
             list.forEach(migrateHabitScoreMethod);
+            list.forEach(migrateAlefToN);
         }
         // ---- סיום מיגרציה ----
 

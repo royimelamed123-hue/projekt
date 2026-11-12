@@ -521,8 +521,8 @@
             let nextStatus = "";
             if (habit.type === 'x_times' || habit.type === 'regular') {
                 if (currentStatus === "" || currentStatus === undefined) {
-                    nextStatus = "א";
-                } else if (currentStatus === "א") {
+                    nextStatus = "N";
+                } else if (currentStatus === "N") {
                     nextStatus = "X";
                 } else if (currentStatus === "X") {
                     nextStatus = target > 1 ? 1 : "V";
@@ -537,8 +537,8 @@
                 }
             } else {
                 if (currentStatus === "" || currentStatus === undefined) {
-                    nextStatus = "א";
-                } else if (currentStatus === "א") {
+                    nextStatus = "N";
+                } else if (currentStatus === "N") {
                     nextStatus = "X";
                 } else if (currentStatus === "X") {
                     nextStatus = "V";
