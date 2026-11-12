@@ -77,32 +77,32 @@
                     const isPast = weekEnd < today;
                     const isCurrent = sunday <= today && today <= weekEnd;
                     const isFuture = sunday > today;
-                    const isAllForce = (result.pct === null); // כולו N או ריק לחלוטין ללא פעולה
+                    const isEmpty = result.isEmpty === true;       // שבוע ריק לחלוטין
+                    const isAllForce = result.isAllForce === true; // שבוע כולו N
 
                     // שבוע כולו N — לא נספר בשום שיטה
                     if (isAllForce) { sunday = addDays(sunday, 7); continue; }
 
                     anyWeekCounted = true;
-                    const weekPct = result.pct !== null ? result.pct : 0;
-                    const weekHasScore = result.pct !== null;
+                    const weekPct = !isEmpty ? result.pct : 0;
 
-                    // עשה טוב: עבר ריק=0, נוכחי ריק=0, עתידי ריק=0 — כולם נספרים
-                    addSum += weekHasScore ? weekPct : 0;
+                    // עשה טוב: כולם נספרים, ריק=0
+                    addSum += weekPct;
                     addCount++;
 
-                    // סור מרע: עבר ריק=0, נוכחי ריק=100, עתידי ריק=100
-                    if (weekHasScore) {
+                    // סור מרע: עבר ריק=0, נוכחי/עתידי ריק=100
+                    if (!isEmpty) {
                         subSum += weekPct;
                     } else if (isPast) {
                         subSum += 0;
                     } else {
-                        subSum += 100; // נוכחי או עתידי ריק
+                        subSum += 100;
                     }
                     subCount++;
 
                     // דע את מקומך: עבר ריק=0, נוכחי נספר, עתידי לא נספר
                     if (!isFuture) {
-                        staticSum += weekHasScore ? weekPct : 0;
+                        staticSum += weekPct;
                         staticCount++;
                     }
 

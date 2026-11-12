@@ -788,10 +788,10 @@
                 }
             }
 
-            if (!hasUserAction) return { pct: null, text: "-" };
+            if (!hasUserAction) return { pct: null, text: "-", isEmpty: true };
 
-            // אם אין הצלחות ופספוסים (רק אונס) — ציון ריק
-            if (totalDone === 0 && totalMiss === 0) return { pct: null, text: "-" };
+            // אם אין הצלחות ופספוסים (רק אונס) — כולו N
+            if (totalDone === 0 && totalMiss === 0) return { pct: null, text: "-", isAllForce: true };
 
             const activeDays = 7 - totalForce;
             if (activeDays <= 0) return { pct: null, text: "-" };
