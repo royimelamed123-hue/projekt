@@ -98,8 +98,7 @@
                     sunday = addDays(sunday, 7);
                 }
 
-                console.log('weekly monthly debug:', { addCount, addSum, subCount, staticCount, anyWeekCounted });
-                if (!anyWeekCounted) return { pct: null, text: "-" };
+                if (!anyWeekCounted) return { pct: null, text: "-", debug: `weeks:${addCount} sum:${addSum}` };
 
                 let pct;
                 if (scoreMethod === 'additive') {
@@ -112,7 +111,7 @@
 
                 if (pct === null) return { pct: null, text: "-" };
                 pct = Math.max(0, Math.min(100, pct));
-                return { pct, text: `${pct}%` };
+                return { pct, text: `${pct}% [${addCount}w,${addSum}]` };
             }
 
             if (habit.type === 'monthly') {
