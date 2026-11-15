@@ -43,73 +43,58 @@
             const startDayOfWeek = firstDayDate.getDay();
 
             if (habit.type === 'weekly') {
+                // חישוב ציון חודשי זהה לחלוטין לחישוב הרגל יומי
+                if (!habit.history || !habit.history[monthKey]) return { pct: null, text: "-" };
+                const history = habit.history[monthKey];
                 const scoreMethod = habit.scoreMethod || 'static';
                 const totalDaysInMonth = calculateDaysInBrowsingMonth(firstDayDate);
-                const monthStart = firstDayDate;
-                const monthEnd = addDays(firstDayDate, totalDaysInMonth - 1);
-                const today = new Date(); today.setHours(0,0,0,0);
-                const currentSunday = getSundayOfWeek(today);
 
-                let sunday = getSundayOfWeek(monthStart);
-                let anyWeekCounted = false; // האם יש לפחות שבוע אחד שנספר
+                let totalDone = 0;
+                let totalMiss = 0;
+                let totalForce = 0;
+                let hasUserAction = false;
 
-                // נאסוף את הנתונים לכל שיטה בנפרד
-                let addSum = 0, addCount = 0;      // עשה טוב
-                let subSum = 0, subCount = 0;      // סור מרע
-                let staticSum = 0, staticCount = 0; // דע את מקומך
+                for (let i = 0; i < totalDaysInMonth; i++) {
+                    const status = history[i];
+                    const cellDayOfWeek = (startDayOfWeek + i) % 7;
+                    const target = getTargetForDay(habit, cellDayOfWeek);
 
-                while (true) {
-                    const weekEnd = addDays(sunday, 6);
-                    // שבוע שחוצה את החודש נכנס כשבוע שלם — עוצרים רק כשהשבוע מתחיל אחרי סוף החודש
-                    if (sunday > monthEnd) break;
-                    // שבוע שנגמר לפני תחילת החודש — דלג
-                    if (weekEnd < monthStart) { sunday = addDays(sunday, 7); continue; }
-
-                    const result = calcWeekScore(habit, sunday);
-                    const isPast = weekEnd < today;
-                    const isCurrent = sunday <= today && today <= weekEnd;
-                    const isFuture = sunday > today;
-                    const isEmpty = result.isEmpty === true;       // שבוע ריק לחלוטין
-                    const isAllForce = result.isAllForce === true; // שבוע כולו N
-
-                    // שבוע כולו N — לא נספר בשום שיטה
-                    if (isAllForce) { sunday = addDays(sunday, 7); continue; }
-
-                    // מתחילים חישוב רק כשיש לפחות הצלחה/פספוס אחד בחודש
-                    if (!isEmpty) anyWeekCounted = true;
-                    const weekPct = !isEmpty ? result.pct : 0;
-
-                    // עשה טוב: כולם נספרים, ריק=0
-                    addSum += weekPct;
-                    addCount++;
-
-                    // סור מרע: (100×n − סכום(100−ציון)) ÷ n
-                    // עבר ריק=0, נוכחי/עתידי ריק=100
-                    const subWeekPct = !isEmpty ? weekPct : (isPast ? 0 : 100);
-                    subSum += (100 - subWeekPct);
-                    subCount++;
-
-                    // דע את מקומך: עבר ריק=0, נוכחי נספר, עתידי לא נספר
-                    if (!isFuture) {
-                        staticSum += weekPct;
-                        staticCount++;
+                    if (status === 'N') {
+                        totalForce += 1;
+                        hasUserAction = true;
+                    } else if (status === 'N_auto') {
+                        totalForce += 1;
+                    } else if (status === 'W') {
+                        totalDone += 1;
+                        hasUserAction = true;
+                    } else if (typeof status === 'number') {
+                        totalDone += status / target;
+                        totalMiss += (target - status) / target;
+                        hasUserAction = true;
+                    } else if (status === 'X') {
+                        totalMiss += 1;
+                        hasUserAction = true;
                     }
-
-                    sunday = addDays(sunday, 7);
+                    // ריק — לא נכנס לחישוב
                 }
 
-                if (!anyWeekCounted) return { pct: null, text: "-" };
+                if (!hasUserAction) return { pct: null, text: "-" };
+                if (totalDone === 0 && totalMiss === 0) return { pct: null, text: "-" };
+
+                const daysMinusForce = totalDaysInMonth - totalForce;
+                if (daysMinusForce <= 0) return { pct: null, text: "-" };
 
                 let pct;
                 if (scoreMethod === 'additive') {
-                    pct = addCount > 0 ? Math.round(addSum / addCount) : null;
+                    pct = Math.round((totalDone / daysMinusForce) * 100);
                 } else if (scoreMethod === 'subtractive') {
-                    pct = subCount > 0 ? Math.round((100 * subCount - subSum) / subCount) : null;
+                    pct = Math.round((1 - (totalMiss / daysMinusForce)) * 100);
                 } else {
-                    pct = staticCount > 0 ? Math.round(staticSum / staticCount) : null;
+                    const total = totalDone + totalMiss;
+                    if (total === 0) return { pct: null, text: "-" };
+                    pct = Math.round((totalDone / total) * 100);
                 }
 
-                if (pct === null) return { pct: null, text: "-" };
                 pct = Math.max(0, Math.min(100, pct));
                 return { pct, text: `${pct}%` };
             }
