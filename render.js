@@ -473,15 +473,13 @@
 
             grid.innerHTML = "";
 
-            const isDaily = (habit.type === 'x_times' || habit.type === 'regular');
             const isComparable = true; // כל הסוגים תומכים בהשוואה
             const tabGraph = document.getElementById('tabGraph');
             const tabComparison = document.getElementById('tabComparison');
-            if (tabGraph) tabGraph.style.display = isDaily ? 'block' : 'none';
+            if (tabGraph) tabGraph.style.display = 'block';
             if (tabComparison) tabComparison.style.display = 'block';
-            if (!isDaily && currentMonthTab === 'graph') switchMonthTab('calendar');
 
-            if (currentMonthTab === 'graph' && isDaily) {
+            if (currentMonthTab === 'graph') {
                 renderMonthGraph();
             }
             if (currentMonthTab === 'comparison') {

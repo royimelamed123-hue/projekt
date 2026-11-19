@@ -2,7 +2,7 @@
         // hebrewDays כבר מוגדר בתחילת הקובץ — לא צריך להגדיר שוב כאן
         function renderMonthGraph() {
             const habit = habits.find(h => h.id === selectedHabitIdForView);
-            if (!habit || (habit.type !== 'x_times' && habit.type !== 'regular')) return;
+            if (!habit) return;
 
             const comps = getHebrewDateComponents(browsingDatePointer);
             const history = habit.history && habit.history[comps.key] ? habit.history[comps.key] : [];
@@ -34,15 +34,20 @@
                 const target = getTargetForDay(habit, dow);
                 const isActive = habit.workdays && habit.workdays[dow];
 
-                if (!isActive || status === 'N' || status === "" || status === undefined) {
+                const isDone = status === 'V' || status === 'W' || (typeof status === 'number' && status >= target);
+                const isPartial = typeof status === 'number' && status > 0 && status < target;
+                const isMiss = status === 'X';
+                const isSkip = status === 'N';
+
+                if (!isActive || isSkip || status === "" || status === undefined) {
                     points.push({ day: i + 1, level, type: 'unchanged' });
-                } else if (status === 'V' || (typeof status === 'number' && status >= target)) {
+                } else if (isDone) {
                     level += 1;
                     points.push({ day: i + 1, level, type: 'v' });
-                } else if (typeof status === 'number' && status > 0) {
+                } else if (isPartial) {
                     level += status / target;
                     points.push({ day: i + 1, level, type: 'partial' });
-                } else if (status === 'X') {
+                } else if (isMiss) {
                     level -= 1;
                     points.push({ day: i + 1, level, type: 'x' });
                 } else {
