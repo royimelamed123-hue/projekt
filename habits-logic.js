@@ -92,28 +92,6 @@
             
             const target = getTargetForDay(habit, currentDayOfWeek);
 
-            if (habit.type === 'monthly') {
-                const mTarget = (habit.monthlyDayTargets && habit.monthlyDayTargets[currentDayOfWeek]) || 1;
-                if (statusType === 'W') {
-                    if (currentStatus === 'W') {
-                        monthHistory[currentHebrewDayIndex] = "";
-                    } else {
-                        if (mTarget > 1) {
-                            const cur = (typeof currentStatus === 'number') ? currentStatus : 0;
-                            const next = cur + 1;
-                            monthHistory[currentHebrewDayIndex] = next >= mTarget ? 'W' : next;
-                        } else {
-                            monthHistory[currentHebrewDayIndex] = 'W';
-                        }
-                    }
-                } else if (statusType === 'N') {
-                    monthHistory[currentHebrewDayIndex] = (currentStatus === 'N') ? "" : 'N';
-                }
-                invalidateStatsCache(habitId);
-                saveToStorageForHabit(habitId);
-                return;
-            }
-
             if (habit.type === 'weekly') {
                 if (statusType === 'W') {
                     if (currentStatus === 'W') {
@@ -500,24 +478,6 @@
                 return;
             }
 
-            if (habit.type === 'monthly') {
-                const mTarget = (habit.monthlyDayTargets && habit.monthlyDayTargets[cellDayOfWeek]) || 1;
-                let nextStatus = "";
-                if (currentStatus === "" || currentStatus === undefined) {
-                    nextStatus = "N";
-                } else if (currentStatus === "N") {
-                    nextStatus = mTarget > 1 ? 1 : "W";
-                } else if (typeof currentStatus === 'number') {
-                    nextStatus = (currentStatus + 1 < mTarget) ? currentStatus + 1 : "W";
-                } else if (currentStatus === "W") {
-                    nextStatus = "";
-                }
-                monthHistory[dayIndex] = nextStatus;
-                invalidateStatsCache(selectedHabitIdForView);
-                saveToStorage();
-                return;
-            }
-            
             let nextStatus = "";
             if (habit.type === 'x_times' || habit.type === 'regular') {
                 if (currentStatus === "" || currentStatus === undefined) {
@@ -565,7 +525,7 @@
         }
 
         function getPeriodDayTargets(habit, periodType) {
-            return periodType === 'weekly' ? habit.weeklyDayTargets : habit.monthlyDayTargets;
+            return habit.weeklyDayTargets;
         }
 
         // מספר הימים ה"מלא" של התקופה: שבוע = 7, חודש = מספר הימים בפועל של אותו חודש עברי (29/30).
@@ -583,7 +543,7 @@
             const skips = getAllowedSkips(habit, periodType);
             if (skips === null || skips === undefined) {
                 // נפילה לאחור: תאימות לנתונים ישנים שטרם עברו מיגרציה
-                const legacy = (periodType === 'weekly' ? habit.weeklyFreq : habit.monthlyFreq);
+                const legacy = habit.weeklyFreq;
                 return (legacy && legacy > 0) ? legacy : 1;
             }
             const target = periodLength - skips;
@@ -592,7 +552,7 @@
 
         // כמות הפעמים שמותר לדלג בתקופה (המודל החדש). מוחזר null אם לא הוגדר.
         function getAllowedSkips(habit, periodType) {
-            const val = (periodType === 'weekly' ? habit.weeklyAllowedSkips : habit.monthlyAllowedSkips);
+            const val = habit.weeklyAllowedSkips;
             return (val === null || val === undefined) ? null : val;
         }
 
@@ -606,12 +566,7 @@
             return getEffectiveTarget(habit, 'weekly', dates);
         }
 
-        // היעד האפקטיבי לחודש עברי מסוים (לפי אורכו בפועל 29/30).
-        function getEffectiveMonthlyTargetForMonth(habit, monthKey) {
-            const anchor = getGregorianStartForMonthKey(monthKey);
-            const dates = getPeriodDates(habit, 'monthly', anchor);
-            return getEffectiveTarget(habit, 'monthly', dates);
-        }
+
 
         function getGenericPeriodStats(habit, periodType, anchorDate) {
             const dates = getPeriodDates(habit, periodType, anchorDate);
@@ -675,24 +630,7 @@
             return (doneScore + openPotential) < freq;
         }
 
-        function getMonthlyStatsForHabitMonth(habit, monthKey) {
-            const anchorDate = getGregorianStartForMonthKey(monthKey);
-            const s = getGenericPeriodStats(habit, 'monthly', anchorDate);
-            return { doneScore: s.doneScore, activeDays: s.activeDays, remainingActive: s.remainingActive, monthlyFreq: s.freq, anyActionTaken: s.anyActionTaken };
-        }
 
-        function isMonthlyNHarmful(habit, monthKey, dayIndex) {
-            const firstDayDate = getGregorianStartForMonthKey(monthKey);
-            const dayGregorian = addDays(firstDayDate, dayIndex);
-            return isGenericNHarmful(habit, 'monthly', dayGregorian);
-        }
-
-        function calculateMonthlyPctForCurrentMonth(habit, monthKey) {
-            const { doneScore, activeDays, remainingActive, monthlyFreq, anyActionTaken } = getMonthlyStatsForHabitMonth(habit, monthKey);
-            if (activeDays === 0 && doneScore === 0) return "-";
-            if ((doneScore + remainingActive) >= monthlyFreq) return "100%";
-            return `${Math.round(((doneScore + remainingActive) / monthlyFreq) * 100)}%`;
-        }
 
         function getHebrewMonthDayIndexForDate(gregorianDate) {
             const comps = getHebrewDateComponents(gregorianDate);

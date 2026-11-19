@@ -99,19 +99,6 @@
                 return { pct, text: `${pct}%` };
             }
 
-            if (habit.type === 'monthly') {
-                const { doneScore, activeDays, remainingActive, monthlyFreq, anyActionTaken } = getMonthlyStatsForHabitMonth(habit, monthKey);
-                if (!anyActionTaken) return { pct: null, text: "-" };
-                let pctVal;
-                if ((doneScore + remainingActive) >= monthlyFreq) {
-                    pctVal = 1;
-                } else {
-                    pctVal = Math.min((doneScore + remainingActive) / monthlyFreq, 1);
-                }
-                const pct = Math.round(pctVal * 100);
-                return { pct, text: `${pct}%` };
-            }
-
             if(!habit.history || !habit.history[monthKey]) return { pct: null, text: "-" };
             const history = habit.history[monthKey];
             const scoreMethod = habit.scoreMethod || 'static';
@@ -362,12 +349,9 @@
                 setupCardDragAndDrop(card, habit.id);
                 card.onclick = () => openMonthView(habit.id);
 
-                // לוגיקה לפי סוג הרגל (יומי/שבועי/חודשי)
-                if (habit.type === 'weekly' || habit.type === 'monthly') {
-                    const isPeriodic = habit.type === 'weekly';
-                    const dayTarget = isPeriodic 
-                        ? (habit.weeklyDayTargets && habit.weeklyDayTargets[currentDayOfWeek]) || 1
-                        : (habit.monthlyDayTargets && habit.monthlyDayTargets[currentDayOfWeek]) || 1;
+                // לוגיקה לפי סוג הרגל (יומי/שבועי)
+                if (habit.type === 'weekly') {
+                    const dayTarget = (habit.weeklyDayTargets && habit.weeklyDayTargets[currentDayOfWeek]) || 1;
                     
                     let wText = dayTarget === 1 ? "הצלחה" : `${dayTarget}`;
                     let wStyle = "";
@@ -391,12 +375,8 @@
                     }
 
                     isNActive = (todayStatus === 'N');
-                    if (isPeriodic) {
-                        const firstDayDate = getFirstHebrewDayDate(mainScreenDatePointer);
-                        isNHarmful = isWeeklyNHarmful(habit, actualCurrentMonthKey, currentHebrewDayIndex, firstDayDate.getDay(), firstDayDate, calculateDaysInBrowsingMonth(mainScreenDatePointer));
-                    } else {
-                        isNHarmful = isMonthlyNHarmful(habit, actualCurrentMonthKey, currentHebrewDayIndex);
-                    }
+                    const firstDayDate = getFirstHebrewDayDate(mainScreenDatePointer);
+                    isNHarmful = isWeeklyNHarmful(habit, actualCurrentMonthKey, currentHebrewDayIndex, firstDayDate.getDay(), firstDayDate, calculateDaysInBrowsingMonth(mainScreenDatePointer));
 
                     card.innerHTML = `
                         <div id="cardMenu-${esc(habit.id)}" class="card-menu-dropdown">
@@ -503,9 +483,6 @@
             if (habit.type === 'weekly') {
                 return status === 'W' || status === 'N' || status === 'X' || typeof status === 'number';
             }
-            if (habit.type === 'monthly') {
-                return status === 'W' || status === 'N' || typeof status === 'number';
-            }
             // יומי
             return status === 'V' || status === 'X' || status === 'N' || typeof status === 'number';
         }
@@ -520,9 +497,6 @@
             const todayStatus = currentMonthHistory[currentHebrewDayIndex];
             if (habit.type === 'weekly') {
                 return todayStatus === 'W' || todayStatus === 'N' || todayStatus === 'X' || typeof todayStatus === 'number';
-            }
-            if (habit.type === 'monthly') {
-                return todayStatus === 'W' || todayStatus === 'N' || typeof todayStatus === 'number';
             }
             return todayStatus === 'V' || todayStatus === 'X' || todayStatus === 'N' || typeof todayStatus === 'number';
         }

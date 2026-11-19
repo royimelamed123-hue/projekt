@@ -33,14 +33,7 @@
                     document.getElementById(`weeklyTargetDay-${i}`).value = (habit.weeklyDayTargets && habit.weeklyDayTargets[i]) || 1;
                 }
 
-                const activeMonthlyTargets = (habit.monthlyDayTargets || []).filter((_, i) => configSelectedWeekdays[i]);
-                const allSameMonthly = activeMonthlyTargets.length === 0 || activeMonthlyTargets.every(v => v === activeMonthlyTargets[0]);
-                monthlyDayMode = allSameMonthly ? 'uniform' : 'custom';
-                document.getElementById('monthlyUniformTargetInput').value = activeMonthlyTargets[0] || 1;
-                for (let i = 0; i < 7; i++) {
-                    document.getElementById(`monthlyTargetDay-${i}`).value = (habit.monthlyDayTargets && habit.monthlyDayTargets[i]) || 1;
-                }
-                document.getElementById('monthlyFreqInput').value = (habit.monthlyAllowedSkips !== null && habit.monthlyAllowedSkips !== undefined) ? habit.monthlyAllowedSkips : 0;
+
                 document.getElementById('passingScoreInput').value = habit.passingScore !== null && habit.passingScore !== undefined ? habit.passingScore : '';
                 document.getElementById('minScoreInput').value = habit.minScore !== null && habit.minScore !== undefined ? habit.minScore : '';
                 selectedHabitTheme = habit.theme || BOOKMARK_COLORS[0];
@@ -51,16 +44,11 @@
                 configSelectedWeekdays = [true, true, true, true, true, true, true];
                 xTimesMode = 'uniform';
                 weeklyDayMode = 'uniform';
-                monthlyDayMode = 'uniform';
                 document.getElementById('uniformTargetInput').value = "1";
                 document.getElementById('weeklyUniformTargetInput').value = "1";
-                document.getElementById('monthlyUniformTargetInput').value = "1";
-
-                document.getElementById('monthlyFreqInput').value = "0";
                 for (let i = 0; i < 7; i++) {
                     document.getElementById(`targetDay-${i}`).value = "1";
                     document.getElementById(`weeklyTargetDay-${i}`).value = "1";
-                    document.getElementById(`monthlyTargetDay-${i}`).value = "1";
                 }
                 selectedHabitTheme = BOOKMARK_COLORS[0];
                 document.getElementById('passingScoreInput').value = '';
@@ -360,7 +348,7 @@
         }
 
         let weeklyDayMode = 'uniform';
-        let monthlyDayMode = 'uniform';
+
 
         function setXTimesMode(mode) {
             xTimesMode = mode;
@@ -376,14 +364,6 @@
             const c = document.getElementById('weeklyModeCustom'); if(c) { if(mode==='custom'){if(!c.classList.contains('active'))c.classList.add('active');}else{c.classList.remove('active');} }
             const us = document.getElementById('weeklyUniformSection'); if(us && us.style.display !== (mode==='uniform'?'flex':'none')) us.style.display = mode==='uniform' ? 'flex' : 'none';
             const cs = document.getElementById('weeklyCustomSection'); if(cs && cs.style.display !== (mode==='custom'?'block':'none')) cs.style.display = mode==='custom' ? 'block' : 'none';
-        }
-
-        function setMonthlyMode(mode) {
-            monthlyDayMode = mode;
-            const u = document.getElementById('monthlyModeUniform'); if(u) { if(mode==='uniform'){if(!u.classList.contains('active'))u.classList.add('active');}else{u.classList.remove('active');} }
-            const c = document.getElementById('monthlyModeCustom'); if(c) { if(mode==='custom'){if(!c.classList.contains('active'))c.classList.add('active');}else{c.classList.remove('active');} }
-            const us = document.getElementById('monthlyUniformSection'); if(us && us.style.display !== (mode==='uniform'?'flex':'none')) us.style.display = mode==='uniform' ? 'flex' : 'none';
-            const cs = document.getElementById('monthlyCustomSection'); if(cs && cs.style.display !== (mode==='custom'?'block':'none')) cs.style.display = mode==='custom' ? 'block' : 'none';
         }
 
         function readDayTargetsFromUI() {
@@ -410,21 +390,6 @@
             } else {
                 for (let i = 0; i < 7; i++) {
                     let val = parseInt(document.getElementById(`weeklyTargetDay-${i}`).value, 10);
-                    targets[i] = isNaN(val) || val < 1 ? 1 : val;
-                }
-                return targets;
-            }
-        }
-
-        function readMonthlyDayTargetsFromUI() {
-            const targets = [1,1,1,1,1,1,1];
-            if (monthlyDayMode === 'uniform') {
-                const val = parseInt(document.getElementById('monthlyUniformTargetInput').value, 10);
-                const v = isNaN(val) || val < 1 ? 1 : val;
-                return targets.map(() => v);
-            } else {
-                for (let i = 0; i < 7; i++) {
-                    let val = parseInt(document.getElementById(`monthlyTargetDay-${i}`).value, 10);
                     targets[i] = isNaN(val) || val < 1 ? 1 : val;
                 }
                 return targets;

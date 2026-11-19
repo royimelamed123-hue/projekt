@@ -17,34 +17,26 @@
                 
             safeToggle('typeBtnXTimes', 'active', configSelectedType === 'x_times' || configSelectedType === 'regular');
             safeToggle('typeBtnWeekly', 'active', configSelectedType === 'weekly');
-            safeToggle('typeBtnMonthly', 'active', configSelectedType === 'monthly');
             safeDisplay('xTimesConfigSection', (configSelectedType === 'x_times' || configSelectedType === 'regular') ? 'block' : 'none');
             safeDisplay('weeklyConfigSection', configSelectedType === 'weekly' ? 'block' : 'none');
-            safeDisplay('monthlyConfigSection', configSelectedType === 'monthly' ? 'block' : 'none');
-
-
 
             setXTimesMode(xTimesMode);
             setWeeklyMode(weeklyDayMode);
-            setMonthlyMode(monthlyDayMode);
             
             for (let i = 0; i < 7; i++) {
                 const btn = safeEl(`weekday-${i}`);
                 const targetBox = safeEl(`targetBox-${i}`);
                 const weeklyTargetBox = safeEl(`weeklyTargetBox-${i}`);
-                const monthlyTargetBox = safeEl(`monthlyTargetBox-${i}`);
                 
                 if (!btn) continue;
                 if (configSelectedWeekdays[i]) {
                     btn.classList.add('active');
                     if (targetBox) { targetBox.style.opacity = '1'; targetBox.style.pointerEvents = 'auto'; }
                     if (weeklyTargetBox) { weeklyTargetBox.style.opacity = '1'; weeklyTargetBox.style.pointerEvents = 'auto'; }
-                    if (monthlyTargetBox) { monthlyTargetBox.style.opacity = '1'; monthlyTargetBox.style.pointerEvents = 'auto'; }
                 } else {
                     btn.classList.remove('active');
                     if (targetBox) { targetBox.style.opacity = '0.4'; targetBox.style.pointerEvents = 'none'; }
                     if (weeklyTargetBox) { weeklyTargetBox.style.opacity = '0.4'; weeklyTargetBox.style.pointerEvents = 'none'; }
-                    if (monthlyTargetBox) { monthlyTargetBox.style.opacity = '0.4'; monthlyTargetBox.style.pointerEvents = 'none'; }
                 }
             }
         }
@@ -73,13 +65,7 @@
                 if (weeklyAllowedSkips > 7) weeklyAllowedSkips = 7;
             }
 
-            let monthlyDayTargets = [1, 1, 1, 1, 1, 1, 1];
-            let monthlyAllowedSkips = 0;
-            if (configSelectedType === 'monthly') {
-                monthlyDayTargets = readMonthlyDayTargetsFromUI();
-                monthlyAllowedSkips = parseInt(document.getElementById('monthlyFreqInput').value, 10);
-                if (isNaN(monthlyAllowedSkips) || monthlyAllowedSkips < 0) monthlyAllowedSkips = 0;
-            }
+
             
             const passingRaw = document.getElementById('passingScoreInput').value.trim();
             const minRaw = document.getElementById('minScoreInput').value.trim();
@@ -112,11 +98,7 @@
                         habit.weeklyAllowedSkips = weeklyAllowedSkips;
                         delete habit.weeklyFreq;
                     }
-                    if (configSelectedType === 'monthly') {
-                        habit.monthlyDayTargets = monthlyDayTargets;
-                        habit.monthlyAllowedSkips = monthlyAllowedSkips;
-                        delete habit.monthlyFreq;
-                    }
+
                     if (habit.type === 'x_times' && habit.history) {
                         for (let monthKey in habit.history) {
                             if (!Array.isArray(habit.history[monthKey])) continue;
@@ -198,8 +180,6 @@
                     dayTargets: dayTargets,
                     weeklyDayTargets: configSelectedType === 'weekly' ? weeklyDayTargets : undefined,
                     weeklyAllowedSkips: configSelectedType === 'weekly' ? weeklyAllowedSkips : undefined,
-                    monthlyDayTargets: configSelectedType === 'monthly' ? monthlyDayTargets : undefined,
-                    monthlyAllowedSkips: configSelectedType === 'monthly' ? monthlyAllowedSkips : undefined,
                     passingScore: passingScore,
                     minScore: minScore,
                     theme: selectedHabitTheme,

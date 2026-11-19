@@ -136,11 +136,33 @@
             }
         }
 
+        function migrateMonthlyToWeekly(habit) {
+            if (!habit || habit.type !== 'monthly') return;
+            habit.type = 'weekly';
+            // monthlyDayTargets → weeklyDayTargets
+            if (habit.monthlyDayTargets) {
+                habit.weeklyDayTargets = habit.monthlyDayTargets;
+                delete habit.monthlyDayTargets;
+            } else if (!habit.weeklyDayTargets) {
+                habit.weeklyDayTargets = [1, 1, 1, 1, 1, 1, 1];
+            }
+            // monthlyAllowedSkips → weeklyAllowedSkips
+            if (habit.monthlyAllowedSkips !== undefined && habit.monthlyAllowedSkips !== null) {
+                habit.weeklyAllowedSkips = habit.monthlyAllowedSkips;
+                delete habit.monthlyAllowedSkips;
+            } else if (habit.weeklyAllowedSkips === undefined) {
+                habit.weeklyAllowedSkips = 0;
+            }
+            delete habit.monthlyFreq;
+            if (!habit.scoreMethod) habit.scoreMethod = 'static';
+        }
+
         function migrateAllHabits(list) {
             if (!Array.isArray(list)) return;
             list.forEach(migrateHabitToAllowedSkips);
             list.forEach(migrateHabitScoreMethod);
             list.forEach(migrateAlefToN);
+            list.forEach(migrateMonthlyToWeekly);
         }
         // ---- סיום מיגרציה ----
 

@@ -24,11 +24,11 @@
                 let statusLabel = '-';
                 let scoreLabel = '';
 
-                if (habit.type === 'weekly' || habit.type === 'monthly') {
+                if (habit.type === 'weekly') {
                     if (status === 'W') { statusLabel = 'בוצע'; scoreLabel = '100%'; }
                     else if (status === 'N') { statusLabel = 'לא בוצע'; scoreLabel = '0%'; }
                     else if (typeof status === 'number') {
-                        const t = (habit.type === 'weekly' ? habit.weeklyDayTargets : habit.monthlyDayTargets)?.[cellDayOfWeek] || 1;
+                        const t = habit.weeklyDayTargets?.[cellDayOfWeek] || 1;
                         statusLabel = `${status}/${t}`;
                         scoreLabel = `${Math.round((status / t) * 100)}%`;
                     }
@@ -127,50 +127,6 @@
             setupCardDragAndDrop(card, habit.id);
             card.onclick = () => openMonthView(habit.id);
             return card;
-        }
-
-        // ---- כרטיס להרגל חודשי (monthly) ----
-        function createMonthlyHabitCard(habit, todayStatus, mStats, currentDayTextVal) {
-            const mTarget = (habit.monthlyDayTargets && habit.monthlyDayTargets[currentDayOfWeek]) || 1;
-            const isNHarmfulM = isMonthlyNHarmful(habit, actualCurrentMonthKey, currentHebrewDayIndex);
-            const isNActiveM = (todayStatus === 'N');
-            const isNAutoM = (todayStatus === 'N_auto');
-
-            let wTextM = mTarget === 1 ? "הצלחה" : `${mTarget}`;
-            let wStyleM = "";
-            let isWActiveM = false;
-            if (todayStatus === 'W') {
-                wTextM = "הצלחה";
-                wStyleM = getStatusProgressStyle(100);
-                isWActiveM = true;
-            } else if (mTarget > 1 && typeof todayStatus === 'number') {
-                const rem = mTarget - todayStatus;
-                wTextM = rem > 0 ? `${rem}` : "הצלחה";
-                const pct = Math.round((todayStatus / mTarget) * 100);
-                wStyleM = getStatusProgressStyle(pct);
-            }
-
-            const card = createBaseCard(habit);
-            card.innerHTML =
-                createCardMenuHTML(habit.id) +
-                createCardHeaderHTML(habit, mStats) +
-                `<div class="controls-row">
-                    <div class="status-buttons-group">
-                        <div class="action-toggle btn-w-skip ${isNActiveM ? 'active' : ''} ${isNHarmfulM ? 'harmful' : ''} ${isNAutoM ? 'n-auto' : ''}" onclick="setStatus('${esc(habit.id)}', 'N', event)">
-                            <span>לא הצליח</span>
-                        </div>
-                        <div class="action-toggle btn-w-done ${isWActiveM ? 'active' : ''}" style="${wStyleM}" onclick="setStatus('${esc(habit.id)}', 'W', event)">
-                            <span>${esc(wTextM)}</span>
-                        </div>
-                    </div>
-                </div>` +
-                createCardNotesHTML(habit.id);
-
-            card.querySelector('[data-habit-title]').textContent = habit.title;
-            const taMonthly = card.querySelector(`#noteText-${CSS.escape(habit.id)}`);
-            taMonthly.value = currentDayTextVal;
-            initAutoResize(taMonthly);
-            return { card, mTarget, isNHarmfulM, todayStatus };
         }
 
         // ---- כרטיס להרגל שבועי (weekly) ----
@@ -320,26 +276,7 @@
                 summaryEl.innerHTML = `${weeklyScoreHTML}חודשי: <span style="color: ${getScoreColor(mStats.pct, habit, mStats.text)}; padding: 1px 6px; border-radius: 4px; font-weight: 700;">${esc(mStats.text)}</span>`;
             }
 
-            if (habit.type === 'monthly') {
-                const mTarget = (habit.monthlyDayTargets && habit.monthlyDayTargets[currentDayOfWeek]) || 1;
-                const isNHarmfulM = isMonthlyNHarmful(habit, actualCurrentMonthKey, currentHebrewDayIndex);
-                const isNActiveM = (todayStatus === 'N');
-                const isNAutoM = (todayStatus === 'N_auto');
-                let wTextM = mTarget === 1 ? 'בוצע' : `${mTarget}`;
-                let wStyleM = '';
-                let isWActiveM = false;
-                if (todayStatus === 'W') { wTextM = 'בוצע'; wStyleM = getStatusProgressStyle(100); isWActiveM = true; }
-                else if (mTarget > 1 && typeof todayStatus === 'number') {
-                    const rem = mTarget - todayStatus;
-                    wTextM = rem > 0 ? `${rem}` : 'בוצע';
-                    wStyleM = getStatusProgressStyle(Math.round((todayStatus / mTarget) * 100));
-                }
-                const btnSkip = card.querySelector('.btn-w-skip');
-                const btnDone = card.querySelector('.btn-w-done');
-                if (btnSkip) { btnSkip.classList.toggle('active', isNActiveM); btnSkip.classList.toggle('harmful', isNHarmfulM); btnSkip.classList.toggle('n-auto', isNAutoM); }
-                if (btnDone) { btnDone.classList.toggle('active', isWActiveM); btnDone.style.cssText = wStyleM; btnDone.querySelector('span').textContent = wTextM; }
-
-            } else if (habit.type === 'weekly') {
+            if (habit.type === 'weekly') {
                 const wTarget = (habit.weeklyDayTargets && habit.weeklyDayTargets[currentDayOfWeek]) || 1;
                 const firstDayDate = getFirstHebrewDayDate(mainScreenDatePointer);
                 const isNHarmful = isWeeklyNHarmful(habit, actualCurrentMonthKey, currentHebrewDayIndex, firstDayDate.getDay(), firstDayDate, calculateDaysInBrowsingMonth(mainScreenDatePointer));
@@ -405,13 +342,7 @@
                 const todayStatus = currentMonthHistory[currentHebrewDayIndex];
                 const target = getTargetForDay(habit, currentDayOfWeek);
 
-                if (habit.type === 'monthly') {
-                    const mTarget = (habit.monthlyDayTargets && habit.monthlyDayTargets[currentDayOfWeek]) || 1;
-                    const isNHarmfulM = isMonthlyNHarmful(habit, actualCurrentMonthKey, currentHebrewDayIndex);
-                    if (typeof todayStatus === 'number') { todayV += todayStatus / mTarget; todayActive += 1; }
-                    else if (todayStatus === 'W') { todayV += 1; todayActive += 1; }
-                    else if (todayStatus === 'N' && isNHarmfulM) { todayActive += 1; }
-                } else if (habit.type === 'weekly') {
+                if (habit.type === 'weekly') {
                     const wTarget = (habit.weeklyDayTargets && habit.weeklyDayTargets[currentDayOfWeek]) || 1;
                     const firstDayDate = getFirstHebrewDayDate(mainScreenDatePointer);
                     const isNHarmful = isWeeklyNHarmful(habit, actualCurrentMonthKey, currentHebrewDayIndex, firstDayDate.getDay(), firstDayDate, calculateDaysInBrowsingMonth(mainScreenDatePointer));
@@ -513,13 +444,7 @@
 
                 let card;
 
-                if (habit.type === 'monthly') {
-                    const { card: mCard, mTarget, isNHarmfulM } = createMonthlyHabitCard(habit, todayStatus, mStats, currentDayTextVal);
-                    card = mCard;
-                    if (typeof todayStatus === 'number') { todayV += todayStatus / mTarget; todayActive += 1; }
-                    else if (todayStatus === 'W') { todayV += 1; todayActive += 1; }
-                    else if (todayStatus === 'N' && isNHarmfulM) { todayActive += 1; }
-                } else if (habit.type === 'weekly') {
+                if (habit.type === 'weekly') {
                     const { card: wCard, wTarget, isNHarmful } = createWeeklyHabitCard(habit, todayStatus, mStats, currentDayTextVal);
                     card = wCard;
                     if (typeof todayStatus === 'number') { todayV += todayStatus / wTarget; todayActive += 1; }
@@ -668,24 +593,6 @@
                     } else if (status === 'N') {
                         cell.classList.add('m-status-א');
                         statusLabel = "אונס";
-                    }
-                } else if (habit.type === 'monthly') {
-                    const mTarget = (habit.monthlyDayTargets && habit.monthlyDayTargets[cellDayOfWeek]) || 1;
-
-                    if (typeof status === 'number') {
-                        const pct = Math.round((status / mTarget) * 100);
-                        cellStyle = getStatusProgressStyle(pct);
-                        statusLabel = status >= mTarget ? "הצלחה" : `${status}/${mTarget}`;
-                    } else if (status === 'W') {
-                        cell.classList.add('m-status-V');
-                        statusLabel = "הצלחה";
-                    } else if (status === 'N') {
-                        const harmful = isMonthlyNHarmful(habit, targetMonthComps.key, i);
-                        cell.classList.add(harmful ? 'm-status-X' : 'm-status-א');
-                        statusLabel = "לא הצליח";
-                    } else if (status === 'N_auto') {
-                        cell.classList.add('m-status-א');
-                        statusLabel = "לא פעיל";
                     }
                 } else {
                     if (typeof status === 'number') {
