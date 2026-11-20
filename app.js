@@ -138,6 +138,16 @@
 
         function migrateMonthlyToWeekly(habit) {
             if (!habit || habit.type !== 'monthly') return;
+            // המר N → X בהיסטוריה לפני שינוי הטייפ (N בחודשי = פספוס, לא אונס)
+            if (habit.history) {
+                for (const monthKey in habit.history) {
+                    const arr = habit.history[monthKey];
+                    if (!Array.isArray(arr)) continue;
+                    for (let i = 0; i < arr.length; i++) {
+                        if (arr[i] === 'N') arr[i] = 'X';
+                    }
+                }
+            }
             habit.type = 'weekly';
             // monthlyDayTargets → weeklyDayTargets
             if (habit.monthlyDayTargets) {
