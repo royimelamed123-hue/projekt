@@ -167,12 +167,37 @@
             if (!habit.scoreMethod) habit.scoreMethod = 'static';
         }
 
+        function migrateDailyToWeekly(habit) {
+            if (!habit || (habit.type !== 'x_times' && habit.type !== 'regular')) return;
+            // המר V → W בהיסטוריה לפני שינוי הטייפ
+            if (habit.history) {
+                for (const monthKey in habit.history) {
+                    const arr = habit.history[monthKey];
+                    if (!Array.isArray(arr)) continue;
+                    for (let i = 0; i < arr.length; i++) {
+                        if (arr[i] === 'V') arr[i] = 'W';
+                    }
+                }
+            }
+            habit.type = 'weekly';
+            // dayTargets → weeklyDayTargets
+            if (habit.dayTargets) {
+                habit.weeklyDayTargets = habit.dayTargets;
+                delete habit.dayTargets;
+            } else if (!habit.weeklyDayTargets) {
+                habit.weeklyDayTargets = [1, 1, 1, 1, 1, 1, 1];
+            }
+            if (habit.weeklyAllowedSkips === undefined) habit.weeklyAllowedSkips = 0;
+            if (!habit.scoreMethod) habit.scoreMethod = 'static';
+        }
+
         function migrateAllHabits(list) {
             if (!Array.isArray(list)) return;
             list.forEach(migrateHabitToAllowedSkips);
             list.forEach(migrateHabitScoreMethod);
             list.forEach(migrateAlefToN);
             list.forEach(migrateMonthlyToWeekly);
+            list.forEach(migrateDailyToWeekly);
         }
         // ---- סיום מיגרציה ----
 

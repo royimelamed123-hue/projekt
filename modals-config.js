@@ -14,16 +14,8 @@
                 document.getElementById('configHabitTitle').value = habit.title;
                 document.getElementById('configHabitDesc').value = habit.description || "";
                 
-                configSelectedType = (habit.type === 'regular' || habit.type === 'x_times') ? 'x_times' : (habit.type || 'x_times');
+                configSelectedType = 'weekly';
                 configSelectedWeekdays = habit.workdays ? [...habit.workdays] : [true, true, true, true, true, true, true];
-                
-                const activeDayTargets = (habit.dayTargets || []).filter((_, i) => configSelectedWeekdays[i]);
-                const allSameDay = activeDayTargets.length === 0 || activeDayTargets.every(v => v === activeDayTargets[0]);
-                xTimesMode = allSameDay ? 'uniform' : 'custom';
-                document.getElementById('uniformTargetInput').value = activeDayTargets[0] || 1;
-                for (let i = 0; i < 7; i++) {
-                    document.getElementById(`targetDay-${i}`).value = (habit.dayTargets && habit.dayTargets[i]) || 1;
-                }
 
                 const activeWeeklyTargets = (habit.weeklyDayTargets || []).filter((_, i) => configSelectedWeekdays[i]);
                 const allSameWeekly = activeWeeklyTargets.length === 0 || activeWeeklyTargets.every(v => v === activeWeeklyTargets[0]);
@@ -40,14 +32,11 @@
                 setScoreMethod(habit.scoreMethod || 'static');
             } else {
                 // (כותרת הוסרה מה-UI)
-                configSelectedType = 'x_times';
+                configSelectedType = 'weekly';
                 configSelectedWeekdays = [true, true, true, true, true, true, true];
-                xTimesMode = 'uniform';
                 weeklyDayMode = 'uniform';
-                document.getElementById('uniformTargetInput').value = "1";
                 document.getElementById('weeklyUniformTargetInput').value = "1";
                 for (let i = 0; i < 7; i++) {
-                    document.getElementById(`targetDay-${i}`).value = "1";
                     document.getElementById(`weeklyTargetDay-${i}`).value = "1";
                 }
                 selectedHabitTheme = BOOKMARK_COLORS[0];
@@ -293,7 +282,7 @@
             window._pendingApplyMinScore = null;
         }
 
-        let xTimesMode = 'uniform';
+
 
         const BOOKMARK_COLORS = ['#3b82f6', '#22c55e', '#8b5cf6', '#f97316', '#14b8a6', '#ec4899', '#eab308', '#ef4444'];
         let bookmarkLabels = {}; // יטען אסינכרונית ב-boot
@@ -349,36 +338,12 @@
 
         let weeklyDayMode = 'uniform';
 
-
-        function setXTimesMode(mode) {
-            xTimesMode = mode;
-            const u = document.getElementById('xTimesModeUniform'); if(u) { if(mode==='uniform'){if(!u.classList.contains('active'))u.classList.add('active');}else{u.classList.remove('active');} }
-            const c = document.getElementById('xTimesModeCustom'); if(c) { if(mode==='custom'){if(!c.classList.contains('active'))c.classList.add('active');}else{c.classList.remove('active');} }
-            const us = document.getElementById('xTimesUniformSection'); if(us && us.style.display !== (mode==='uniform'?'flex':'none')) us.style.display = mode==='uniform' ? 'flex' : 'none';
-            const cs = document.getElementById('xTimesCustomSection'); if(cs && cs.style.display !== (mode==='custom'?'block':'none')) cs.style.display = mode==='custom' ? 'block' : 'none';
-        }
-
         function setWeeklyMode(mode) {
             weeklyDayMode = mode;
             const u = document.getElementById('weeklyModeUniform'); if(u) { if(mode==='uniform'){if(!u.classList.contains('active'))u.classList.add('active');}else{u.classList.remove('active');} }
             const c = document.getElementById('weeklyModeCustom'); if(c) { if(mode==='custom'){if(!c.classList.contains('active'))c.classList.add('active');}else{c.classList.remove('active');} }
             const us = document.getElementById('weeklyUniformSection'); if(us && us.style.display !== (mode==='uniform'?'flex':'none')) us.style.display = mode==='uniform' ? 'flex' : 'none';
             const cs = document.getElementById('weeklyCustomSection'); if(cs && cs.style.display !== (mode==='custom'?'block':'none')) cs.style.display = mode==='custom' ? 'block' : 'none';
-        }
-
-        function readDayTargetsFromUI() {
-            const targets = [1,1,1,1,1,1,1];
-            if (xTimesMode === 'uniform') {
-                const val = parseInt(document.getElementById('uniformTargetInput').value, 10);
-                const v = isNaN(val) || val < 1 ? 1 : val;
-                return targets.map(() => v);
-            } else {
-                for (let i = 0; i < 7; i++) {
-                    let val = parseInt(document.getElementById(`targetDay-${i}`).value, 10);
-                    targets[i] = isNaN(val) || val < 1 ? 1 : val;
-                }
-                return targets;
-            }
         }
 
         function readWeeklyDayTargetsFromUI() {

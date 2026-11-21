@@ -60,7 +60,7 @@
         let accessLockUiReady = false;
 
         let isModalEditMode = false;
-        let configSelectedType = 'x_times'; 
+        let configSelectedType = 'weekly'; 
         let configSelectedWeekdays = [true, true, true, true, true, true, true]; 
 
         // ---- מטמון סטטיסטיקות (תיקון 4: ביצועים) ----

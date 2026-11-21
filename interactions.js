@@ -409,61 +409,7 @@
                             <button class="btn-card-notes-save" onclick="saveCardNote('${esc(habit.id)}', event)">שמור</button>
                         </div>
                     `;
-                } else {
-                    // יומי (x_times / regular)
-                    let vText = "הצלחה";
-                    let vStyle = "";
-                    let isVActive = false;
 
-                    if (typeof todayStatus === 'number') {
-                        const rem = target - todayStatus;
-                        vText = rem > 0 ? `${rem}` : `הצלחה`;
-                        const pct = Math.round((todayStatus / target) * 100);
-                        vStyle = getStatusProgressStyle(pct);
-                        isVActive = (todayStatus >= target);
-                    } else if (todayStatus === 'V') {
-                        vText = `הצלחה`;
-                        vStyle = getStatusProgressStyle(100);
-                        isVActive = true;
-                    } else {
-                        vText = target === 1 ? `הצלחה` : `${target}`;
-                    }
-
-                    card.innerHTML = `
-                        <div id="cardMenu-${esc(habit.id)}" class="card-menu-dropdown">
-                            <div class="card-menu-item" onclick="editHabitFromHome('${esc(habit.id)}', event); closeAllCardMenus();">ערוך הרגל</div>
-                            <div class="card-menu-item" onclick="duplicateHabit('${esc(habit.id)}', event); closeAllCardMenus();">שכפל הרגל</div>
-                            <div class="card-menu-item" onclick="toggleHabitArchive('${esc(habit.id)}', event); closeAllCardMenus();">הסר מארכיון</div>
-                            <div class="card-menu-item danger" onclick="deleteHabit('${esc(habit.id)}', event); closeAllCardMenus();">מחק הרגל</div>
-                        </div>
-                        <div class="habit-header">
-                            <div style="display:flex; align-items:center; justify-content:space-between; width:100%;">
-                                <button class="btn-card-menu" onclick="toggleCardMenu('${esc(habit.id)}', event)" style="position:static; margin:0;">⋮</button>
-                                <span class="habit-stats-summary" style="margin:0;">חודשי: <span style="color: ${getScoreColor(mStats.pct, habit, mStats.text)}; padding: 1px 6px; border-radius: 4px; font-weight: 700;">${esc(mStats.text)}</span></span>
-                            </div>
-                            <div style="width:100%; margin-top:4px;">
-                                <span class="habit-title" data-habit-title style="display:block; width:100%;"></span>
-                            </div>
-                        </div>
-                        <div class="controls-row">
-                            <div class="status-buttons-group">
-                                <div class="action-toggle btn-a ${todayStatus === 'N' ? 'active' : ''}" onclick="setStatus('${esc(habit.id)}', 'N', event)">
-                                    <span>אונס</span>
-                                </div>
-                                <div class="action-toggle btn-x ${todayStatus === 'X' ? 'active' : ''}" onclick="setStatus('${esc(habit.id)}', 'X', event)">
-                                    <span>פספוס</span>
-                                </div>
-                                <div class="action-toggle btn-v ${isVActive ? 'active' : ''}" style="${vStyle}" onclick="setStatus('${esc(habit.id)}', 'V', event)">
-                                    <span>${esc(vText)}</span>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="card-notes-container" onclick="event.stopPropagation();">
-                            <textarea id="noteText-${esc(habit.id)}" class="card-notes-textarea" placeholder="רשום הערה ליום זה..."></textarea>
-                            <button class="btn-card-notes-save" onclick="saveCardNote('${esc(habit.id)}', event)">שמור</button>
-                        </div>
-                    `;
-                }
 
                 card.querySelector('[data-habit-title]').textContent = habit.title;
                 card.querySelector(`#noteText-${CSS.escape(habit.id)}`).value = currentDayTextVal;
@@ -472,33 +418,14 @@
         }
 
 
-        function isHabitSignedToday(habit) {
-            // בדוק לפי היום שנבחר בניווט (לא בהכרח היום האמיתי)
-            const comps = getHebrewDateComponents(mainScreenDatePointer);
-            const history = peekMonthHistory(habit, comps.key);
-            const dayIdx = comps.dayIndex !== undefined ? comps.dayIndex : currentHebrewDayIndex;
-            const status = history[dayIdx];
-            if (status === '' || status === undefined || status === null) return false;
-
-            if (habit.type === 'weekly') {
-                return status === 'W' || status === 'N' || status === 'X' || typeof status === 'number';
-            }
-            // יומי
-            return status === 'V' || status === 'X' || status === 'N' || typeof status === 'number';
-        }
-
         // ---- פילטר סימניות + לא סומן ----
-        let activeBookmarkFilter = null; // null = הכל, colorKey = רק סימניה זו
-        let showUnsignedOnly = false;    // true = רק הרגלים שלא סומנו היום
+        let activeBookmarkFilter = null;
+        let showUnsignedOnly = false;
 
-        // בודק אם הרגל מסוים סומן היום (כל סוג)
         function isHabitSignedToday(habit) {
             const currentMonthHistory = peekMonthHistory(habit, actualCurrentMonthKey);
             const todayStatus = currentMonthHistory[currentHebrewDayIndex];
-            if (habit.type === 'weekly') {
-                return todayStatus === 'W' || todayStatus === 'N' || todayStatus === 'X' || typeof todayStatus === 'number';
-            }
-            return todayStatus === 'V' || todayStatus === 'X' || todayStatus === 'N' || typeof todayStatus === 'number';
+            return todayStatus === 'W' || todayStatus === 'V' || todayStatus === 'X' || todayStatus === 'N' || typeof todayStatus === 'number';
         }
 
         let _lastBookmarkBarState = null;

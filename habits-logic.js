@@ -1,7 +1,6 @@
         function getTargetForDay(habit, dayOfWeekIndex) {
-            if (habit.type === 'regular') return 1;
-            if (habit.dayTargets && habit.dayTargets[dayOfWeekIndex] !== undefined) {
-                return habit.dayTargets[dayOfWeekIndex];
+            if (habit.weeklyDayTargets && habit.weeklyDayTargets[dayOfWeekIndex] !== undefined) {
+                return habit.weeklyDayTargets[dayOfWeekIndex];
             }
             return 1;
         }
@@ -117,19 +116,11 @@
             }
 
             if (statusType === 'V') {
-                if (habit.type === 'x_times' || habit.type === 'regular') {
-                    let currentCount = (typeof currentStatus === 'number') ? currentStatus : (currentStatus === 'V' ? target : 0);
-                    if (currentCount >= target) {
-                        monthHistory[currentHebrewDayIndex] = "";
-                    } else {
-                        monthHistory[currentHebrewDayIndex] = currentCount + 1;
-                    }
+                let currentCount = (typeof currentStatus === 'number') ? currentStatus : (currentStatus === 'V' || currentStatus === 'W' ? target : 0);
+                if (currentCount >= target) {
+                    monthHistory[currentHebrewDayIndex] = "";
                 } else {
-                    if (currentStatus === "V") {
-                        monthHistory[currentHebrewDayIndex] = "";
-                    } else {
-                        monthHistory[currentHebrewDayIndex] = "V";
-                    }
+                    monthHistory[currentHebrewDayIndex] = currentCount + 1;
                 }
             } else {
                 if (currentStatus === statusType) {
@@ -479,32 +470,14 @@
             }
 
             let nextStatus = "";
-            if (habit.type === 'x_times' || habit.type === 'regular') {
-                if (currentStatus === "" || currentStatus === undefined) {
-                    nextStatus = "N";
-                } else if (currentStatus === "N") {
-                    nextStatus = "X";
-                } else if (currentStatus === "X") {
-                    nextStatus = target > 1 ? 1 : "V";
-                } else if (typeof currentStatus === 'number') {
-                    if (currentStatus < target) {
-                        nextStatus = currentStatus + 1;
-                    } else {
-                        nextStatus = "";
-                    }
-                } else if (currentStatus === "V") {
-                    nextStatus = "";
-                }
-            } else {
-                if (currentStatus === "" || currentStatus === undefined) {
-                    nextStatus = "N";
-                } else if (currentStatus === "N") {
-                    nextStatus = "X";
-                } else if (currentStatus === "X") {
-                    nextStatus = "V";
-                } else if (currentStatus === "V") {
-                    nextStatus = "";
-                }
+            if (currentStatus === "" || currentStatus === undefined) {
+                nextStatus = "N";
+            } else if (currentStatus === "N") {
+                nextStatus = "X";
+            } else if (currentStatus === "X") {
+                nextStatus = "W";
+            } else if (currentStatus === "V" || currentStatus === "W") {
+                nextStatus = "";
             }
             
             monthHistory[dayIndex] = nextStatus;

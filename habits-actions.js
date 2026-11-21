@@ -1,8 +1,3 @@
-        function setConfigHabitType(type) {
-            configSelectedType = type;
-            updateConfigModalUI();
-        }
-
         function toggleConfigWeekday(dayIndex) {
             configSelectedWeekdays[dayIndex] = !configSelectedWeekdays[dayIndex];
             updateConfigModalUI();
@@ -15,12 +10,8 @@
             const safeToggle = (id, cls, val) => { const el = safeEl(id); if(el) { if(val) { if(!el.classList.contains(cls)) el.classList.add(cls); } else { el.classList.remove(cls); } } };
             const safeDisplay = (id, val) => { const el = safeEl(id); if(el && el.style.display !== val) el.style.display = val; };
                 
-            safeToggle('typeBtnXTimes', 'active', configSelectedType === 'x_times' || configSelectedType === 'regular');
-            safeToggle('typeBtnWeekly', 'active', configSelectedType === 'weekly');
-            safeDisplay('xTimesConfigSection', (configSelectedType === 'x_times' || configSelectedType === 'regular') ? 'block' : 'none');
-            safeDisplay('weeklyConfigSection', configSelectedType === 'weekly' ? 'block' : 'none');
+            safeDisplay('weeklyConfigSection', 'block');
 
-            setXTimesMode(xTimesMode);
             setWeeklyMode(weeklyDayMode);
             
             for (let i = 0; i < 7; i++) {
@@ -50,20 +41,10 @@
                 return;
             }
             
-            let dayTargets = [1, 1, 1, 1, 1, 1, 1];
-            if (configSelectedType === 'x_times' || configSelectedType === 'regular') {
-                dayTargets = readDayTargetsFromUI();
-            }
-
-            // המודל החדש: הקלט מייצג כמה פעמים מותר לדלג (לא לעשות) בתקופה.
-            let weeklyDayTargets = [1, 1, 1, 1, 1, 1, 1];
+            const weeklyDayTargets = readWeeklyDayTargetsFromUI();
             let weeklyAllowedSkips = 0;
-            if (configSelectedType === 'weekly') {
-                weeklyDayTargets = readWeeklyDayTargetsFromUI();
-                weeklyAllowedSkips = 0;
-                if (isNaN(weeklyAllowedSkips) || weeklyAllowedSkips < 0) weeklyAllowedSkips = 0;
-                if (weeklyAllowedSkips > 7) weeklyAllowedSkips = 7;
-            }
+            if (isNaN(weeklyAllowedSkips) || weeklyAllowedSkips < 0) weeklyAllowedSkips = 0;
+            if (weeklyAllowedSkips > 7) weeklyAllowedSkips = 7;
 
 
             
@@ -90,16 +71,14 @@
                 const applyEdit = () => {
                     habit.title = title;
                     habit.description = desc;
-                    habit.type = configSelectedType;
+                    habit.type = 'weekly';
                     habit.workdays = [...configSelectedWeekdays];
-                    habit.dayTargets = dayTargets;
-                    if (configSelectedType === 'weekly') {
-                        habit.weeklyDayTargets = weeklyDayTargets;
-                        habit.weeklyAllowedSkips = weeklyAllowedSkips;
-                        delete habit.weeklyFreq;
-                    }
+                    habit.weeklyDayTargets = weeklyDayTargets;
+                    habit.weeklyAllowedSkips = weeklyAllowedSkips;
+                    delete habit.weeklyFreq;
+                    delete habit.dayTargets;
 
-                    if (habit.type === 'x_times' && habit.history) {
+                    if (habit.history) {
                         for (let monthKey in habit.history) {
                             if (!Array.isArray(habit.history[monthKey])) continue;
                             let startDayOfWeek = 0;
@@ -112,7 +91,7 @@
                             for (let i = 0; i < habit.history[monthKey].length; i++) {
                                 let currentStatus = habit.history[monthKey][i];
                                 let cellDayOfWeek = (startDayOfWeek + i) % 7;
-                                let newTarget = dayTargets[cellDayOfWeek];
+                                let newTarget = weeklyDayTargets[cellDayOfWeek];
                                 if (typeof currentStatus === 'number') {
                                     if (currentStatus >= newTarget) {
                                         habit.history[monthKey][i] = newTarget;
@@ -175,11 +154,10 @@
                     id: Date.now().toString(),
                     title: title,
                     description: desc,
-                    type: configSelectedType,
+                    type: 'weekly',
                     workdays: [...configSelectedWeekdays],
-                    dayTargets: dayTargets,
-                    weeklyDayTargets: configSelectedType === 'weekly' ? weeklyDayTargets : undefined,
-                    weeklyAllowedSkips: configSelectedType === 'weekly' ? weeklyAllowedSkips : undefined,
+                    weeklyDayTargets: weeklyDayTargets,
+                    weeklyAllowedSkips: weeklyAllowedSkips,
                     passingScore: passingScore,
                     minScore: minScore,
                     theme: selectedHabitTheme,

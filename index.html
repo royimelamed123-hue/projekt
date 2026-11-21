@@ -237,14 +237,6 @@
             </div>
 
             <div>
-                <div class="modal-section-title">סוג ההרגל:</div>
-                <div class="type-selector-group">
-                    <div id="typeBtnXTimes" class="type-radio-btn active" onclick="setConfigHabitType('x_times')">יומי</div>
-                    <div id="typeBtnWeekly" class="type-radio-btn" onclick="setConfigHabitType('weekly')">שבועי</div>
-                </div>
-            </div>
-
-            <div>
                 <div class="modal-section-title">בחר ימי עבודה:</div>
                 <div class="weekdays-selection-container">
                     <div id="weekday-0" class="weekday-checkbox-btn active" onclick="toggleConfigWeekday(0)">ראשון</div>
@@ -254,29 +246,6 @@
                     <div id="weekday-4" class="weekday-checkbox-btn active" onclick="toggleConfigWeekday(4)">חמישי</div>
                     <div id="weekday-5" class="weekday-checkbox-btn active" onclick="toggleConfigWeekday(5)">שישי</div>
                     <div id="weekday-6" class="weekday-checkbox-btn active" onclick="toggleConfigWeekday(6)">שבת</div>
-                </div>
-            </div>
-
-            <div id="xTimesConfigSection" class="targets-config-section">
-                <div style="display: flex; gap: 10px; margin-bottom: 10px;">
-                    <div id="xTimesModeUniform" class="type-radio-btn active" onclick="setXTimesMode('uniform')">כל הימים אותה כמות</div>
-                    <div id="xTimesModeCustom" class="type-radio-btn" onclick="setXTimesMode('custom')">שונה מיום ליום</div>
-                </div>
-                <div id="xTimesUniformSection" style="display: flex; align-items: center; gap: 10px; padding: 10px 12px; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px;">
-                    <label style="font-size: 13px; font-weight: 600; color: #475569; white-space: nowrap;">כמות פעמים ביום:</label>
-                    <input type="number" id="uniformTargetInput" min="1" value="1" style="width: 60px; text-align: center; border: 1px solid #cbd5e1; border-radius: 6px; padding: 4px 6px; font-size: 14px; font-weight: 600;">
-                </div>
-                <div id="xTimesCustomSection" style="display: none;">
-                    <div class="modal-section-title" style="margin-bottom: 4px;">כמות פעמים לכל יום:</div>
-                    <div class="days-targets-inputs-grid">
-                        <div class="day-target-box" id="targetBox-0"><span>א'</span><input type="number" id="targetDay-0" min="1" value="1"></div>
-                        <div class="day-target-box" id="targetBox-1"><span>ב'</span><input type="number" id="targetDay-1" min="1" value="1"></div>
-                        <div class="day-target-box" id="targetBox-2"><span>ג'</span><input type="number" id="targetDay-2" min="1" value="1"></div>
-                        <div class="day-target-box" id="targetBox-3"><span>ד'</span><input type="number" id="targetDay-3" min="1" value="1"></div>
-                        <div class="day-target-box" id="targetBox-4"><span>ה'</span><input type="number" id="targetDay-4" min="1" value="1"></div>
-                        <div class="day-target-box" id="targetBox-5"><span>ו'</span><input type="number" id="targetDay-5" min="1" value="1"></div>
-                        <div class="day-target-box" id="targetBox-6"><span>ש'</span><input type="number" id="targetDay-6" min="1" value="1"></div>
-                    </div>
                 </div>
             </div>
 
