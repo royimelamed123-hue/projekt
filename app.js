@@ -158,7 +158,7 @@
         }
 
         function migrateDailyToWeekly(habit) {
-            if (!habit || (habit.type !== 'x_times' && habit.type !== 'regular')) return;
+            if (!habit || habit.type !== 'x_times') return;
             // המר בהיסטוריה: V→W, N→Z (אונס), X→N (פספוס) — סדר קריטי
             if (habit.history) {
                 for (const monthKey in habit.history) {
