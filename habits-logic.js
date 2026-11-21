@@ -105,10 +105,10 @@
                             monthHistory[currentHebrewDayIndex] = 'W';
                         }
                     }
+                } else if (statusType === 'Z') {
+                    monthHistory[currentHebrewDayIndex] = (currentStatus === 'Z') ? "" : 'Z';
                 } else if (statusType === 'N') {
                     monthHistory[currentHebrewDayIndex] = (currentStatus === 'N') ? "" : 'N';
-                } else if (statusType === 'X') {
-                    monthHistory[currentHebrewDayIndex] = (currentStatus === 'X') ? "" : 'X';
                 }
                 invalidateStatsCache(habitId);
                 saveToStorageForHabit(habitId);
@@ -445,17 +445,17 @@
                 if (!isActiveDow) {
                     // יום לא פעיל: אונס ↔ הצלחה
                     if (currentStatus === 'W') {
-                        nextStatus = 'N';
+                        nextStatus = 'Z';
                     } else {
                         nextStatus = 'W';
                     }
                 } else {
-                    // יום פעיל: ריק → N (אונס) → X (פספוס) → W (הצלחה) → ריק
+                    // יום פעיל: ריק → Z (אונס) → N (פספוס) → W (הצלחה) → ריק
                     if (currentStatus === "" || currentStatus === undefined) {
+                        nextStatus = "Z";
+                    } else if (currentStatus === "Z") {
                         nextStatus = "N";
                     } else if (currentStatus === "N") {
-                        nextStatus = "X";
-                    } else if (currentStatus === "X") {
                         nextStatus = wTarget > 1 ? 1 : "W";
                     } else if (typeof currentStatus === 'number') {
                         nextStatus = (currentStatus + 1 < wTarget) ? currentStatus + 1 : "W";
@@ -471,10 +471,10 @@
 
             let nextStatus = "";
             if (currentStatus === "" || currentStatus === undefined) {
+                nextStatus = "Z";
+            } else if (currentStatus === "Z") {
                 nextStatus = "N";
             } else if (currentStatus === "N") {
-                nextStatus = "X";
-            } else if (currentStatus === "X") {
                 nextStatus = "W";
             } else if (currentStatus === "V" || currentStatus === "W") {
                 nextStatus = "";
@@ -565,7 +565,10 @@
                     } else if (status === 'W') {
                         doneScore += 1;
                         anyActionTaken = true;
+                    } else if (status === 'Z') {
+                        anyActionTaken = true;
                     } else if (status === 'N') {
+                        // פספוס
                         anyActionTaken = true;
                     }
                 } else {
@@ -654,7 +657,7 @@
 
             let totalDone = 0;   // סכום הצלחה (כולל חלקי)
             let totalMiss = 0;   // סכום פספוס (כולל חלקי)
-            let totalForce = 0;  // ימי אונס (N)
+            let totalForce = 0;  // ימי אונס (Z)
             let hasUserAction = false;
 
             for (const day of days) {
@@ -682,7 +685,7 @@
                     continue;
                 }
 
-                if (status === 'N') {
+                if (status === 'Z') {
                     // אונס
                     totalForce += 1;
                     hasUserAction = true;
@@ -693,7 +696,8 @@
                     totalDone += status / target;
                     totalMiss += (target - status) / target;
                     hasUserAction = true;
-                } else if (status === 'X') {
+                } else if (status === 'N') {
+                    // פספוס
                     totalMiss += 1;
                     hasUserAction = true;
                 }
@@ -701,7 +705,7 @@
 
             if (!hasUserAction) return { pct: null, text: "-", isEmpty: true };
 
-            // אם אין הצלחות ופספוסים (רק אונס) — כולו N
+            // אם אין הצלחות ופספוסים (רק אונס) — כולו Z
             if (totalDone === 0 && totalMiss === 0) return { pct: null, text: "-", isAllForce: true };
 
             const activeDays = 7 - totalForce;

@@ -25,8 +25,8 @@
                 let scoreLabel = '';
 
                 if (status === 'W' || status === 'V') { statusLabel = 'בוצע'; scoreLabel = '100%'; }
-                else if (status === 'X') { statusLabel = 'פספוס'; scoreLabel = '0%'; }
-                else if (status === 'N') { statusLabel = 'אונס'; scoreLabel = '-'; }
+                else if (status === 'N') { statusLabel = 'פספוס'; scoreLabel = '0%'; }
+                else if (status === 'Z') { statusLabel = 'אונס'; scoreLabel = '-'; }
                 else if (typeof status === 'number') {
                     const t = habit.weeklyDayTargets?.[cellDayOfWeek] || 1;
                     statusLabel = status >= t ? 'בוצע' : `${status}/${t}`;
@@ -143,22 +143,23 @@
                 isWActive = (todayStatus === 'W');
             }
 
+            const isZActive = (todayStatus === 'Z');
             const isNActive = (todayStatus === 'N');
             const isNAuto = (todayStatus === 'N_auto');
             const isNHarmful = isWeeklyNHarmful(habit, actualCurrentMonthKey, currentHebrewDayIndex, firstDayDate.getDay(), firstDayGregorian, totalDaysInMonth);
             const isTodayActive = habit.workdays && habit.workdays[currentDayOfWeek];
 
             const buttonsHTML = isTodayActive
-                ? `<div class="action-toggle btn-a ${isNActive ? 'active' : ''}" onclick="setStatus('${esc(habit.id)}', 'N', event)">
+                ? `<div class="action-toggle btn-a ${isZActive ? 'active' : ''}" onclick="setStatus('${esc(habit.id)}', 'Z', event)">
                         <span>אונס</span>
                     </div>
-                    <div class="action-toggle btn-w-skip ${todayStatus === 'X' ? 'active' : ''} ${isNHarmful ? 'harmful' : ''}" onclick="setStatus('${esc(habit.id)}', 'X', event)">
+                    <div class="action-toggle btn-w-skip ${isNActive ? 'active' : ''} ${isNHarmful ? 'harmful' : ''}" onclick="setStatus('${esc(habit.id)}', 'N', event)">
                         <span>פספוס</span>
                     </div>
                     <div class="action-toggle btn-w-done ${isWActive ? 'active' : ''}" style="${wStyle}" onclick="setStatus('${esc(habit.id)}', 'W', event)">
                         <span>${esc(wText)}</span>
                     </div>`
-                : `<div class="action-toggle btn-a ${todayStatus !== 'W' ? 'active' : ''}" onclick="setStatus('${esc(habit.id)}', 'N', event)">
+                : `<div class="action-toggle btn-a ${isZActive ? 'active' : ''}" onclick="setStatus('${esc(habit.id)}', 'Z', event)">
                         <span>אונס</span>
                     </div>
                     <div class="action-toggle btn-w-done ${isWActive ? 'active' : ''}" style="${wStyle}" onclick="setStatus('${esc(habit.id)}', 'W', event)">
@@ -223,6 +224,7 @@
                 const wTarget = (habit.weeklyDayTargets && habit.weeklyDayTargets[currentDayOfWeek]) || 1;
                 const firstDayDate = getFirstHebrewDayDate(mainScreenDatePointer);
                 const isNHarmful = isWeeklyNHarmful(habit, actualCurrentMonthKey, currentHebrewDayIndex, firstDayDate.getDay(), firstDayDate, calculateDaysInBrowsingMonth(mainScreenDatePointer));
+                const isZActive2 = (todayStatus === 'Z');
                 const isNActive = (todayStatus === 'N');
                 const isNAuto = (todayStatus === 'N_auto');
                 let wText = wTarget === 1 ? 'בוצע' : `${wTarget}`;
@@ -236,9 +238,11 @@
                         wStyle = getStatusProgressStyle(Math.round((todayStatus / wTarget) * 100));
                     }
                 } else { isWActive = (todayStatus === 'W'); }
-                const btnSkip = card.querySelector('.btn-w-skip');
+                const btnSkipZ = card.querySelector('.btn-a');
+                const btnSkipN = card.querySelector('.btn-w-skip');
                 const btnDone = card.querySelector('.btn-w-done');
-                if (btnSkip) { btnSkip.classList.toggle('active', isNActive); btnSkip.classList.toggle('harmful', isNHarmful); btnSkip.classList.toggle('n-auto', isNAuto); }
+                if (btnSkipZ) { btnSkipZ.classList.toggle('active', isZActive2); }
+                if (btnSkipN) { btnSkipN.classList.toggle('active', isNActive); btnSkipN.classList.toggle('harmful', isNHarmful); btnSkipN.classList.toggle('n-auto', isNAuto); }
                 if (btnDone) { btnDone.classList.toggle('active', isWActive); btnDone.style.cssText = wStyle; btnDone.querySelector('span').textContent = wText; }
 
             } else {
@@ -287,7 +291,7 @@
                 const isNHarmful2 = isWeeklyNHarmful(habit, actualCurrentMonthKey, currentHebrewDayIndex, firstDayDate2.getDay(), firstDayDate2, calculateDaysInBrowsingMonth(mainScreenDatePointer));
                 if (typeof todayStatus === 'number') { todayV += todayStatus / wTarget; todayActive += 1; }
                 else if (todayStatus === 'W') { todayV += 1; todayActive += 1; }
-                else if (todayStatus === 'N' && isNHarmful2) { todayActive += 1; }
+                else if (todayStatus === 'Z' && isNHarmful2) { todayActive += 1; }
             });
 
             document.getElementById('statTotalHabits').innerText = activeHabitsList.length;
@@ -382,7 +386,7 @@
                 card = wCard;
                 if (typeof todayStatus === 'number') { todayV += todayStatus / wTarget; todayActive += 1; }
                 else if (todayStatus === 'W') { todayV += 1; todayActive += 1; }
-                else if (todayStatus === 'N' && isNHarmful) { todayActive += 1; }
+                else if (todayStatus === 'Z' && isNHarmful) { todayActive += 1; }
 
                 if (isVisibleInSearch) { grid.appendChild(card); attachDragHandle(card, habit.id); }
             });
@@ -509,10 +513,10 @@
                 } else if (status === 'W' || status === 'V') {
                     cell.classList.add('m-status-V');
                     statusLabel = "הצלחה";
-                } else if (status === 'X') {
+                } else if (status === 'N') {
                     cell.classList.add('m-status-X');
                     statusLabel = "פספוס";
-                } else if (status === 'N') {
+                } else if (status === 'Z') {
                     cell.classList.add('m-status-א');
                     statusLabel = "אונס";
                 }

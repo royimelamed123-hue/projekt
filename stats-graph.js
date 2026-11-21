@@ -36,8 +36,8 @@
 
                 const isDone = status === 'V' || status === 'W' || (typeof status === 'number' && status >= target);
                 const isPartial = typeof status === 'number' && status > 0 && status < target;
-                const isMiss = status === 'X';
-                const isSkip = status === 'N';
+                const isMiss = status === 'N';
+                const isSkip = status === 'Z';
 
                 if (!isActive || isSkip || status === "" || status === undefined) {
                     points.push({ day: i + 1, level, type: 'unchanged' });
@@ -214,7 +214,7 @@
                 anyActionTaken = true;
                 if (typeof status === 'number') { totalV += status; totalActive += target; }
                 else if (status === 'V') { totalV += target; totalActive += target; }
-                else if (status === 'X') { totalActive += target; }
+                else if (status === 'N') { totalActive += target; }
             }
             if (!anyActionTaken || totalActive === 0) return null;
             return { pct: Math.round((totalV / totalActive) * 100), activeDays: totalActive, anyActionTaken };

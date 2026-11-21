@@ -59,7 +59,7 @@
                     const cellDayOfWeek = (startDayOfWeek + i) % 7;
                     const target = getTargetForDay(habit, cellDayOfWeek);
 
-                    if (status === 'N') {
+                    if (status === 'Z') {
                         totalForce += 1;
                         hasUserAction = true;
                     } else if (status === 'N_auto') {
@@ -71,7 +71,7 @@
                         totalDone += status / target;
                         totalMiss += (target - status) / target;
                         hasUserAction = true;
-                    } else if (status === 'X') {
+                    } else if (status === 'N') {
                         totalMiss += 1;
                         hasUserAction = true;
                     }
@@ -116,24 +116,22 @@
                 const isActiveDay = habit.workdays ? habit.workdays[cellDayOfWeek] : true;
                 const target = getTargetForDay(habit, cellDayOfWeek);
 
-                if (status === 'N') {
-                    // אונס — מוריד מימי החודש
+                if (status === 'Z') {
+                    // אונס
                     totalForce += 1;
                     hasUserAction = true;
                 } else if (status === 'N_auto') {
-                    // יום לא פעיל אוטומטי — נספר כאונס (ימי שבת/מנוחה שהוגדרו)
                     totalForce += 1;
-                } else if (status === 'V') {
-                    // הצלחה מלאה
+                } else if (status === 'W' || status === 'V') {
+                    // הצלחה
                     totalDone += 1;
                     hasUserAction = true;
                 } else if (typeof status === 'number') {
-                    // הצלחה/פספוס חלקי
                     totalDone += status / target;
                     totalMiss += (target - status) / target;
                     hasUserAction = true;
-                } else if (status === 'X') {
-                    // פספוס מלא
+                } else if (status === 'N') {
+                    // פספוס
                     totalMiss += 1;
                     hasUserAction = true;
                 }
@@ -374,6 +372,7 @@
                         isWActive = (todayStatus === 'W');
                     }
 
+                    const isZActive = (todayStatus === 'Z');
                     isNActive = (todayStatus === 'N');
                     const firstDayDate = getFirstHebrewDayDate(mainScreenDatePointer);
                     isNHarmful = isWeeklyNHarmful(habit, actualCurrentMonthKey, currentHebrewDayIndex, firstDayDate.getDay(), firstDayDate, calculateDaysInBrowsingMonth(mainScreenDatePointer));
@@ -396,7 +395,10 @@
                         </div>
                         <div class="controls-row">
                             <div class="status-buttons-group">
-                                <div class="action-toggle btn-w-skip ${isNActive ? 'active' : ''} ${isNHarmful ? 'harmful' : ''}" onclick="setStatus('${esc(habit.id)}', 'N', event)">
+                                <div class="action-toggle btn-w-skip ${isZActive ? 'active' : ''} ${isNHarmful ? 'harmful' : ''}" onclick="setStatus('${esc(habit.id)}', 'Z', event)">
+                                    <span>אונס</span>
+                                </div>
+                                <div class="action-toggle btn-w-skip ${isNActive ? 'active' : ''}" onclick="setStatus('${esc(habit.id)}', 'N', event)">
                                     <span>פספוס</span>
                                 </div>
                                 <div class="action-toggle btn-w-done ${isWActive ? 'active' : ''}" style="${wStyle}" onclick="setStatus('${esc(habit.id)}', 'W', event)">
@@ -425,7 +427,7 @@
         function isHabitSignedToday(habit) {
             const currentMonthHistory = peekMonthHistory(habit, actualCurrentMonthKey);
             const todayStatus = currentMonthHistory[currentHebrewDayIndex];
-            return todayStatus === 'W' || todayStatus === 'V' || todayStatus === 'X' || todayStatus === 'N' || typeof todayStatus === 'number';
+            return todayStatus === 'W' || todayStatus === 'V' || todayStatus === 'N' || todayStatus === 'Z' || typeof todayStatus === 'number';
         }
 
         let _lastBookmarkBarState = null;

@@ -191,6 +191,23 @@
             if (!habit.scoreMethod) habit.scoreMethod = 'static';
         }
 
+        function migrateNtoZ(habit) {
+            // שלב 1: N → Z (אונס נשמר)
+            // שלב 2: X → N (פספוס הופך לN)
+            // הסדר קריטי — לא להפוך
+            if (!habit || !habit.history) return;
+            for (const monthKey in habit.history) {
+                const arr = habit.history[monthKey];
+                if (!Array.isArray(arr)) continue;
+                for (let i = 0; i < arr.length; i++) {
+                    if (arr[i] === 'N') arr[i] = 'Z';
+                }
+                for (let i = 0; i < arr.length; i++) {
+                    if (arr[i] === 'X') arr[i] = 'N';
+                }
+            }
+        }
+
         function migrateAllHabits(list) {
             if (!Array.isArray(list)) return;
             list.forEach(migrateHabitToAllowedSkips);
@@ -198,6 +215,7 @@
             list.forEach(migrateAlefToN);
             list.forEach(migrateMonthlyToWeekly);
             list.forEach(migrateDailyToWeekly);
+            list.forEach(migrateNtoZ);
         }
         // ---- סיום מיגרציה ----
 
