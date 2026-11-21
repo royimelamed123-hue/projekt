@@ -138,16 +138,6 @@
 
         function migrateMonthlyToWeekly(habit) {
             if (!habit || habit.type !== 'monthly') return;
-            // המר N → X בהיסטוריה לפני שינוי הטייפ (N בחודשי = פספוס, לא אונס)
-            if (habit.history) {
-                for (const monthKey in habit.history) {
-                    const arr = habit.history[monthKey];
-                    if (!Array.isArray(arr)) continue;
-                    for (let i = 0; i < arr.length; i++) {
-                        if (arr[i] === 'N') arr[i] = 'X';
-                    }
-                }
-            }
             habit.type = 'weekly';
             // monthlyDayTargets → weeklyDayTargets
             if (habit.monthlyDayTargets) {
@@ -169,13 +159,19 @@
 
         function migrateDailyToWeekly(habit) {
             if (!habit || (habit.type !== 'x_times' && habit.type !== 'regular')) return;
-            // המר V → W בהיסטוריה לפני שינוי הטייפ
+            // המר בהיסטוריה: V→W, N→Z (אונס), X→N (פספוס) — סדר קריטי
             if (habit.history) {
                 for (const monthKey in habit.history) {
                     const arr = habit.history[monthKey];
                     if (!Array.isArray(arr)) continue;
                     for (let i = 0; i < arr.length; i++) {
                         if (arr[i] === 'V') arr[i] = 'W';
+                    }
+                    for (let i = 0; i < arr.length; i++) {
+                        if (arr[i] === 'N') arr[i] = 'Z';
+                    }
+                    for (let i = 0; i < arr.length; i++) {
+                        if (arr[i] === 'X') arr[i] = 'N';
                     }
                 }
             }
@@ -191,23 +187,6 @@
             if (!habit.scoreMethod) habit.scoreMethod = 'static';
         }
 
-        function migrateNtoZ(habit) {
-            // שלב 1: N → Z (אונס נשמר)
-            // שלב 2: X → N (פספוס הופך לN)
-            // הסדר קריטי — לא להפוך
-            if (!habit || !habit.history) return;
-            for (const monthKey in habit.history) {
-                const arr = habit.history[monthKey];
-                if (!Array.isArray(arr)) continue;
-                for (let i = 0; i < arr.length; i++) {
-                    if (arr[i] === 'N') arr[i] = 'Z';
-                }
-                for (let i = 0; i < arr.length; i++) {
-                    if (arr[i] === 'X') arr[i] = 'N';
-                }
-            }
-        }
-
         function migrateAllHabits(list) {
             if (!Array.isArray(list)) return;
             list.forEach(migrateHabitToAllowedSkips);
@@ -215,7 +194,6 @@
             list.forEach(migrateAlefToN);
             list.forEach(migrateMonthlyToWeekly);
             list.forEach(migrateDailyToWeekly);
-            list.forEach(migrateNtoZ);
         }
         // ---- סיום מיגרציה ----
 
