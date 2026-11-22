@@ -478,6 +478,7 @@
                     btn.appendChild(dot);
                     btn.appendChild(document.createTextNode(label));
                     btn.onclick = () => { activeBookmarkFilter = isActive ? null : colorKey; renderHabits(); };
+                    btn.oncontextmenu = (e) => { e.preventDefault(); renameBookmark(colorKey, e); renderHabits(); };
                     bookmarkRow.appendChild(btn);
                 });
 
