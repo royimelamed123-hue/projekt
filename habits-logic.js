@@ -252,6 +252,15 @@
             const grid = document.getElementById('modalDaysGrid');
             grid.innerHTML = "";
 
+            // כותרות ימי שבוע
+            const dowLabels = ['א', 'ב', 'ג', 'ד', 'ה', 'ו', 'ש'];
+            dowLabels.forEach(label => {
+                const hdr = document.createElement('div');
+                hdr.style.cssText = 'text-align:center; font-size:11px; font-weight:700; color:#64748b; padding-bottom:2px;';
+                hdr.textContent = label;
+                grid.appendChild(hdr);
+            });
+
             // תאים ריקים לפני א' החודש לפי יום בשבוע
             for (let i = 0; i < startDayOfWeek; i++) {
                 const empty = document.createElement('div');
@@ -273,8 +282,12 @@
                 if (typeof status === 'number') {
                     const pct = Math.round((status / target) * 100);
                     dayBtn.style.cssText = `${dayBtn.style.cssText}; ${getStatusProgressStyle(pct)}`;
-                } else if(status) {
-                    dayBtn.classList.add(`m-status-${status}`);
+                } else if (status === 'W' || status === 'V') {
+                    dayBtn.style.background = '#bbf7d0'; dayBtn.style.color = '#166534';
+                } else if (status === 'N') {
+                    dayBtn.style.background = '#fecaca'; dayBtn.style.color = '#991b1b';
+                } else if (status === 'Z') {
+                    dayBtn.style.background = '#e2e8f0'; dayBtn.style.color = '#475569';
                 }
 
                 if (targetMonthComps.key === actualCurrentMonthKey && i === currentHebrewDayIndex) {
