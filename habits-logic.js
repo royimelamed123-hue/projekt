@@ -252,6 +252,15 @@
             const grid = document.getElementById('modalDaysGrid');
             grid.innerHTML = "";
 
+            // תאים ריקים לפני א' החודש לפי יום בשבוע
+            for (let i = 0; i < startDayOfWeek; i++) {
+                const empty = document.createElement('div');
+                empty.className = 'modal-day-btn';
+                empty.style.visibility = 'hidden';
+                empty.style.pointerEvents = 'none';
+                grid.appendChild(empty);
+            }
+
             for (let i = 0; i < totalDaysInMonth; i++) {
                 const dayBtn = document.createElement('button');
                 dayBtn.className = 'modal-day-btn';
