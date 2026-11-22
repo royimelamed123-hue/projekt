@@ -411,7 +411,7 @@
                             <button class="btn-card-notes-save" onclick="saveCardNote('${esc(habit.id)}', event)">שמור</button>
                         </div>
                     `;
-
+                }
 
                 card.querySelector('[data-habit-title]').textContent = habit.title;
                 card.querySelector(`#noteText-${CSS.escape(habit.id)}`).value = currentDayTextVal;
