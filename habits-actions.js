@@ -98,7 +98,15 @@
                                     }
                                 } else if (currentStatus === 'V' || currentStatus === 'W') {
                                     if (newTarget > 1) {
-                                        habit.history[monthKey][i] = 1;
+                                        // שחזר כמות מהtarget הישן
+                                        const oldTarget = (habitSnapshot.weeklyDayTargets && habitSnapshot.weeklyDayTargets[cellDayOfWeek]) || 1;
+                                        if (oldTarget >= newTarget) {
+                                            // הכמות הישנה >= target חדש → הצלחה
+                                            habit.history[monthKey][i] = 'W';
+                                        } else {
+                                            // הכמות הישנה < target חדש → הצג כמה חסר
+                                            habit.history[monthKey][i] = oldTarget;
+                                        }
                                     }
                                 }
                             }
