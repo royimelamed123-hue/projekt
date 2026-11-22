@@ -96,7 +96,7 @@
                                     if (currentStatus >= newTarget) {
                                         habit.history[monthKey][i] = newTarget;
                                     }
-                                } else if (currentStatus === 'V') {
+                                } else if (currentStatus === 'V' || currentStatus === 'W') {
                                     if (newTarget > 1) {
                                         habit.history[monthKey][i] = 1;
                                     }
