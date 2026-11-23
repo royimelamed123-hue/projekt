@@ -24,8 +24,7 @@
                 let statusLabel = '-';
                 let scoreLabel = '';
 
-                if (status === 'W' || status === 'V') { statusLabel = 'בוצע'; scoreLabel = '100%'; }
-                else if (status === 'N') { statusLabel = 'פספוס'; scoreLabel = '0%'; }
+                if (status === 'N') { statusLabel = 'פספוס'; scoreLabel = '0%'; }
                 else if (status === 'Z') { statusLabel = 'אונס'; scoreLabel = '-'; }
                 else if (typeof status === 'number') {
                     const t = habit.weeklyDayTargets?.[cellDayOfWeek] || 1;
@@ -127,20 +126,18 @@
             const totalDaysInMonth = calculateDaysInBrowsingMonth(mainScreenDatePointer);
             const wTarget = (habit.weeklyDayTargets && habit.weeklyDayTargets[currentDayOfWeek]) || 1;
 
-            let wText = wTarget === 1 ? "הצלחה" : `${wTarget}`;
-            let wStyle = "";
-            let isWActive = false;
-
-            if (wTarget > 1) {
-                if (todayStatus === 'W') {
-                    wText = "הצלחה"; wStyle = getStatusProgressStyle(100); isWActive = true;
-                } else if (typeof todayStatus === 'number') {
-                    const rem = wTarget - todayStatus;
-                    wText = rem > 0 ? `${rem}` : `הצלחה`;
-                    wStyle = getStatusProgressStyle(Math.round((todayStatus / wTarget) * 100));
-                }
+            const doneSoFar = typeof todayStatus === 'number' ? todayStatus : 0;
+            const isWActive = doneSoFar >= wTarget;
+            let wText, wStyle;
+            if (isWActive) {
+                wText = "הצלחה";
+                wStyle = getStatusProgressStyle(100);
+            } else if (doneSoFar > 0) {
+                wText = `${wTarget - doneSoFar}`;
+                wStyle = getStatusProgressStyle(Math.round((doneSoFar / wTarget) * 100));
             } else {
-                isWActive = (todayStatus === 'W');
+                wText = wTarget === 1 ? "הצלחה" : `${wTarget}`;
+                wStyle = "";
             }
 
             const isZActive = (todayStatus === 'Z');
@@ -227,17 +224,16 @@
                 const isZActive2 = (todayStatus === 'Z');
                 const isNActive = (todayStatus === 'N');
                 const isNAuto = (todayStatus === 'N_auto');
-                let wText = wTarget === 1 ? 'בוצע' : `${wTarget}`;
-                let wStyle = '';
-                let isWActive = false;
-                if (wTarget > 1) {
-                    if (todayStatus === 'W') { wText = 'בוצע'; wStyle = getStatusProgressStyle(100); isWActive = true; }
-                    else if (typeof todayStatus === 'number') {
-                        const rem = wTarget - todayStatus;
-                        wText = rem > 0 ? `${rem}` : 'בוצע';
-                        wStyle = getStatusProgressStyle(Math.round((todayStatus / wTarget) * 100));
-                    }
-                } else { isWActive = (todayStatus === 'W'); }
+                const doneSoFar2 = typeof todayStatus === 'number' ? todayStatus : 0;
+                const isWActive = doneSoFar2 >= wTarget;
+                let wText, wStyle;
+                if (isWActive) {
+                    wText = 'בוצע'; wStyle = getStatusProgressStyle(100);
+                } else if (doneSoFar2 > 0) {
+                    wText = `${wTarget - doneSoFar2}`; wStyle = getStatusProgressStyle(Math.round((doneSoFar2 / wTarget) * 100));
+                } else {
+                    wText = wTarget === 1 ? 'בוצע' : `${wTarget}`; wStyle = '';
+                }
                 const btnSkipZ = card.querySelector('.btn-a');
                 const btnSkipN = card.querySelector('.btn-w-skip');
                 const btnDone = card.querySelector('.btn-w-done');
@@ -290,7 +286,6 @@
                 const firstDayDate2 = getFirstHebrewDayDate(mainScreenDatePointer);
                 const isNHarmful2 = isWeeklyNHarmful(habit, actualCurrentMonthKey, currentHebrewDayIndex, firstDayDate2.getDay(), firstDayDate2, calculateDaysInBrowsingMonth(mainScreenDatePointer));
                 if (typeof todayStatus === 'number') { todayV += todayStatus / wTarget; todayActive += 1; }
-                else if (todayStatus === 'W') { todayV += 1; todayActive += 1; }
                 else if (todayStatus === 'Z' && isNHarmful2) { todayActive += 1; }
             });
 
@@ -385,7 +380,6 @@
                 const { card: wCard, wTarget, isNHarmful } = createWeeklyHabitCard(habit, todayStatus, mStats, currentDayTextVal);
                 card = wCard;
                 if (typeof todayStatus === 'number') { todayV += todayStatus / wTarget; todayActive += 1; }
-                else if (todayStatus === 'W') { todayV += 1; todayActive += 1; }
                 else if (todayStatus === 'Z' && isNHarmful) { todayActive += 1; }
 
                 if (isVisibleInSearch) { grid.appendChild(card); attachDragHandle(card, habit.id); }
@@ -507,12 +501,14 @@
 
                 const wTarget = (habit.weeklyDayTargets && habit.weeklyDayTargets[cellDayOfWeek]) || 1;
                 if (typeof status === 'number') {
-                    const pct = Math.round((status / wTarget) * 100);
-                    cellStyle = getStatusProgressStyle(pct);
-                    statusLabel = status >= wTarget ? "הצלחה" : `${status}/${wTarget}`;
-                } else if (status === 'W' || status === 'V') {
-                    cell.classList.add('m-status-V');
-                    statusLabel = "הצלחה";
+                    if (status >= wTarget) {
+                        cell.classList.add('m-status-V');
+                        statusLabel = "הצלחה";
+                    } else {
+                        const pct = Math.round((status / wTarget) * 100);
+                        cellStyle = getStatusProgressStyle(pct);
+                        statusLabel = `${status}/${wTarget}`;
+                    }
                 } else if (status === 'N') {
                     cell.classList.add('m-status-X');
                     statusLabel = "פספוס";

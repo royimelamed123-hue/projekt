@@ -165,9 +165,6 @@
                     const arr = habit.history[monthKey];
                     if (!Array.isArray(arr)) continue;
                     for (let i = 0; i < arr.length; i++) {
-                        if (arr[i] === 'V') arr[i] = 'W';
-                    }
-                    for (let i = 0; i < arr.length; i++) {
                         if (arr[i] === 'N') arr[i] = 'Z';
                     }
                     for (let i = 0; i < arr.length; i++) {
@@ -187,6 +184,29 @@
             if (!habit.scoreMethod) habit.scoreMethod = 'static';
         }
 
+        function migrateWToNumber(habit) {
+            // W ו-V → target של אותו יום (מספר)
+            // רץ אחרון — אחרי כל המיגרציות
+            if (!habit || !habit.history || !habit.weeklyDayTargets) return;
+            const firstDayOfMonthCache = {};
+            for (const monthKey in habit.history) {
+                const arr = habit.history[monthKey];
+                if (!Array.isArray(arr)) continue;
+                if (!firstDayOfMonthCache[monthKey]) {
+                    firstDayOfMonthCache[monthKey] = getGregorianStartForMonthKey(monthKey);
+                }
+                const firstDay = firstDayOfMonthCache[monthKey];
+                const startDayOfWeek = firstDay ? firstDay.getDay() : 0;
+                for (let i = 0; i < arr.length; i++) {
+                    if (arr[i] === 'W' || arr[i] === 'V') {
+                        const cellDayOfWeek = (startDayOfWeek + i) % 7;
+                        const target = (habit.weeklyDayTargets && habit.weeklyDayTargets[cellDayOfWeek]) || 1;
+                        arr[i] = target;
+                    }
+                }
+            }
+        }
+
         function migrateAllHabits(list) {
             if (!Array.isArray(list)) return;
             list.forEach(migrateHabitToAllowedSkips);
@@ -194,6 +214,7 @@
             list.forEach(migrateAlefToN);
             list.forEach(migrateMonthlyToWeekly);
             list.forEach(migrateDailyToWeekly);
+            list.forEach(migrateWToNumber);
         }
         // ---- סיום מיגרציה ----
 

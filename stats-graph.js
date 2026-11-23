@@ -34,7 +34,7 @@
                 const target = getTargetForDay(habit, dow);
                 const isActive = habit.workdays && habit.workdays[dow];
 
-                const isDone = status === 'V' || status === 'W' || (typeof status === 'number' && status >= target);
+                const isDone = typeof status === 'number' && status >= target;
                 const isPartial = typeof status === 'number' && status > 0 && status < target;
                 const isMiss = status === 'N';
                 const isSkip = status === 'Z';
@@ -213,7 +213,6 @@
                 if (status === '' || status === undefined) continue;
                 anyActionTaken = true;
                 if (typeof status === 'number') { totalV += status; totalActive += target; }
-                else if (status === 'V') { totalV += target; totalActive += target; }
                 else if (status === 'N') { totalActive += target; }
             }
             if (!anyActionTaken || totalActive === 0) return null;

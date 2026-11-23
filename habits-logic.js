@@ -93,17 +93,14 @@
 
             if (habit.type === 'weekly') {
                 if (statusType === 'W') {
-                    if (currentStatus === 'W') {
+                    const wTarget = (habit.weeklyDayTargets && habit.weeklyDayTargets[currentDayOfWeek]) || 1;
+                    const cur = (typeof currentStatus === 'number') ? currentStatus : 0;
+                    if (cur >= wTarget) {
+                        // כבר הצלחה — לחיצה נוספת מאפסת
                         monthHistory[currentHebrewDayIndex] = "";
                     } else {
-                        const wTarget = (habit.weeklyDayTargets && habit.weeklyDayTargets[currentDayOfWeek]) || 1;
-                        if (wTarget > 1) {
-                            const cur = (typeof currentStatus === 'number') ? currentStatus : 0;
-                            const next = cur + 1;
-                            monthHistory[currentHebrewDayIndex] = next >= wTarget ? 'W' : next;
-                        } else {
-                            monthHistory[currentHebrewDayIndex] = 'W';
-                        }
+                        // מוסיף 1, שומר תמיד מספר
+                        monthHistory[currentHebrewDayIndex] = cur + 1;
                     }
                 } else if (statusType === 'Z') {
                     monthHistory[currentHebrewDayIndex] = (currentStatus === 'Z') ? "" : 'Z';
@@ -464,25 +461,24 @@
                 const isActiveDow = habit.workdays && habit.workdays[cellDayOfWeek];
                 let nextStatus = "";
 
+                const curNum = typeof currentStatus === 'number' ? currentStatus : 0;
                 if (!isActiveDow) {
-                    // יום לא פעיל: אונס ↔ הצלחה
-                    if (currentStatus === 'W') {
+                    // יום לא פעיל: אונס ↔ הצלחה (target)
+                    if (curNum >= wTarget) {
                         nextStatus = 'Z';
                     } else {
-                        nextStatus = 'W';
+                        nextStatus = wTarget;
                     }
                 } else {
-                    // יום פעיל: ריק → Z (אונס) → N (פספוס) → W (הצלחה) → ריק
+                    // יום פעיל: ריק → Z → N → 1 → 2 → ... → target → ריק
                     if (currentStatus === "" || currentStatus === undefined) {
                         nextStatus = "Z";
                     } else if (currentStatus === "Z") {
                         nextStatus = "N";
                     } else if (currentStatus === "N") {
-                        nextStatus = wTarget > 1 ? 1 : "W";
+                        nextStatus = 1;
                     } else if (typeof currentStatus === 'number') {
-                        nextStatus = (currentStatus + 1 < wTarget) ? currentStatus + 1 : "W";
-                    } else if (currentStatus === "W") {
-                        nextStatus = "";
+                        nextStatus = currentStatus + 1 <= wTarget ? currentStatus + 1 : "";
                     }
                 }
                 monthHistory[dayIndex] = nextStatus;
@@ -583,14 +579,8 @@
                     activeDays++;
                     if (typeof status === 'number') {
                         doneScore += Math.min(status / target, 1);
-                        if (status > 0) anyActionTaken = true;
-                    } else if (status === 'W') {
-                        doneScore += 1;
                         anyActionTaken = true;
-                    } else if (status === 'Z') {
-                        anyActionTaken = true;
-                    } else if (status === 'N') {
-                        // פספוס
+                    } else if (status === 'Z' || status === 'N') {
                         anyActionTaken = true;
                     }
                 } else {
@@ -619,7 +609,6 @@
 
                 if (!isEmpty) {
                     if (typeof status === 'number') doneScore += Math.min(status / target, 1);
-                    else if (status === 'W') doneScore += 1;
                 } else {
                     openPotential++;
                 }
@@ -708,18 +697,13 @@
                 }
 
                 if (status === 'Z') {
-                    // אונס
                     totalForce += 1;
                     hasUserAction = true;
-                } else if (status === 'W') {
-                    totalDone += 1;
-                    hasUserAction = true;
                 } else if (typeof status === 'number') {
-                    totalDone += status / target;
-                    totalMiss += (target - status) / target;
+                    totalDone += Math.min(status / target, 1);
+                    if (status < target) totalMiss += (target - status) / target;
                     hasUserAction = true;
                 } else if (status === 'N') {
-                    // פספוס
                     totalMiss += 1;
                     hasUserAction = true;
                 }

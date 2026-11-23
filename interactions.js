@@ -64,12 +64,9 @@
                         hasUserAction = true;
                     } else if (status === 'N_auto') {
                         totalForce += 1;
-                    } else if (status === 'W') {
-                        totalDone += 1;
-                        hasUserAction = true;
                     } else if (typeof status === 'number') {
-                        totalDone += status / target;
-                        totalMiss += (target - status) / target;
+                        totalDone += Math.min(status / target, 1);
+                        if (status < target) totalMiss += (target - status) / target;
                         hasUserAction = true;
                     } else if (status === 'N') {
                         totalMiss += 1;
@@ -122,16 +119,11 @@
                     hasUserAction = true;
                 } else if (status === 'N_auto') {
                     totalForce += 1;
-                } else if (status === 'W' || status === 'V') {
-                    // הצלחה
-                    totalDone += 1;
-                    hasUserAction = true;
                 } else if (typeof status === 'number') {
-                    totalDone += status / target;
-                    totalMiss += (target - status) / target;
+                    totalDone += Math.min(status / target, 1);
+                    if (status < target) totalMiss += (target - status) / target;
                     hasUserAction = true;
                 } else if (status === 'N') {
-                    // פספוס
                     totalMiss += 1;
                     hasUserAction = true;
                 }
@@ -427,7 +419,7 @@
         function isHabitSignedToday(habit) {
             const currentMonthHistory = peekMonthHistory(habit, actualCurrentMonthKey);
             const todayStatus = currentMonthHistory[currentHebrewDayIndex];
-            return todayStatus === 'W' || todayStatus === 'V' || todayStatus === 'N' || todayStatus === 'Z' || typeof todayStatus === 'number';
+            return todayStatus === 'N' || todayStatus === 'Z' || typeof todayStatus === 'number';
         }
 
         let _lastBookmarkBarState = null;
