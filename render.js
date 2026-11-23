@@ -91,7 +91,7 @@
                     <div style="display:flex; align-items:center; justify-content:space-between; width:100%;">
                         <button class="btn-card-menu" onclick="toggleCardMenu('${esc(habit.id)}', event)" style="position:static; margin:0;">⋮</button>
                         <span class="btn-drag-handle" title="גרור לסידור מחדש" style="flex:1; text-align:center;">⠿⠿</span>
-                        <span class="habit-stats-summary" style="margin:0;">${weeklyScoreHTML}חודשי: <span style="color: ${getScoreColor(mStats.pct, habit, mStats.text)}; padding: 1px 6px; border-radius: 4px; font-weight: 700;">${esc(mStats.text)}</span></span>
+                        <span class="habit-stats-summary" style="margin-right:8px;">${weeklyScoreHTML}חודשי: <span style="color: ${getScoreColor(mStats.pct, habit, mStats.text)}; padding: 1px 6px; border-radius: 4px; font-weight: 700;">${esc(mStats.text)}</span></span>
                     </div>
                     <div style="width:100%; margin-top:4px;">
                         <span class="habit-title" data-habit-title style="display:block; width:100%;"></span>
