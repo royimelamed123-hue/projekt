@@ -478,7 +478,11 @@
                     } else if (currentStatus === "N") {
                         nextStatus = 1;
                     } else if (typeof currentStatus === 'number') {
-                        nextStatus = currentStatus + 1 <= wTarget ? currentStatus + 1 : "";
+                        if (currentStatus >= wTarget) {
+                            nextStatus = ""; // כבר הצלחה — לחיצה נוספת מאפסת
+                        } else {
+                            nextStatus = currentStatus + 1;
+                        }
                     }
                 }
                 monthHistory[dayIndex] = nextStatus;

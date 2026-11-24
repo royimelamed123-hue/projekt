@@ -92,45 +92,11 @@
                                 let currentStatus = habit.history[monthKey][i];
                                 let cellDayOfWeek = (startDayOfWeek + i) % 7;
                                 let newTarget = weeklyDayTargets[cellDayOfWeek];
-                                if (typeof currentStatus === 'number') {
-                                    if (currentStatus >= newTarget) {
-                                        habit.history[monthKey][i] = newTarget;
-                                    }
-                                } else if (currentStatus === 'V' || currentStatus === 'W') {
-                                    if (newTarget > 1) {
-                                        // שחזר כמות מהtarget הישן
-                                        const oldTarget = (habitSnapshot.weeklyDayTargets && habitSnapshot.weeklyDayTargets[cellDayOfWeek]) || 1;
-                                        if (oldTarget >= newTarget) {
-                                            // הכמות הישנה >= target חדש → הצלחה
-                                            habit.history[monthKey][i] = 'W';
-                                        } else {
-                                            // הכמות הישנה < target חדש → הצג כמה חסר
-                                            habit.history[monthKey][i] = oldTarget;
-                                        }
-                                    }
-                                }
+                                // שומרים את המספר כמו שהוא — התצוגה תחשב הצלחה/חסר לפי target
                             }
                         }
                     }
-                    if (habit.type === 'weekly' && habit.history) {
-                        for (let monthKey in habit.history) {
-                            if (!Array.isArray(habit.history[monthKey])) continue;
-                            let startDayOfWeek = 0;
-                            try {
-                                startDayOfWeek = getGregorianStartForMonthKey(monthKey).getDay();
-                            } catch(e) { startDayOfWeek = new Date().getDay(); }
-                            for (let i = 0; i < habit.history[monthKey].length; i++) {
-                                let currentStatus = habit.history[monthKey][i];
-                                if (typeof currentStatus === 'number') {
-                                    let cellDayOfWeek = (startDayOfWeek + i) % 7;
-                                    let newTarget = weeklyDayTargets[cellDayOfWeek];
-                                    if (currentStatus >= newTarget) {
-                                        habit.history[monthKey][i] = 'W';
-                                    }
-                                }
-                            }
-                        }
-                    }
+
                     for (let monthKey in habit.history) {
                         applyAutomaticOffDaysForMonth(habit, monthKey, isTypeChanged ? null : oldWorkdays);
                     }
