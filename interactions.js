@@ -349,19 +349,14 @@
                     let isNActive = false;
                     let isNHarmful = false;
 
-                    if (dayTarget > 1) {
-                        if (todayStatus === 'W') {
-                            wText = "הצלחה";
-                            wStyle = getStatusProgressStyle(100);
-                            isWActive = true;
-                        } else if (typeof todayStatus === 'number') {
-                            const rem = dayTarget - todayStatus;
-                            wText = rem > 0 ? `${rem}` : "הצלחה";
-                            const pct = Math.round((todayStatus / dayTarget) * 100);
-                            wStyle = getStatusProgressStyle(pct);
-                        }
+                    const doneSoFarA = typeof todayStatus === 'number' ? todayStatus : 0;
+                    isWActive = doneSoFarA >= dayTarget;
+                    if (isWActive) {
+                        wText = "הצלחה"; wStyle = getStatusProgressStyle(100);
+                    } else if (doneSoFarA > 0) {
+                        wText = `${dayTarget - doneSoFarA}`; wStyle = getStatusProgressStyle(Math.round((doneSoFarA / dayTarget) * 100));
                     } else {
-                        isWActive = (todayStatus === 'W');
+                        wText = dayTarget === 1 ? "הצלחה" : `${dayTarget}`; wStyle = "";
                     }
 
                     const isZActive = (todayStatus === 'Z');

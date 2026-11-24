@@ -277,10 +277,12 @@
                 const target = getTargetForDay(habit, cellDayOfWeek);
 
                 if (typeof status === 'number') {
-                    const pct = Math.round((status / target) * 100);
-                    dayBtn.style.cssText = `${dayBtn.style.cssText}; ${getStatusProgressStyle(pct)}`;
-                } else if (status === 'W' || status === 'V') {
-                    dayBtn.style.background = '#bbf7d0'; dayBtn.style.color = '#166534';
+                    if (status >= target) {
+                        dayBtn.style.background = '#bbf7d0'; dayBtn.style.color = '#166534';
+                    } else {
+                        const pct = Math.round((status / target) * 100);
+                        dayBtn.style.cssText = `${dayBtn.style.cssText}; ${getStatusProgressStyle(pct)}`;
+                    }
                 } else if (status === 'N') {
                     dayBtn.style.background = '#fecaca'; dayBtn.style.color = '#991b1b';
                 } else if (status === 'Z') {
@@ -497,9 +499,10 @@
             } else if (currentStatus === "Z") {
                 nextStatus = "N";
             } else if (currentStatus === "N") {
-                nextStatus = "W";
-            } else if (currentStatus === "V" || currentStatus === "W") {
-                nextStatus = "";
+                nextStatus = 1;
+            } else if (typeof currentStatus === 'number') {
+                const t2 = (habit && habit.weeklyDayTargets && habit.weeklyDayTargets[cellDayOfWeek]) || 1;
+                nextStatus = currentStatus >= t2 ? "" : currentStatus + 1;
             }
             
             monthHistory[dayIndex] = nextStatus;
@@ -683,12 +686,11 @@
                 const isEmpty = (status === "" || status === undefined);
 
                 if (!isActive) {
-                    if (status === 'W') {
-                        // הצלחה ביום לא פעיל — נספור כהצלחה, לא כאונס
+                    if (typeof status === 'number' && status >= target) {
+                        // הצלחה ביום לא פעיל
                         totalDone += 1;
                         hasUserAction = true;
                     } else {
-                        // אונס (אוטומטי או ידני) — מוריד מה-7
                         totalForce += 1;
                     }
                     continue;
