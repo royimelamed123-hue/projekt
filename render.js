@@ -284,8 +284,8 @@
                 const wTarget = (habit.weeklyDayTargets && habit.weeklyDayTargets[currentDayOfWeek]) || 1;
                 const firstDayDate2 = getFirstHebrewDayDate(mainScreenDatePointer);
                 const isNHarmful2 = isWeeklyNHarmful(habit, actualCurrentMonthKey, currentHebrewDayIndex, firstDayDate2.getDay(), firstDayDate2, calculateDaysInBrowsingMonth(mainScreenDatePointer));
-                if (typeof todayStatus === 'number') { todayV += todayStatus / wTarget; todayActive += 1; }
-                else if (todayStatus === 'Z' && isNHarmful2) { todayActive += 1; }
+                if (typeof todayStatus === 'number') { todayV += Math.min(todayStatus / wTarget, 1); todayActive += 1; }
+                else if (todayStatus === 'N') { todayActive += 1; }
             });
 
             document.getElementById('statTotalHabits').innerText = activeHabitsList.length;
@@ -378,8 +378,8 @@
 
                 const { card: wCard, wTarget, isNHarmful } = createWeeklyHabitCard(habit, todayStatus, mStats, currentDayTextVal);
                 card = wCard;
-                if (typeof todayStatus === 'number') { todayV += todayStatus / wTarget; todayActive += 1; }
-                else if (todayStatus === 'Z' && isNHarmful) { todayActive += 1; }
+                if (typeof todayStatus === 'number') { todayV += Math.min(todayStatus / wTarget, 1); todayActive += 1; }
+                else if (todayStatus === 'N') { todayActive += 1; }
 
                 if (isVisibleInSearch) { grid.appendChild(card); attachDragHandle(card, habit.id); }
             });
