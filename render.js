@@ -142,7 +142,6 @@
 
             const isZActive = (todayStatus === 'Z');
             const isNActive = (todayStatus === 'N');
-            const isNAuto = (todayStatus === 'N_auto');
             const isNHarmful = isWeeklyNHarmful(habit, actualCurrentMonthKey, currentHebrewDayIndex, firstDayDate.getDay(), firstDayGregorian, totalDaysInMonth);
             const isTodayActive = habit.workdays && habit.workdays[currentDayOfWeek];
 
@@ -223,7 +222,7 @@
                 const isNHarmful = isWeeklyNHarmful(habit, actualCurrentMonthKey, currentHebrewDayIndex, firstDayDate.getDay(), firstDayDate, calculateDaysInBrowsingMonth(mainScreenDatePointer));
                 const isZActive2 = (todayStatus === 'Z');
                 const isNActive = (todayStatus === 'N');
-                const isNAuto = (todayStatus === 'N_auto');
+
                 const doneSoFar2 = typeof todayStatus === 'number' ? todayStatus : 0;
                 const isWActive = doneSoFar2 >= wTarget;
                 let wText, wStyle;
@@ -238,7 +237,7 @@
                 const btnSkipN = card.querySelector('.btn-w-skip');
                 const btnDone = card.querySelector('.btn-w-done');
                 if (btnSkipZ) { btnSkipZ.classList.toggle('active', isZActive2); }
-                if (btnSkipN) { btnSkipN.classList.toggle('active', isNActive); btnSkipN.classList.toggle('harmful', isNHarmful); btnSkipN.classList.toggle('n-auto', isNAuto); }
+                if (btnSkipN) { btnSkipN.classList.toggle('active', isNActive); btnSkipN.classList.toggle('harmful', isNHarmful); }
                 if (btnDone) { btnDone.classList.toggle('active', isWActive); btnDone.style.cssText = wStyle; btnDone.querySelector('span').textContent = wText; }
 
             } else {

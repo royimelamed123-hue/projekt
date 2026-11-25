@@ -62,8 +62,6 @@
                     if (status === 'Z') {
                         totalForce += 1;
                         hasUserAction = true;
-                    } else if (status === 'N_auto') {
-                        totalForce += 1;
                     } else if (typeof status === 'number') {
                         totalDone += Math.min(status / target, 1);
                         if (status < target) totalMiss += (target - status) / target;
@@ -117,8 +115,6 @@
                     // אונס
                     totalForce += 1;
                     hasUserAction = true;
-                } else if (status === 'N_auto') {
-                    totalForce += 1;
                 } else if (typeof status === 'number') {
                     totalDone += Math.min(status / target, 1);
                     if (status < target) totalMiss += (target - status) / target;
