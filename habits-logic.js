@@ -587,26 +587,21 @@
                 const target = (dayTargets && dayTargets[dow]) || 1;
                 const isEmpty = (status === "" || status === undefined);
 
-                // יום לא פעיל — נכנס לחישוב רק אם יש לו נתון מספרי
-                if (!isActive) {
-                    if (typeof status === 'number') {
-                        activeDays++;
-                        doneScore += Math.min(status / target, 1);
-                        anyActionTaken = true;
-                    }
+                // הציון נקבע לפי הסטטוס בלבד, לא לפי האם היום פעיל
+                if (isEmpty) {
+                    if (isActive) remainingActive++;
                     continue;
                 }
 
-                if (!isEmpty) {
+                if (status === 'Z') {
+                    anyActionTaken = true;
+                } else if (typeof status === 'number') {
                     activeDays++;
-                    if (typeof status === 'number') {
-                        doneScore += Math.min(status / target, 1);
-                        anyActionTaken = true;
-                    } else if (status === 'Z' || status === 'N') {
-                        anyActionTaken = true;
-                    }
-                } else {
-                    remainingActive++;
+                    doneScore += Math.min(status / target, 1);
+                    anyActionTaken = true;
+                } else if (status === 'N') {
+                    activeDays++;
+                    anyActionTaken = true;
                 }
             }
 
@@ -628,17 +623,13 @@
                 const target = (dayTargets && dayTargets[dow]) || 1;
                 const isEmpty = (status === "" || status === undefined);
 
-                // יום לא פעיל — נכנס רק אם יש נתון מספרי
-                if (!isActive) {
-                    if (typeof status === 'number') doneScore += Math.min(status / target, 1);
+                // הציון נקבע לפי הסטטוס בלבד
+                if (isEmpty) {
+                    if (isActive) openPotential++;
                     continue;
                 }
 
-                if (!isEmpty) {
-                    if (typeof status === 'number') doneScore += Math.min(status / target, 1);
-                } else {
-                    openPotential++;
-                }
+                if (typeof status === 'number') doneScore += Math.min(status / target, 1);
             }
 
             return (doneScore + openPotential) < freq;
@@ -706,25 +697,8 @@
                 const target = (dayTargets && dayTargets[dow]) || 1;
                 const isEmpty = (status === "" || status === undefined);
 
-                if (!isActive) {
-                    if (typeof status === 'number') {
-                        // יום לא פעיל עם ספירה — נכנס לחישוב כמו יום פעיל (חלקי או מלא)
-                        totalDone += Math.min(status / target, 1);
-                        if (status < target) totalMiss += (target - status) / target;
-                        inactiveWithData += 1;
-                        hasUserAction = true;
-                    } else {
-                        // Z או ריק ביום לא פעיל — אונס, לא נספר
-                        totalForce += 1;
-                    }
-                    continue;
-                }
-
-                // יום פעיל
-                if (isEmpty) {
-                    // ריק — לא נכנס לחישוב כלל
-                    continue;
-                }
+                // הציון נקבע לפי הסטטוס בלבד, לא לפי האם היום פעיל
+                if (isEmpty) continue;
 
                 if (status === 'Z') {
                     totalForce += 1;
