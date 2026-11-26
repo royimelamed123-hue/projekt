@@ -692,11 +692,13 @@
                 const isEmpty = (status === "" || status === undefined);
 
                 if (!isActive) {
-                    if (typeof status === 'number' && status >= target) {
-                        // הצלחה ביום לא פעיל
-                        totalDone += 1;
+                    if (typeof status === 'number') {
+                        // יום לא פעיל עם ספירה — נכנס לחישוב כמו יום פעיל (חלקי או מלא)
+                        totalDone += Math.min(status / target, 1);
+                        if (status < target) totalMiss += (target - status) / target;
                         hasUserAction = true;
                     } else {
+                        // Z או ריק ביום לא פעיל — אונס, לא נספר
                         totalForce += 1;
                     }
                     continue;
