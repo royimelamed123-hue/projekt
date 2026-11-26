@@ -23,12 +23,12 @@
                 if (configSelectedWeekdays[i]) {
                     btn.classList.add('active');
                     if (targetBox) { targetBox.style.opacity = '1'; targetBox.style.pointerEvents = 'auto'; }
-                    if (weeklyTargetBox) { weeklyTargetBox.style.opacity = '1'; weeklyTargetBox.style.pointerEvents = 'auto'; }
                 } else {
                     btn.classList.remove('active');
                     if (targetBox) { targetBox.style.opacity = '0.4'; targetBox.style.pointerEvents = 'none'; }
-                    if (weeklyTargetBox) { weeklyTargetBox.style.opacity = '0.4'; weeklyTargetBox.style.pointerEvents = 'none'; }
                 }
+                // weeklyTargetBox תמיד פעיל — יום לא פעיל עדיין צריך target
+                if (weeklyTargetBox) { weeklyTargetBox.style.opacity = '1'; weeklyTargetBox.style.pointerEvents = 'auto'; }
             }
         }
 
@@ -220,3 +220,4 @@
                 saveToStorage();
             });
         }
+
