@@ -582,11 +582,20 @@
             for (const dayGregorian of dates) {
                 const dow = dayGregorian.getDay();
                 const isActive = habit.workdays && habit.workdays[dow];
-                if (!isActive) continue;
 
                 const status = getHabitStatusForGregorianDate(habit, dayGregorian);
                 const target = (dayTargets && dayTargets[dow]) || 1;
                 const isEmpty = (status === "" || status === undefined);
+
+                // יום לא פעיל — נכנס לחישוב רק אם יש לו נתון מספרי
+                if (!isActive) {
+                    if (typeof status === 'number') {
+                        activeDays++;
+                        doneScore += Math.min(status / target, 1);
+                        anyActionTaken = true;
+                    }
+                    continue;
+                }
 
                 if (!isEmpty) {
                     activeDays++;
@@ -614,11 +623,16 @@
             for (const d of dates) {
                 const dow = d.getDay();
                 const isActive = habit.workdays && habit.workdays[dow];
-                if (!isActive) continue;
 
                 const status = getHabitStatusForGregorianDate(habit, d);
                 const target = (dayTargets && dayTargets[dow]) || 1;
                 const isEmpty = (status === "" || status === undefined);
+
+                // יום לא פעיל — נכנס רק אם יש נתון מספרי
+                if (!isActive) {
+                    if (typeof status === 'number') doneScore += Math.min(status / target, 1);
+                    continue;
+                }
 
                 if (!isEmpty) {
                     if (typeof status === 'number') doneScore += Math.min(status / target, 1);
@@ -679,9 +693,10 @@
             const dayTargets = habit.weeklyDayTargets;
             const days = Array.from({ length: 7 }, (_, i) => addDays(sundayGregorian, i));
 
-            let totalDone = 0;   // סכום הצלחה (כולל חלקי)
-            let totalMiss = 0;   // סכום פספוס (כולל חלקי)
-            let totalForce = 0;  // ימי אונס (Z)
+            let totalDone = 0;         // סכום הצלחה (כולל חלקי)
+            let totalMiss = 0;         // סכום פספוס (כולל חלקי)
+            let totalForce = 0;        // ימי אונס (Z)
+            let inactiveWithData = 0;  // ימי לא פעיל עם ספירה (נכנסים למכנה)
             let hasUserAction = false;
 
             for (const day of days) {
@@ -696,6 +711,7 @@
                         // יום לא פעיל עם ספירה — נכנס לחישוב כמו יום פעיל (חלקי או מלא)
                         totalDone += Math.min(status / target, 1);
                         if (status < target) totalMiss += (target - status) / target;
+                        inactiveWithData += 1;
                         hasUserAction = true;
                     } else {
                         // Z או ריק ביום לא פעיל — אונס, לא נספר
@@ -728,6 +744,7 @@
             // אם אין הצלחות ופספוסים (רק אונס) — כולו Z
             if (totalDone === 0 && totalMiss === 0) return { pct: null, text: "-", isAllForce: true };
 
+            // activeDays = כל הימים שנכנסו לחישוב (פעילים + לא פעילים עם נתון), ללא אונס
             const activeDays = 7 - totalForce;
             if (activeDays <= 0) return { pct: null, text: "-" };
 
