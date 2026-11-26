@@ -90,7 +90,7 @@
                 <div class="habit-header">
                     <div style="display:flex; align-items:center; justify-content:space-between; width:100%;">
                         <button class="btn-card-menu" onclick="toggleCardMenu('${esc(habit.id)}', event)" style="position:static; margin:0;">⋮</button>
-                        <span class="btn-drag-handle" title="גרור לסידור מחדש" style="flex:1; text-align:center; padding-right:24px;">⠿⠿</span>
+                        <span class="btn-drag-handle" title="גרור לסידור מחדש" style="flex:1; text-align:center; padding-left:24px;">⠿⠿</span>
                         <span class="habit-stats-summary" style="margin-right:8px;">${weeklyScoreHTML}חודשי: <span style="color: ${getScoreColor(mStats.pct, habit, mStats.text)}; padding: 1px 6px; border-radius: 4px; font-weight: 700;">${esc(mStats.text)}</span></span>
                     </div>
                     <div style="width:100%; margin-top:4px;">
