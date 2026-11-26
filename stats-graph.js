@@ -39,7 +39,7 @@
                 const isMiss = status === 'N';
                 const isSkip = status === 'Z';
 
-                if (!isActive || isSkip || status === "" || status === undefined) {
+                if (isSkip || status === "" || status === undefined) {
                     points.push({ day: i + 1, level, type: 'unchanged' });
                 } else if (isDone) {
                     level += 1;
@@ -296,4 +296,5 @@
                 rows.forEach(r => renderRow(r.label, r.pct, minPct, maxPct));
             }
         }
+
 
