@@ -52,6 +52,7 @@
                 let totalDone = 0;
                 let totalMiss = 0;
                 let totalForce = 0;
+                let totalEmpty = 0;
                 let hasUserAction = false;
 
                 for (let i = 0; i < totalDaysInMonth; i++) {
@@ -59,7 +60,9 @@
                     const cellDayOfWeek = (startDayOfWeek + i) % 7;
                     const target = getTargetForDay(habit, cellDayOfWeek);
 
-                    if (status === 'Z') {
+                    if (status === '' || status === undefined || status === null) {
+                        totalEmpty += 1;
+                    } else if (status === 'Z') {
                         totalForce += 1;
                         hasUserAction = true;
                     } else if (typeof status === 'number') {
@@ -70,13 +73,12 @@
                         totalMiss += 1;
                         hasUserAction = true;
                     }
-                    // ריק — לא נכנס לחישוב
                 }
 
                 if (!hasUserAction) return { pct: null, text: "-" };
                 if (totalDone === 0 && totalMiss === 0) return { pct: null, text: "-" };
 
-                const daysMinusForce = totalDaysInMonth - totalForce;
+                const daysMinusForce = totalDaysInMonth - totalForce - totalEmpty;
                 if (daysMinusForce <= 0) return { pct: null, text: "-" };
 
                 let pct;
@@ -102,16 +104,18 @@
 
             let totalDone = 0;   // סכום בוצע (כולל חלקי)
             let totalMiss = 0;   // סכום פספוס (כולל חלקי)
-            let totalForce = 0;  // סכום אונס (ימי A)
-            let hasUserAction = false; // האם המשתמש הזין משהו (לא רק אוטו-אונס)
+            let totalForce = 0;  // סכום אונס (Z)
+            let totalEmpty = 0;  // ימים ריקים (לא נכנסים לחישוב ולא למכנה)
+            let hasUserAction = false;
 
             for(let i = 0; i < totalDaysInMonth; i++) {
                 const status = history[i];
                 const cellDayOfWeek = (startDayOfWeek + i) % 7;
-                const isActiveDay = habit.workdays ? habit.workdays[cellDayOfWeek] : true;
                 const target = getTargetForDay(habit, cellDayOfWeek);
 
-                if (status === 'Z') {
+                if (status === '' || status === undefined || status === null) {
+                    totalEmpty += 1;
+                } else if (status === 'Z') {
                     totalForce += 1;
                     hasUserAction = true;
                 } else if (typeof status === 'number') {
@@ -122,16 +126,13 @@
                     totalMiss += 1;
                     hasUserAction = true;
                 }
-                // ריק — לא נכנס לחישוב
             }
 
-            // אם אין שום פעולת משתמש — ציון ריק
             if (!hasUserAction) return { pct: null, text: "-" };
-
-            // אם אין הצלחות ופספוסים (רק אונס) — ציון ריק
             if (totalDone === 0 && totalMiss === 0) return { pct: null, text: "-" };
 
-            const daysMinusForce = totalDaysInMonth - totalForce;
+            // המכנה = ימים עם סטטוס (ללא ריקים וללא אונס)
+            const daysMinusForce = totalDaysInMonth - totalForce - totalEmpty;
             if (daysMinusForce <= 0) return { pct: null, text: "-" };
 
             let pct;
