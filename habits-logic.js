@@ -105,7 +105,13 @@
                 } else if (statusType === 'Z') {
                     monthHistory[currentHebrewDayIndex] = (currentStatus === 'Z') ? "" : 'Z';
                 } else if (statusType === 'N') {
-                    monthHistory[currentHebrewDayIndex] = (currentStatus === 'N') ? "" : 'N';
+                    const isActiveDay = habit.workdays && habit.workdays[currentDayOfWeek];
+                    if (!isActiveDay) {
+                        // ביום לא פעיל — פספוס הופך לאונס
+                        monthHistory[currentHebrewDayIndex] = (currentStatus === 'Z') ? "" : 'Z';
+                    } else {
+                        monthHistory[currentHebrewDayIndex] = (currentStatus === 'N') ? "" : 'N';
+                    }
                 }
                 invalidateStatsCache(habitId);
                 saveToStorageForHabit(habitId);
