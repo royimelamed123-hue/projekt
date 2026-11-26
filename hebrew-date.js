@@ -262,7 +262,11 @@
                 }
 
                 if (!isNowActive) {
-                    habit.history[monthKey][i] = offValue;
+                    // כותב אונס רק אם התא ריק — לא דורס נתונים קיימים
+                    const existing = habit.history[monthKey][i];
+                    if (existing === "" || existing === undefined) {
+                        habit.history[monthKey][i] = offValue;
+                    }
                 } else {
                     if (habit.history[monthKey][i] === offValue) {
                         habit.history[monthKey][i] = "";
