@@ -465,11 +465,17 @@
 
                 const curNum = typeof currentStatus === 'number' ? currentStatus : 0;
                 if (!isActiveDow) {
-                    // יום לא פעיל: אונס ↔ הצלחה (target)
-                    if (curNum >= wTarget) {
-                        nextStatus = 'Z';
+                    // יום לא פעיל: Z → 1 → 2 → ... → target (הצלחה) → Z
+                    if (currentStatus === 'Z' || currentStatus === '' || currentStatus === undefined) {
+                        nextStatus = 1;
+                    } else if (typeof currentStatus === 'number') {
+                        if (currentStatus >= wTarget) {
+                            nextStatus = 'Z';
+                        } else {
+                            nextStatus = currentStatus + 1;
+                        }
                     } else {
-                        nextStatus = wTarget;
+                        nextStatus = 'Z';
                     }
                 } else {
                     // יום פעיל: ריק → Z → N → 1 → 2 → ... → target → ריק
@@ -767,3 +773,4 @@
         function getScoreBgColor(pct, habit) {
             return '';
         }
+
