@@ -112,7 +112,6 @@
                 const target = getTargetForDay(habit, cellDayOfWeek);
 
                 if (status === 'Z') {
-                    // אונס
                     totalForce += 1;
                     hasUserAction = true;
                 } else if (typeof status === 'number') {
@@ -1046,4 +1045,5 @@
             content.innerHTML = html;
         }
         // ---- סיום מודל ממוצע הרגלים ספציפיים ----
+
 
