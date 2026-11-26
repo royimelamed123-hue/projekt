@@ -207,6 +207,25 @@
             }
         }
 
+        function migrateInactiveDayNtoZ(habit) {
+            if (!habit || !habit.history || !habit.workdays) return;
+            for (const monthKey in habit.history) {
+                const arr = habit.history[monthKey];
+                if (!Array.isArray(arr)) continue;
+                const firstDay = getGregorianStartForMonthKey(monthKey);
+                if (!firstDay) continue;
+                const startDayOfWeek = firstDay.getDay();
+                for (let i = 0; i < arr.length; i++) {
+                    if (arr[i] === 'N') {
+                        const cellDayOfWeek = (startDayOfWeek + i) % 7;
+                        if (!habit.workdays[cellDayOfWeek]) {
+                            arr[i] = 'Z';
+                        }
+                    }
+                }
+            }
+        }
+
         function migrateAllHabits(list) {
             if (!Array.isArray(list)) return;
             list.forEach(migrateHabitToAllowedSkips);
@@ -215,6 +234,7 @@
             list.forEach(migrateMonthlyToWeekly);
             list.forEach(migrateDailyToWeekly);
             list.forEach(migrateWToNumber);
+            list.forEach(migrateInactiveDayNtoZ);
         }
         // ---- סיום מיגרציה ----
 
