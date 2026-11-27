@@ -178,6 +178,7 @@
                 invalidateStatsCache(id);
                 habits = habits.filter(h => h.id !== id);
                 saveToStorage();
+                if (typeof updateArchiveButtonCount === 'function') updateArchiveButtonCount();
             });
         }
 
