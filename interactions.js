@@ -264,6 +264,15 @@
             pushUndoAction({ type: 'archive', habitId: id, previousArchived: habit.archived });
             habit.archived = !habit.archived;
             saveToStorage();
+            updateArchiveButtonCount();
+        }
+
+        function updateArchiveButtonCount() {
+            const btn = document.getElementById('btnShowArchive');
+            if (!btn) return;
+            const archivedCount = habits.filter(h => h.archived).length;
+            const countSuffix = archivedCount ? ` (${archivedCount})` : '';
+            btn.innerText = archiveViewOpen ? `סגור ארכיון${countSuffix}` : `פתח ארכיון${countSuffix}`;
         }
 
         function toggleArchiveView() {
