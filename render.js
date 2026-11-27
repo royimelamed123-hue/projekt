@@ -442,16 +442,13 @@
                 weeklyScoreCard.style.display = '';
                 const firstDayDate = getFirstHebrewDayDate(browsingDatePointer);
                 const totalDaysInMonth = calculateDaysInBrowsingMonth(browsingDatePointer);
-                // תמיד מציג ציון לשבוע האמיתי (היום), לא לחודש הנצפה
-                const currentFirstDayDate = getFirstHebrewDayDate(mainScreenDatePointer);
-                const currentTotalDays = calculateDaysInBrowsingMonth(mainScreenDatePointer);
                 const weekText = calculateWeeklyPctForCurrentWeek(
                     habit,
-                    actualCurrentMonthKey,
+                    targetMonthComps.key,
                     currentHebrewDayIndex,
-                    currentFirstDayDate.getDay(),
-                    currentFirstDayDate,
-                    currentTotalDays
+                    firstDayDate.getDay(),
+                    firstDayDate,
+                    totalDaysInMonth
                 );
                 const weekPct = parseInt(weekText, 10);
                 browsingWeekEl.innerText = weekText;
